@@ -34,3 +34,4 @@ themeConfig.mjs
 
 .vercel
 .claude
+public/data/postData.json

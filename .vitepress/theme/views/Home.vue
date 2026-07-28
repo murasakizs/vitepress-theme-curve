@@ -35,6 +35,7 @@ import { mainStore } from "@/store";
 import { useDesktopAside } from "@/utils/useDesktopAside.mjs";
 import { usePostData } from "@/utils/usePostData.mjs";
 
+const route = useRoute();
 const { theme } = useData();
 const { isDesktopAsideVisible } = useDesktopAside();
 const { postData: allPosts, tagsData, categoriesData, loadPostData } = usePostData();
@@ -67,6 +68,9 @@ const props = defineProps({
 // 每页文章数
 const postSize = theme.value.postSize;
 
+// 当前页数（分类 / 标签页使用 query 参数控制，需要手动保持响应式）
+const currentPage = ref(props.page || 1);
+
 // 列表总数量
 const allListTotal = computed(() => {
   const data = props.showCategories
@@ -81,19 +85,24 @@ const allListTotal = computed(() => {
 // 获得当前页数
 const getCurrentPage = () => {
   if (props.showCategories || props.showTags) {
-    if (typeof window === "undefined") return 0;
-    const params = new URLSearchParams(window.location.search);
-    const page = params.get("page");
-    if (!page) return 0;
-    const currentPage = Number(page);
-    return currentPage ? currentPage - 1 : 0;
+    if (typeof window === "undefined") return 1;
+    const routePath = route.path;
+    const search = routePath.includes("?") ? routePath.split("?")[1] : window.location.search;
+    const params = new URLSearchParams(search);
+    const page = Number(params.get("page"));
+    return Number.isInteger(page) && page > 0 ? page : 1;
   }
-  return props.page ? props.page - 1 : 0;
+  return props.page || 1;
+};
+
+// 更新当前页数
+const updateCurrentPage = () => {
+  currentPage.value = getCurrentPage();
 };
 
 // 根据页数计算列表数据
 const postData = computed(() => {
-  const page = getCurrentPage();
+  const page = currentPage.value - 1;
   console.log("当前页数：", page);
   let data = null;
   // 分类数据
@@ -113,7 +122,15 @@ const postData = computed(() => {
 });
 
 onMounted(() => {
+  updateCurrentPage();
   loadPostData();
+  window.addEventListener("popstate", updateCurrentPage);
+  window.addEventListener("pagination-change", updateCurrentPage);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("popstate", updateCurrentPage);
+  window.removeEventListener("pagination-change", updateCurrentPage);
 });
 
 // 恢复滚动位置
@@ -133,6 +150,16 @@ const restoreScrollY = (val) => {
 };
 
 // 监听加载结束
+watch(
+  () => route.path,
+  () => updateCurrentPage(),
+);
+
+watch(
+  () => props.page,
+  () => updateCurrentPage(),
+);
+
 watch(
   () => store.loadingStatus,
   (val) => restoreScrollY(val),

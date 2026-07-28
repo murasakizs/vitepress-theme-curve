@@ -135,6 +135,7 @@ const validateInput = () => {
 
 // 跳转页面
 const jumpPage = (url, page) => {
+  currentPage.value = page;
   // 使用参数跳转
   if (props.useParams) {
     if (page === 1) {
@@ -142,6 +143,9 @@ const jumpPage = (url, page) => {
     } else {
       router.go(`${props.routePath}?page=${page}`);
     }
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("pagination-change"));
+    });
   }
   // 正常跳转
   else {
@@ -161,16 +165,28 @@ const fastJump = () => {
 
 // 检查当前路径参数
 const checkCurrentPage = () => {
-  const params = new URLSearchParams(window.location.search);
-  const page = params.get("page");
-  if (page && props.useParams) {
-    currentPage.value = Number(page);
+  if (!props.useParams) {
+    currentPage.value = props.page;
+    return;
   }
+  const params = new URLSearchParams(window.location.search);
+  const page = Number(params.get("page"));
+  currentPage.value = Number.isInteger(page) && page > 0 ? page : 1;
 };
 
 onMounted(() => {
   checkCurrentPage();
+  window.addEventListener("popstate", checkCurrentPage);
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener("popstate", checkCurrentPage);
+});
+
+watch(
+  () => props.page,
+  () => checkCurrentPage(),
+);
 </script>
 
 <style lang="scss" scoped>

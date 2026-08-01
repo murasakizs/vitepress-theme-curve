@@ -74,7 +74,7 @@ const text = computed(() => {
 
   if (props.mode === "days-since") {
     const diff = now.diff(target, "day", true);
-    return diff >= 0 ? String(Math.floor(diff)) : "0";
+    return diff >= 0 ? String(Math.floor(diff) + 1) : "0";
   }
 
   if (props.mode === "days-until") {

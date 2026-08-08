@@ -59,9 +59,11 @@ const props = defineProps({
 // 存储一言数据和状态
 const hitokotoData = ref({ hitokoto: '', from: '', from_who: '' });
 const isHitokotoDisplayed = ref(false);
+const isManualSloganDisplayed = ref(false);
 
 // 自动轮询相关
 const hitokotoInitialTimeout = ref(null);
+const manualSloganTimeout = ref(null);
 const autoSwitchInterval = ref(null);
 const autoSwitchActive = ref(false);
 
@@ -70,27 +72,35 @@ const disableAuto = ref(false);
 
 // 默认标语
 const defaultSlogan = theme.value.siteMeta.description;
+const manualSlogan = '所以，回去吧，回到我们，所有「奇迹」开始的地方';
 
 // 计算展示的文字：若当前为“一言”状态则显示一言，否则显示默认标语
 const displayText = computed(() =>
   isHitokotoDisplayed.value && hitokotoData.value.hitokoto
     ? hitokotoData.value.hitokoto
-    : defaultSlogan
+    : isManualSloganDisplayed.value
+      ? manualSlogan
+      : defaultSlogan
 );
 
 // 点击处理：
-// 1. 若当前仍在自动模式，第一次点击会停止自动、显示默认标语
-// 2. 之后的点击均为手动获取新一言
+// 每次人工点击都会暂停自动轮播；最后一次点击 3 秒后恢复。
 async function toggleHitokoto() {
-  if (!disableAuto.value && autoSwitchActive.value) {
-    // 第一次点击：关闭自动、显示默认
-    pauseHitokotoCycle();
-    disableAuto.value = true;
+  const isFirstManualInteraction = !disableAuto.value;
+
+  pauseHitokotoCycle();
+  disableAuto.value = true;
+
+  if (isFirstManualInteraction) {
+    // 首次人工介入时显示手动标语。
     isHitokotoDisplayed.value = false;
-    return;
+    isManualSloganDisplayed.value = true;
+  } else {
+    // 后续点击仍可手动获取新一言。
+    await fetchAndShowHitokoto();
   }
-  // 手动获取并显示一言
-  await fetchAndShowHitokoto();
+
+  manualSloganTimeout.value = setTimeout(resumeHitokotoCycle, 3000);
 }
 
 // 真正执行一次请求并显示结果
@@ -103,6 +113,7 @@ async function fetchAndShowHitokoto() {
       from_who: result.from_who
     };
     isHitokotoDisplayed.value = true;
+    isManualSloganDisplayed.value = false;
   } catch (err) {
     console.error('一言获取失败：', err);
   }
@@ -123,8 +134,27 @@ function startHitokotoCycle() {
   }, 4000);
 }
 
+// 手动标语停留 3 秒后，恢复正常的一言轮播。
+async function resumeHitokotoCycle() {
+  manualSloganTimeout.value = null;
+  disableAuto.value = false;
+  await fetchAndShowHitokoto();
+  if (!disableAuto.value && !autoSwitchInterval.value) {
+    autoSwitchInterval.value = setInterval(autoToggleHitokoto, 7000);
+    autoSwitchActive.value = true;
+  }
+}
+
+function clearManualSloganTimeout() {
+  if (manualSloganTimeout.value) {
+    clearTimeout(manualSloganTimeout.value);
+    manualSloganTimeout.value = null;
+  }
+}
+
 // 暂停所有定时/请求
 function pauseHitokotoCycle() {
+  clearManualSloganTimeout();
   if (hitokotoInitialTimeout.value) {
     clearTimeout(hitokotoInitialTimeout.value);
     hitokotoInitialTimeout.value = null;

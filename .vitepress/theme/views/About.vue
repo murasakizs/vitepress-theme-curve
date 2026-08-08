@@ -2,25 +2,11 @@
   <div class="about">
     <h1 class="title">关于本站</h1>
     <div class="about-content" style="grid-template-columns: 3fr 2fr">
-      <!-- 介绍 -->
       <div class="about-item hello">
         <span class="text1">你好，很高兴认识你👋</span>
         <span class="text2 title2">我是 池鱼</span>
         <span class="text3">是一名 正在HRT的MtF🏳‍⚧🏳‍⚧</span>
       </div>
-      <!-- 追求 -->
-      <!--
-      <div class="about-item pursuit">
-        <span class="tip">#</span>
-        <span class="title2">#</span>
-        <span class="title2">#</span>
-        <span class="title2">#</span>
-      </div>
-    </div>
-    <div class="about-content" style="grid-template-columns: 2fr 3fr">
-      -->
-      <!-- 技能 -->
-
       <div class="about-item skills">
         <span class="tip">技能</span>
         <span class="title2">我不会的玩意</span>
@@ -40,92 +26,8 @@
           </a>
         </div>
       </div>
-
-      <!-- 生涯 -->
-       <!--
-      <div class="about-item career">
-        <span class="tip">生涯</span>
-        <span class="title2">
-          <i>無限進步</i>
-        </span>
-        <div class="list">
-          <span class="list-item" style="--color: #357ef5">#</span>
-          <span class="list-item" style="--color: #eb372a">#</span>
-        </div>
-        <img
-          class="career-img"
-          src="https://pic.efefee.cn/uploads/2024/02/22/65d71db18bcf9.png"
-          alt="career"
-        />
-      </div>
-    </div>
-    <div class="about-content" style="grid-template-columns: 3fr 2fr">
-      -->
-      <!-- 性格 -->
-       <!--
-      <div class="about-item character" style="--color: #4298b4">
-        <span class="tip">#</span>
-        <span class="title2">#</span>
-        <span class="title2" style="color: var(--color)">#</span>
-        <span class="more">
-          在
-          <a href="#" target="_blank">16personalities</a>
-          了解更多关于
-          <a href="#" target="_blank">
-            #
-          </a>
-        </span>
-        <img
-          src="#"
-          alt="male"
-          class="male"
-        />
-      </div>
-    -->
-      <!-- 座右铭 -->
-      <!--
-      <div class="about-item">
-        <span class="tip">#</span>
-        <span class="title1" style="margin-top: 20px">#，</span>
-        <span class="title2">#。</span>
-      </div>
-    </div>
-    <div class="about-content" style="grid-template-columns: 1fr 1fr">
-      <div
-        class="about-item like image"
-        style="
-          --color: #0c0e20;
-          background-image: url(#);
-        "
-      >
-        <div class="image-content">
-          <span class="tip">#</span>
-          <span class="title2">#</span>
-          <div class="image-desc">
-            <span class="left">#</span>
-          </div>
-        </div>
-      </div>
-      <div
-        class="about-item like image"
-        style="
-          --color: #7b3c25;
-          background-image: url(#);
-        "
-      >
-        <div class="image-content">
-          <span class="tip">#</span>
-          <span class="title2">#</span>
-          <div class="image-desc">
-            <span class="left">#</span>
-          </div>
-        </div>
-      </div>
     </div>
     <div class="about-content" style="grid-template-columns: 2fr 3fr">
-    -->
-      <!-- 数据 -->
-
       <div
         class="about-item static image"
         style="
@@ -135,22 +37,25 @@
       >
         <div class="image-content">
           <span class="tip">数据</span>
-          <span class="title2">访问统计</span>
+          <span class="title2">站点数据</span>
           <div class="static-data">
-            <div v-for="(item, key, index) in statisticsData" :key="index" class="static-item">
-              <span class="static-name">{{ key }}</span>
-              <span class="static-num">{{ item }}</span>
+            <div class="static-item">
+              <span class="static-name">总访问量</span>
+              <span id="busuanzi_value_site_pv" class="static-num">0</span>
+            </div>
+            <div class="static-item">
+              <span class="static-name">总访客数</span>
+              <span id="busuanzi_value_site_uv" class="static-num">0</span>
             </div>
           </div>
           <div class="image-desc opacity">
             <span class="left">
-              统计信息来自 <a href="https://v6.51.la/" target="_blank">51la</a>
+              统计信息来自 <a href="https://busuanzi.ibruce.info/" target="_blank">不蒜子</a>
             </span>
           </div>
         </div>
       </div>
 
-      <!-- 信息 -->
       <div class="about-item child">
         <div
           class="about-item map image"
@@ -158,7 +63,7 @@
         >
           <span class="position">我现在住在 <strong>中国，江苏省，苏州市</strong></span>
         </div>
-        <div class="about-itsem info">
+        <div class="about-item info">
           <div class="info-item">
             <span class="info-name">诞生于</span>
             <span class="info-num" style="--color: #43a6c6">2010</span>
@@ -185,6 +90,9 @@
           <strong>跨过晨昏线，便是永夜。</strong>
         </p>
         <p class="text">
+          所以，回去吧，回到我们，所有<strong>「奇迹」</strong>开始的地方
+        </p>
+        <p class="text">
           我爱你们。
         </p>
       </div>
@@ -193,9 +101,7 @@
 </template>
 
 <script setup>
-import { getStatistics } from "@/api";
-
-const { theme } = useData();
+import { loadScript } from "@/utils/commonTools";
 
 // 技能数据
 
@@ -268,17 +174,11 @@ const skillsData = [
   },
 ];
 
-// 站点统计数据
-const statisticsData = ref(null);
-
-// 获取站点统计数据
-const getStatisticsData = async () => {
-  const result = await getStatistics(theme.value.tongji["51la"]);
-  statisticsData.value = result;
-};
-
 onMounted(() => {
-  getStatisticsData();
+  loadScript("https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js", {
+    async: true,
+    reload: true,
+  });
 });
 </script>
 
@@ -288,6 +188,7 @@ onMounted(() => {
     font-size: 2.4rem;
     text-align: center;
     border: none;
+    padding-bottom: 0;
   }
   .about-content {
     display: grid;
@@ -298,6 +199,7 @@ onMounted(() => {
       position: relative;
       display: flex;
       flex-direction: column;
+      min-width: 0;
       width: 100%;
       padding: 1.2rem 2rem;
       border-radius: 12px;
@@ -598,6 +500,42 @@ onMounted(() => {
     @media (max-width: 768px) {
       display: flex;
       flex-direction: column;
+
+      .about-item {
+        padding: 1.2rem 1.25rem;
+
+        .title1 {
+          font-size: 2rem;
+        }
+
+        .title2 {
+          font-size: clamp(1.5rem, 8vw, 2rem);
+          margin-right: 0;
+          overflow-wrap: anywhere;
+        }
+
+        .text {
+          font-size: 1rem;
+        }
+
+        &.static .static-data .static-item .static-num,
+        &.info .info-item .info-num {
+          font-size: 1.75rem;
+        }
+
+        &.map .position {
+          padding: 1rem 1.25rem;
+          font-size: 1rem;
+        }
+
+        &.info {
+          gap: 1.5rem;
+
+          .info-item {
+            margin-right: 0;
+          }
+        }
+      }
     }
   }
 }

@@ -16,7 +16,7 @@ export const themeConfig = {
     author: {
       name: "池鱼",
       cover: "/images/logo/logo.webp",
-      email: "kazukokawagawa@qq.com",
+      email: "hi@chiyu.it",
       link: "https://chiyu.it",
     },
   },
@@ -173,7 +173,7 @@ export const themeConfig = {
     social: [
       {
         icon: "email",
-        link: "mailto:kazukokawagawa@qq.com",
+        link: "mailto:hi@chiyu.it",
       },
       {
         icon: "github",

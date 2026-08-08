@@ -10,6 +10,7 @@ const normalizeItem = (item) => ({
   event: item?.event || "",
   date: item?.date || "",
   yearly: Boolean(item?.yearly),
+  includeStart: Boolean(item?.includeStart),
 });
 
 const timingItems = computed(() => {
@@ -59,7 +60,7 @@ const getMode = (item) => (item.yearly ? "days-until" : "days-gap");
         <span v-if="item.event" class="event-name">{{ item.event }}</span>
         <span class="state-text">{{ isFuture(item) ? "还有" : "已经" }}</span>
         <span class="day-number">
-          <LiveDate :mode="getMode(item)" :date="item.date" :yearly="item.yearly" />
+          <LiveDate :mode="getMode(item)" :date="item.date" :yearly="item.yearly" :include-start="item.includeStart" />
         </span>
         <span class="state-text">天</span>
       </p>

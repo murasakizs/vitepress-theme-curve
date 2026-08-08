@@ -23,6 +23,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  includeStart: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { theme } = useData();
@@ -84,7 +88,7 @@ const text = computed(() => {
 
   if (props.mode === "days-gap") {
     const diff = now.diff(target, "day", true);
-    return diff >= 0 ? String(Math.floor(diff)) : String(Math.ceil(-diff));
+    return diff >= 0 ? String(Math.floor(diff) + (props.includeStart ? 1 : 0)) : String(Math.ceil(-diff));
   }
 
   if (props.mode === "age") {

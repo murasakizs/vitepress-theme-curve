@@ -310,11 +310,13 @@ export const themeConfig = {
           name: "池鱼",
           event: "活着",
           date: "2010-09-07",
+          includeStart: true,
         },
         {
           icon: "💊",
           event: "HRT",
           date: "2025-03-24",
+          includeStart: true,
         },
       ],
     },

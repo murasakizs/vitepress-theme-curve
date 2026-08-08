@@ -14,8 +14,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
-    { "source": "/feed.xml", "destination": "/feed.xml" },
     { "source": "/redirect", "destination": "/redirect.html" }
   ]
 }

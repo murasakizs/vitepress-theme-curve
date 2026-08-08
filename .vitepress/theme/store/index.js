@@ -28,7 +28,7 @@ export const mainStore = defineStore("main", {
       // 搜索框显示
       searchShow: false,
       // 个性化配置显示
-      showSeetings: false,
+      showSettings: false,
       // 播放器数据
       playState: false,
       playerShow: false,

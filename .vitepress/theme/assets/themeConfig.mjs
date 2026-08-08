@@ -50,7 +50,7 @@ export const themeConfig = {
           rel: "alternate",
           type: "application/rss+xml",
           title: "RSS",
-          href: "#",
+          href: "/rss.xml",
         },
       ],
             // iconfont

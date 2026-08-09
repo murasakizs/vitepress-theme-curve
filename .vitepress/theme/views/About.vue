@@ -6,6 +6,10 @@
         <span class="text1">你好，很高兴认识你👋</span>
         <span class="text2 title2">我是 池鱼</span>
         <span class="text3">是一名 正在HRT的MtF🏳‍⚧🏳‍⚧</span>
+        <span class="text4">
+          HRT 始于 <LiveDate mode="format" :date="hrtDate" format="YYYY.MM.DD" />，已进行
+          <LiveDate mode="days-since" :date="hrtDate" /> 天
+        </span>
       </div>
       <div class="about-item skills">
         <span class="tip">技能</span>
@@ -72,6 +76,12 @@
             <span class="info-name">生日</span>
             <span class="info-num" style="--color: #dfac46">0907</span>
           </div>
+          <div class="info-item">
+            <span class="info-name">距生日</span>
+            <span class="info-num" style="--color: #8c78e8">
+              <LiveDate mode="days-until" :date="birthDate" yearly /> 天
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -102,6 +112,9 @@
 
 <script setup>
 import { loadScript } from "@/utils/commonTools";
+
+const birthDate = "2010-09-07";
+const hrtDate = "2025-03-24";
 
 // 技能数据
 
@@ -245,6 +258,11 @@ onMounted(() => {
         animation: gradientFlow 6s ease infinite;
         .title2 {
           line-height: 2;
+        }
+        .text4 {
+          margin-top: 0.5rem;
+          font-size: 0.9rem;
+          opacity: 0.8;
         }
       }
       &.pursuit {
@@ -474,13 +492,14 @@ onMounted(() => {
         }
       }
       &.info {
-        flex-direction: row;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         align-items: center;
-        justify-content: flex-start;
+        gap: 1.25rem 2rem;
         .info-item {
           display: flex;
           flex-direction: column;
-          margin-right: 32px;
+          min-width: 0;
           .info-name {
             font-size: 14px;
             margin-bottom: 8px;
@@ -529,7 +548,8 @@ onMounted(() => {
         }
 
         &.info {
-          gap: 1.5rem;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1.25rem 1rem;
 
           .info-item {
             margin-right: 0;

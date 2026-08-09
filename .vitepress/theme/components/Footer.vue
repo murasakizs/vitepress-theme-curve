@@ -57,8 +57,8 @@ const { footerIsShow } = storeToRefs(store);
 // 视窗监听器
 const observer = ref(null);
 
-// 实时年份
-const thisYear = computed(() => new Date().getFullYear());
+// Keep the SSR output stable; update it only after the client has hydrated.
+const thisYear = ref(2025);
 
 // 监听页脚视窗
 const isShowFooter = () => {
@@ -75,6 +75,7 @@ const isShowFooter = () => {
 };
 
 onMounted(() => {
+  thisYear.value = new Date().getFullYear();
   isShowFooter();
 });
 

@@ -78,7 +78,12 @@ export default withPwa(
     },
     // transformHtml
     transformHtml: (html) => {
-      return jumpRedirect(html, themeConfig);
+      // VitePress 1.6.4 emits an empty vp-icons.css preload for custom themes.
+      const withoutEmptyIconPreload = html.replace(
+        /\s*<link rel="preload stylesheet" href="\/vp-icons\.css" as="style">/,
+        "",
+      );
+      return jumpRedirect(withoutEmptyIconPreload, themeConfig);
     },
     // buildEnd
     buildEnd: async (config) => {
@@ -167,6 +172,7 @@ export default withPwa(
         ],
         // 缓存文件
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,jpeg,gif,svg,woff2,ttf}"],
+        globIgnores: ["**/vp-icons.css"],
         // 排除路径
         navigateFallbackDenylist: [/^\/sitemap.xml$/, /^\/rss.xml$/, /^\/robots.txt$/, /^\/redirect(?:\.html)?(?:\/|$)/],
       },

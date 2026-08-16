@@ -2,7 +2,7 @@
 <template>
   <div class="link">
     <!-- 顶图 -->
-    <Banner type="page" title="友情链接" desc="与各位博主无限进步">
+    <Banner type="page" title="友情链接" desc="贴贴大家w">
       <template v-slot:header-slot>
         <div class="menu">
           <div class="menu-item random" @click="randomJump">

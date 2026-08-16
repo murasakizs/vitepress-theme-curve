@@ -143,9 +143,9 @@ export const mainStore = defineStore("main", {
 
       const root = document.documentElement;
       if (actualTheme === 'light') {
-        root.style.setProperty('--cursor-bg-color', '#000');
+        root.style.setProperty('--cursor-bg-color', '#e8558e');
       } else {
-        root.style.setProperty('--cursor-bg-color', '#fff');
+        root.style.setProperty('--cursor-bg-color', '#f06292');
       }
       
       if (actualTheme === 'dark') {

@@ -3,6 +3,9 @@
     <Transition name="fade" mode="out-in">
       <div v-if="loadingStatus" class="loading" @click="loadingStatus = false">
         <img :src="theme.siteMeta.logo" class="logo" alt="loading-logo" />
+        <div class="progress-bar">
+          <div class="progress-fill" :class="{ done: !loadingStatus }" />
+        </div>
         <span :class="['tip', { show: showTip }]"> 一直显示？点击任意区域即可关闭 </span>
       </div>
     </Transition>
@@ -59,6 +62,21 @@ onBeforeUnmount(() => {
     height: 100px;
     animation: loading 2s infinite;
   }
+  .progress-bar {
+    width: 160px;
+    height: 5px;
+    margin-top: 20px;
+    border-radius: 2px;
+    background-color: var(--main-card-second-background);
+    overflow: hidden;
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: 2px;
+      background-color: var(--main-color);
+      animation: progress 2s ease-out forwards;
+    }
+  }
   .tip {
     position: absolute;
     bottom: 2rem;
@@ -69,5 +87,13 @@ onBeforeUnmount(() => {
       opacity: 0.6;
     }
   }
+}
+
+@keyframes progress {
+  0% { width: 0%; }
+  20% { width: 30%; }
+  50% { width: 60%; }
+  80% { width: 85%; }
+  100% { width: 95%; }
 }
 </style>

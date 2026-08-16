@@ -76,7 +76,7 @@ const initAbstract = () => {
 const showOther = () => {
   if (loading.value) return false;
   const text =
-    "我是池鱼开发的摘要生成助理 FakeGPT，如你所见，这是一个假的 GPT，所有文本皆源于本地书写的内容。我在这里只负责显示，并仿照 GPT 的形式输出。";
+    "我是泠诗尘开发的摘要生成助理 FakeGPT，如你所见，这是一个假的 GPT，所有文本皆源于本地书写的内容。我在这里只负责显示，并仿照 GPT 的形式输出。";
   showIndex.value = 0;
   loading.value = true;
   abstractData.value = "";

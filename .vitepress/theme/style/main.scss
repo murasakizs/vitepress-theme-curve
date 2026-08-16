@@ -3,14 +3,17 @@
 
 // 全局颜色变量
 :root {
-  --main-color: #425aef;
-  --main-color-bg: #4259ef0d;
-  --main-site-background: #f7f9fe;
-  --main-card-background: #fff;
-  --main-card-second-background: #f7f7f9;
+  --main-color: #e8558e;
+  --main-color-bg: #e8558e0d;
+  --main-accent: #64b5f6;
+  --main-accent-bg: #64b5f61a;
+  --hello-gradient: linear-gradient(120deg, #64b5f6 0%, #f0e4ea 50%, #e8558e 100%);
+  --main-site-background: linear-gradient(135deg, #fce8ef 0%, #e8f0fc 100%);
+  --main-card-background: #ffffff;
+  --main-card-second-background: #eaf2fe;
   --main-font-color: #363636;
   --main-font-second-color: #3c3c43cc;
-  --main-card-border: #e3e8f7;
+  --main-card-border: #f0e4ea;
   --main-border-shadow: #2c2d300c;
   --main-scrollbar-bar: rgba(60, 60, 67, 0.4);
   --main-mask-background: rgba(255, 255, 255, 0.95);
@@ -36,11 +39,14 @@
 }
 
 html.dark {
-  --main-color: #dfac46;
-  --main-color-bg: #f2b94b23;
-  --main-site-background: #18171d;
-  --main-card-background: #1b1c20;
-  --main-card-second-background: #21232a;
+  --main-color: #f06292;
+  --main-color-bg: #f0629223;
+  --main-accent: #90caf9;
+  --main-accent-bg: #90caf91a;
+  --hello-gradient: linear-gradient(120deg, #1a3a5c 0%, #2a1f2e 50%, #4a1a35 100%);
+  --main-site-background: linear-gradient(135deg, #2a1f25 0%, #1f2233 100%);
+  --main-card-background: #251e24;
+  --main-card-second-background: #1e2230;
   --main-font-color: #f7f7fa;
   --main-font-second-color: #a1a2b8;
   --main-card-border: #3d3d3f;
@@ -206,12 +212,12 @@ body {
   margin: 0;
   padding: 0;
   color: var(--main-font-color);
-  background-color: var(--main-site-background);
+  background: var(--main-site-background);
   animation: show forwards 0.5s;
   overflow-x: hidden;
   transition:
     color 0.3s,
-    background-color 0.3s;
+    background 0.3s;
 }
 
 a {
@@ -354,7 +360,7 @@ a {
   width: 18px;
   height: 18px;
   // 使用 CSS 变量来控制背景色
-  background: var(--cursor-bg-color, #fff); // 默认值为 #fff (白色)
+  background: var(--cursor-bg-color, #e8558e); // 默认值为粉色
   border-radius: 25px;
   opacity: 0.25;
   z-index: 10086;
@@ -373,5 +379,40 @@ a {
 
   @media (max-width: 768px) {
     display: none !important;
+  }
+}
+
+// 圆形头像
+.site-logo,
+.logo img.author,
+.link-logo-img,
+.cf-friends-avatar,
+.loading .logo {
+  border-radius: 50%;
+}
+
+// 辅助色（浅蓝）应用
+a:hover {
+  color: var(--main-accent);
+}
+
+.s-card:hover {
+  border-color: var(--main-accent);
+}
+
+.tag-item {
+  &:hover {
+    color: var(--main-accent);
+    border-color: var(--main-accent);
+    background-color: var(--main-accent-bg);
+  }
+}
+
+.pagination .page-item {
+  &:hover,
+  &.choose {
+    color: var(--main-accent);
+    border-color: var(--main-accent);
+    background-color: var(--main-accent-bg);
   }
 }

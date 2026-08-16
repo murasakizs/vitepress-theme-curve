@@ -4,4 +4,4 @@ Allow: /pages/
 Allow: /posts/
 Disallow: /redirect.html
 
-Sitemap: https://chiyu.it/sitemap.xml
+Sitemap: https://sgexilq.top/sitemap.xml

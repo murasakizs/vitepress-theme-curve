@@ -6,26 +6,22 @@
         <div class="left-nav">
           <div class="more-menu nav-btn" title="更多内容">
             <i class="iconfont icon-menu" />
+            <span class="site-name">{{ site.title }}</span>
             <div class="more-card s-card">
               <div v-for="(item, index) in theme.navMore" :key="index" class="more-item">
-                <span class="more-name">{{ item.name }}</span>
                 <div class="more-list">
                   <a
                     v-for="(link, i) in item.list"
                     :key="i"
                     :href="link.url"
                     class="more-link"
-                    target="_blank"
+                    :target="link.url.startsWith('/') ? '_self' : '_blank'"
                   >
-                    <img class="link-icon" :src="link.icon" :alt="link.name" />
                     <span class="link-name">{{ link.name }}</span>
                   </a>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="site-name" @click="router.go('/')">
-            {{ site.title }}
           </div>
         </div>
         <!-- 导航栏菜单 -->
@@ -166,22 +162,27 @@ const { site, theme, frontmatter, page } = useData();
     left: 0;
     width: 100vw;
     height: 60px;
-    background-color: var(--main-card-background);
+    background: color-mix(in srgb, var(--main-card-background) 80%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     transition:
       background-color 0.3s,
       backdrop-filter 0.3s;
     &::after {
       content: "";
       position: absolute;
-      height: 1px;
+      height: 80px;
       width: 100%;
       left: 0;
-      bottom: 0;
-      background-color: var(--main-card-border);
+      bottom: -80px;
+      background: linear-gradient(to bottom, color-mix(in srgb, var(--main-card-background) 30%, transparent), transparent);
+      pointer-events: none;
       transition: opacity 0.3s;
     }
     &.top {
-      background-color: transparent;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
       outline: 0px;
       &::after {
         opacity: 0;
@@ -223,6 +224,10 @@ const { site, theme, frontmatter, page } = useData();
       .more-menu {
         position: relative;
         margin-right: 4px;
+        justify-content: flex-start;
+        width: 120px;
+        padding-left: 9px;
+        border-radius: 50px;
         @media (max-width: 512px) {
           display: none;
         }
@@ -233,34 +238,32 @@ const { site, theme, frontmatter, page } = useData();
           opacity: 0;
           visibility: hidden;
           transform-origin: left top;
-          transform: scale(0.8) translateY(-5px);
+          transform: translateY(-10px) scale(0.8);
+          padding: 6px 2px;
+          background-color: var(--main-card-background);
+          border: 1px solid var(--main-color);
+          box-shadow: 0 8px 12px -3px var(--main-color-bg);
+          border-radius: 28px;
+          transition:
+            opacity 0.3s,
+            visibility 0.3s,
+            transform 0.3s;
           .more-item {
-            margin-top: 0.8rem;
-            &:first-child {
-              margin-top: 0;
-            }
-            .more-name {
-              font-size: 14px;
-              display: inline-block;
-              color: var(--main-font-second-color);
-              margin-bottom: 0.6rem;
-            }
             .more-list {
-              display: grid;
-              gap: 0.8rem;
-              grid-template-columns: 1fr 1fr;
+              display: flex;
+              flex-direction: column;
               .more-link {
                 display: flex;
                 align-items: center;
-                width: 150px;
-                padding: 6px 8px;
-                border-radius: 8px;
-                .link-icon {
-                  width: 24px;
-                  height: 24px;
-                  border-radius: 50%;
-                  margin-right: 8px;
-                }
+                height: 42px;
+                line-height: 50px;
+                padding: 0 1.8rem 0 2.0rem;
+                border-radius: 100px;
+                white-space: nowrap;
+                margin: 0 4px;
+                transition:
+                  color 0.3s,
+                  background-color 0.3s;
                 &:hover {
                   color: var(--main-card-background);
                   background-color: var(--main-color);
@@ -284,53 +287,17 @@ const { site, theme, frontmatter, page } = useData();
         &:hover {
           .more-card {
             opacity: 1;
-            transform: scale(1) translateY(0);
+            transform: translateY(0) scale(1);
             visibility: visible;
           }
         }
       }
       .site-name {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: bold;
-        height: 34px;
-        padding: 0 6px;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: transform 0.3s;
-        cursor: pointer;
-        &::after {
-          content: "\e032";
-          font-family: "iconfont";
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          color: var(--main-card-background);
-          background-color: var(--main-color);
-          font-size: 22px;
-          border-radius: 25px;
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        @media (min-width: 768px) {
-          &:hover {
-            &::after {
-              opacity: 1;
-            }
-          }
-          &:active {
-            transform: scale(0.95);
-          }
-        }
+        margin-left: 8px;
+        margin-top: -1px;
       }
     }
     .nav-center {

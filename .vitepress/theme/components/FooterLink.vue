@@ -14,7 +14,8 @@
         target="_blank"
         class="social-link"
       >
-        <i :class="`iconfont icon-${item.icon}`"></i>
+        <img v-if="item.iconType === 'image'" :src="item.icon" :alt="item.icon" class="social-icon-img" />
+        <i v-else :class="`iconfont icon-${item.icon}`"></i>
       </a>
       <div class="logo" title="返回顶部" @click="smoothScrolling">
         <img :src="siteMeta.author.cover" alt="author" class="author" />
@@ -26,7 +27,8 @@
         target="_blank"
         class="social-link"
       >
-        <i :class="`iconfont icon-${item.icon}`"></i>
+        <img v-if="item.iconType === 'image'" :src="item.icon" :alt="item.icon" class="social-icon-img" />
+        <i v-else :class="`iconfont icon-${item.icon}`"></i>
       </a>
     </div>
     <div class="footer-sitemap">
@@ -214,6 +216,10 @@ const toggleBadge = (index) => {
         font-size: 20px;
         color: var(--main-card-background);
       }
+      .social-icon-img {
+        width: 20px;
+        height: 20px;
+      }
       &:hover {
         transform: scale(1.15);
         background-color: var(--main-color);
@@ -371,5 +377,14 @@ const toggleBadge = (index) => {
       }
     }
   }
+}
+</style>
+
+<style lang="scss">
+.social-icon-img {
+  filter: brightness(0) invert(1);
+}
+html.dark .social-icon-img {
+  filter: none;
 }
 </style>

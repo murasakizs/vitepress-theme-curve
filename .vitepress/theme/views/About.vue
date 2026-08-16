@@ -4,11 +4,12 @@
     <div class="about-content" style="grid-template-columns: 3fr 2fr">
       <div class="about-item hello">
         <span class="text1">你好，很高兴认识你👋</span>
-        <span class="text2 title2">我是 池鱼</span>
-        <span class="text3">是一名 正在HRT的MtF🏳‍⚧🏳‍⚧</span>
+        <span class="text2 title2">我是 泠诗尘</span>
+        <span class="text3">是一个跨性别女孩子</span>
         <span class="text4">
-          HRT 始于 <LiveDate mode="format" :date="hrtDate" format="YYYY.MM.DD" />，已进行
-          <LiveDate mode="days-since" :date="hrtDate" /> 天
+          DIY HRT于2026.5.10，停止于6.21<br/>
+          获得小证于2026.6.19，已过去 {{ daysSinceCard }} 天<br/>
+          获得北医三院HRT处方于2026.7.28
         </span>
       </div>
       <div class="about-item skills">
@@ -34,10 +35,7 @@
     <div class="about-content" style="grid-template-columns: 2fr 3fr">
       <div
         class="about-item static image"
-        style="
-          --color: #0f1114;
-          background-image: url(#);
-        "
+        style="--color: #3c3c4380"
       >
         <div class="image-content">
           <span class="tip">数据</span>
@@ -61,20 +59,18 @@
       </div>
 
       <div class="about-item child">
-        <div
-          class="about-item map image"
-          style="background-image: url(https://raw.20100907.xyz/other/tc.png)"
-        >
-          <span class="position">我现在住在 <strong>中国，江苏省，苏州市</strong></span>
+        <div class="about-item" style="padding-top: 1.2rem; padding-bottom: 0.8rem">
+          <span class="tip" style="margin-bottom: 4px">我在</span>
+          <span class="title2"><strong style="color: var(--main-accent)">重庆合川</strong>&<strong style="color: var(--main-color)">江苏苏州</strong></span>
         </div>
         <div class="about-item info">
           <div class="info-item">
             <span class="info-name">诞生于</span>
-            <span class="info-num" style="--color: #43a6c6">2010</span>
+            <span class="info-num" style="--color: var(--main-accent)">2009</span>
           </div>
           <div class="info-item">
             <span class="info-name">生日</span>
-            <span class="info-num" style="--color: #dfac46">0907</span>
+            <span class="info-num" style="--color: #e8558e">1010</span>
           </div>
           <div class="info-item">
             <span class="info-name">距生日</span>
@@ -85,26 +81,38 @@
         </div>
       </div>
     </div>
-    <!-- 心路历程 -->
+    <!-- 上方卡片 -->
     <div class="about-content" style="display: flex">
       <div class="about-item">
-        <span class="tip">关于这个破站</span>
-        <span class="title2">一个记录自己生活的站点</span>
+        <span class="title2">我</span>
+      </div>
+    </div>
+    <!-- 关于这个站 -->
+    <div class="about-content" style="display: flex">
+      <div class="about-item">
+        <span class="tip">关于这个站</span>
+        <span class="title2" style="margin-bottom: 0.8rem">一个莫名其妙的小站（？）</span>
         <p class="text">
-          首先感谢一下小恒提供的域名贡献
+          愿每个人都被世界温柔以待~
         </p>
-        <p class="text">
-          写几句slogan好了
+        <p class="text" style="opacity: 0.4">
+          年年岁岁花相似，岁岁年年人不同
         </p>
-        <p class="text">
-          <strong>跨过晨昏线，便是永夜。</strong>
+        <p class="text" style="color: var(--main-color); font-weight: bold">
+          我爱你们
         </p>
-        <p class="text">
-          所以，回去吧，回到我们，所有<strong>「奇迹」</strong>开始的地方
-        </p>
-        <p class="text">
-          我爱你们。
-        </p>
+      </div>
+    </div>
+    <!-- 下方卡片 -->
+    <div class="about-content" style="display: flex">
+      <div class="about-item">
+        <p class="text">往前走</p>
+        <p class="text">路是很难走</p>
+        <p class="text">跟我们普通人相比</p>
+        <p class="text">这是条非常难的崎岖的路</p>
+        <p class="text" style="color: var(--main-color); font-weight: bold">但是不往前走怎么办</p>
+        <p class="text" style="color: var(--main-color); font-weight: bold">可能连路都没有</p>
+        <p class="text" style="text-align: right; opacity: 0.6">------潘柏林</p>
       </div>
     </div>
   </div>
@@ -113,8 +121,14 @@
 <script setup>
 import { loadScript } from "@/utils/commonTools";
 
-const birthDate = "2010-09-07";
-const hrtDate = "2025-03-24";
+const birthDate = "2009-10-10";
+
+// 获得小证天数
+const daysSinceCard = computed(() => {
+  const start = new Date("2026-06-19");
+  const now = new Date();
+  return Math.floor((now - start) / (1000 * 60 * 60 * 24));
+});
 
 // 技能数据
 
@@ -253,7 +267,7 @@ onMounted(() => {
         justify-content: center;
         padding: 2rem;
         color: #fff;
-        background-image: linear-gradient(120deg, #5b27ff 0%, #00d4ff 100%);
+        background-image: var(--hello-gradient);
         background-size: 200% 200%;
         animation: gradientFlow 6s ease infinite;
         .title2 {
@@ -324,7 +338,7 @@ onMounted(() => {
             margin-top: 10px;
             padding: 8px 12px 8px 8px;
             border-radius: 40px;
-            background-color: var(--main-site-background);
+            background: var(--main-site-background);
             border: 1px solid var(--main-card-border);
             box-shadow: 0 8px 12px -4px var(--main-border-shadow);
             transition: background-color 0.3s;
@@ -409,7 +423,7 @@ onMounted(() => {
           display: flex;
           flex-direction: column;
           z-index: 2;
-          color: #fff;
+          color: var(--main-font-color);
           .image-desc {
             width: 100%;
             display: flex;
@@ -419,10 +433,10 @@ onMounted(() => {
             margin-top: auto;
             &.opacity {
               font-size: 14px;
-              color: #eee;
+              color: var(--main-font-second-color);
               opacity: 0.8;
               a {
-                color: #eee;
+                color: var(--main-font-second-color);
                 &:hover {
                   color: var(--main-color);
                 }
@@ -437,7 +451,7 @@ onMounted(() => {
           height: 100%;
           top: 0;
           left: 0;
-          box-shadow: inset 0 -70px 204px 10px var(--color);
+          box-shadow: none;
           z-index: 0;
         }
       }
@@ -560,3 +574,5 @@ onMounted(() => {
   }
 }
 </style>
+
+

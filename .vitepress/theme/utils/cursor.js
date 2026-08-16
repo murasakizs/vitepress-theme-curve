@@ -89,9 +89,9 @@ class Cursor {
     let cursorColor;
     if (themeType === 'auto') {
       const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      cursorColor = prefersDarkMode ? 'white' : 'black';
+      cursorColor = prefersDarkMode ? '%23f06292' : '%23e8558e';
     } else {
-      cursorColor = themeType === 'dark' ? 'white' : 'black';
+      cursorColor = themeType === 'dark' ? '%23f06292' : '%23e8558e';
     }
     this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'><circle cx='4' cy='4' r='4' fill='${cursorColor}' /></svg>") 4 4, auto !important}`;
   }

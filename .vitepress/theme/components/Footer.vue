@@ -6,7 +6,7 @@
         <a :href="theme.siteMeta.author.link" class="author link" target="_blank">
           {{ theme.siteMeta.author.name }}
         </a>
-        <a class="icp link" href="https://icp.gov.moe/?keyword=20259222" target="_blank">
+        <a v-if="theme.icp" class="icp link" href="https://icp.gov.moe/?keyword=20259222" target="_blank">
           <i class="iconfont icon-safe" />
           {{ theme.icp }}
         </a>
@@ -22,7 +22,7 @@
           <span class="name">主题</span>
         </a>
         -->
-        <a class="rss link" href="https://chiyu.it/rss.xml" target="_blank">
+        <a class="rss link" href="/rss.xml" target="_blank">
           <i class="iconfont icon-rss" />
           <span class="name">订阅</span>
         </a>
@@ -40,6 +40,9 @@
           <img class="light-badge" src="/notbyai/Written-By-Human-Not-By-AI-Badge-white.svg" alt="Written By Human" />
           <img class="dark-badge" src="/notbyai/Written-By-Human-Not-By-AI-Badge-black.svg" alt="Written By Human" />
         </a>
+      </div>
+      <div class="credit">
+        本站基于 <a href="https://github.com/kazukokawagawa/vitepress-theme-curve" target="_blank">vitepress-theme-curve</a> 开源项目进行修改与部署，感谢上游作者的贡献。<br style="line-height: 1.8">本站遵循 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL v3</a> 开源协议。
       </div>
     </div>
   </footer>
@@ -218,6 +221,19 @@ onBeforeUnmount(() => {
           .iconfont {
             display: none;
           }
+        }
+      }
+    }
+    .credit {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      opacity: 0.5;
+      margin-top: 8px;
+      a {
+        color: var(--main-color);
+        &:hover {
+          opacity: 0.8;
         }
       }
     }

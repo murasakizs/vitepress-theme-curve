@@ -155,3 +155,17 @@
 .toLeft-leave-to {
   transform: translateX(300px);
 }
+
+// fadeUp
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.fade-up-enter-from,
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}

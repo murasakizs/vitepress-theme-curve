@@ -14,39 +14,24 @@
       @modal-close="store.changeShowStatus('showSettings')"
     >
       <div class="set-list">
-        <span class="title">字体</span>
+        <span class="title">通用</span>
         <div class="set-item">
-          <span class="set-label">全站字体</span>
+          <span class="set-label">首页样式（ Banner 高度 ）</span>
           <div class="set-options">
             <span
-              :class="['options', { choose: fontFamily === 'vsans' }]"
-              @click="fontFamily = 'vsans'"
+              :class="['options', { choose: bannerType === 'half' }]"
+              @click="bannerType = 'half'"
             >
-              vivo Sans
+              半屏
             </span>
             <span
-              :class="['options', { choose: fontFamily === 'hmos' }]"
-              @click="fontFamily = 'hmos'"
+              :class="['options', { choose: bannerType === 'full' }]"
+              @click="bannerType = 'full'"
             >
-              HarmonyOS Sans
-            </span>
-            <span
-              :class="['options', { choose: fontFamily === 'xlfont' }]"
-              @click="fontFamily = 'xlfont'"
-            >
-              小赖字体
+              全屏
             </span>
           </div>
         </div>
-        <div class="set-item">
-          <span class="set-label">全站字体大小</span>
-          <div class="set-options">
-            <span class="options" @click="store.changeFontSize(false)"> - </span>
-            <span class="num">{{ fontSize }}</span>
-            <span class="options" @click="store.changeFontSize(true)"> + </span>
-          </div>
-        </div>
-        <span class="title">壁纸个性化</span>
         <div class="set-item">
           <span class="set-label">全站背景</span>
           <div class="set-options">
@@ -82,43 +67,6 @@
             />
           </div>
         </div>
-        <span class="title">首页样式</span>
-        <div class="set-item">
-          <span class="set-label">Banner 高度</span>
-          <div class="set-options">
-            <span
-              :class="['options', { choose: bannerType === 'half' }]"
-              @click="bannerType = 'half'"
-            >
-              半屏
-            </span>
-            <span
-              :class="['options', { choose: bannerType === 'full' }]"
-              @click="bannerType = 'full'"
-            >
-              全屏
-            </span>
-          </div>
-        </div>
-        <span class="title">杂项调整</span>
-        <div class="set-item">
-          <span class="set-label">额外信息显示位置</span>
-          <div class="set-options">
-            <span
-              :class="['options', { choose: infoPosition === 'normal' }]"
-              @click="infoPosition = 'normal'"
-            >
-              默认位置
-            </span>
-            <span
-              :class="['options', { choose: infoPosition === 'fixed' }]"
-              @click="infoPosition = 'fixed'"
-            >
-              右下角
-            </span>
-          </div>
-        </div>
-        <span class="title">外观调整</span>
         <div class="set-item">
           <span class="set-label">调整明暗显示外观</span>
           <div class="set-options">
@@ -142,6 +90,205 @@
             </span>
           </div>
         </div>
+        <div class="set-item">
+          <span class="set-label">全站字体</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: fontFamily === 'vsans' }]"
+              @click="fontFamily = 'vsans'"
+            >
+              vivo Sans
+            </span>
+            <span
+              :class="['options', { choose: fontFamily === 'hmos' }]"
+              @click="fontFamily = 'hmos'"
+            >
+              HarmonyOS Sans
+            </span>
+            <span
+              :class="['options', { choose: fontFamily === 'xlfont' }]"
+              @click="fontFamily = 'xlfont'"
+            >
+              小赖字体
+            </span>
+          </div>
+        </div>
+        <span class="title">更多</span>
+        <div class="set-item">
+          <span class="set-label">额外信息显示位置</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: infoPosition === 'normal' }]"
+              @click="infoPosition = 'normal'"
+            >
+              默认位置
+            </span>
+            <span
+              :class="['options', { choose: infoPosition === 'fixed' }]"
+              @click="infoPosition = 'fixed'"
+            >
+              右下角
+            </span>
+          </div>
+        </div>
+        <div class="set-item">
+          <span class="set-label">自定义右键菜单</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: !useRightMenu }]"
+              @click="useRightMenu = false"
+            >
+              关闭
+            </span>
+            <span
+              :class="['options', { choose: useRightMenu }]"
+              @click="useRightMenu = true"
+            >
+              开启
+            </span>
+          </div>
+        </div>
+        <div class="set-item">
+          <span class="set-label">自定义光标样式</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: !useCustomCursor }]"
+              @click="useCustomCursor = false; store.toggleCustomCursor()"
+            >
+              关闭
+            </span>
+            <span
+              :class="['options', { choose: useCustomCursor }]"
+              @click="useCustomCursor = true; store.toggleCustomCursor()"
+            >
+              开启
+            </span>
+          </div>
+        </div>
+        <div class="set-item">
+          <span class="set-label">显示更多选项</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: !showMoreSettings }]"
+              @click="showMoreSettings = false; showMoreSettingsConfirmed = false"
+            >
+              关闭
+            </span>
+            <span
+              :class="['options', { choose: showMoreSettings }]"
+              @click="showMoreSettings = true; scrollToWarn()"
+            >
+              开启
+            </span>
+          </div>
+        </div>
+        <Transition name="fade-up">
+          <div v-if="showMoreSettings && !showMoreSettingsConfirmed" ref="warnRef" class="set-warn">
+            <span class="warn-text">更改这些选项可能会导致未知的问题，你确定要继续吗</span>
+            <span class="options" @click="showMoreSettingsConfirmed = true">确认</span>
+          </div>
+        </Transition>
+        <Transition name="fade-up">
+          <div v-if="showMoreSettings && showMoreSettingsConfirmed" class="more-options">
+            <div class="set-item">
+              <span class="set-label">全站字体大小</span>
+              <div class="set-options">
+                <span class="options" @click="store.changeFontSize(false)"> - </span>
+                <span class="num">{{ fontSize }}</span>
+                <span class="options" @click="store.changeFontSize(true)"> + </span>
+              </div>
+            </div>
+            <span class="title">实验性功能</span>
+            <span class="set-desc">以下选项还处于开发/计划开发中，可能不稳定或暂时无法使用</span>
+            <div class="set-item">
+              <span class="set-label">站点布局</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: siteLayout === 'auto' }]"
+                  @click="handleLayoutAuto"
+                >
+                  自动选择
+                </span>
+                <span
+                  :class="['options', { choose: siteLayout === 'pc' }]"
+                  @click="handleLayoutChange('pc')"
+                >
+                  桌面端
+                </span>
+                <span
+                  :class="['options', { choose: siteLayout === 'mobile' }]"
+                  @click="handleLayoutChange('mobile')"
+                >
+                  移动端
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="layoutConfirmVisible" class="set-warn set-warn-purple" @click="handleLayoutFail">
+                <span />
+                <span class="warn-text">网站能正常显示吗？</span>
+                <span class="warn-countdown">{{ layoutCountdown }}秒后将恢复自动选择</span>
+                <div class="warn-actions">
+                  <span class="options warn-no" @click.stop="handleLayoutFail">不能</span>
+                  <span class="options warn-yes" @click.stop="handleLayoutOk">是的</span>
+                </div>
+              </div>
+            </Transition>
+          <div class="set-item">
+            <span class="set-label">背景模糊</span>
+            <div class="set-options">
+              <span
+                :class="['options', { choose: !backgroundBlur }]"
+                @click="backgroundBlur = false"
+              >
+                关闭
+              </span>
+              <span
+                :class="['options', { choose: backgroundBlur }]"
+                @click="backgroundBlur = true"
+              >
+                开启
+              </span>
+            </div>
+          </div>
+          <div class="set-item">
+            <span class="set-label">播放器</span>
+            <div class="set-options">
+              <span
+                :class="['options', { choose: !playerShow }]"
+                @click="playerShow = false"
+              >
+                关闭
+              </span>
+              <span
+                :class="['options', { choose: playerShow }]"
+                @click="playerShow = true"
+              >
+                开启
+              </span>
+            </div>
+          </div>
+          <span class="title">恢复默认配置</span>
+          <div class="set-item">
+            <span class="set-label">恢复默认配置</span>
+            <div class="set-options">
+              <span
+                v-if="!showResetConfirm"
+                class="options"
+                @click="showResetConfirm = true; scrollToResetWarn()"
+              >
+                确认
+              </span>
+            </div>
+          </div>
+          <Transition name="fade-up">
+            <div v-if="showResetConfirm" ref="resetWarnRef" class="set-warn">
+              <span class="warn-text">即将恢复默认配置，你确定要继续吗</span>
+              <span class="options" @click="handleResetConfig">确认</span>
+            </div>
+          </Transition>
+          </div>
+        </Transition>
       </div>
     </Modal>
   </div>
@@ -152,8 +299,102 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType } =
+const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending } =
   storeToRefs(store);
+
+// 警告区域自动滚动
+const warnRef = ref(null);
+const scrollToWarn = () => {
+  nextTick(() => {
+    warnRef.value?.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+};
+
+// 站点布局确认逻辑
+const layoutConfirmVisible = ref(false);
+const layoutCountdown = ref(10);
+let layoutTimer = null;
+
+const startLayoutCountdown = () => {
+  clearLayoutCountdown();
+  layoutCountdown.value = 10;
+  layoutConfirmVisible.value = true;
+  siteLayoutPending.value = true;
+  layoutTimer = setInterval(() => {
+    layoutCountdown.value--;
+    if (layoutCountdown.value <= 0) {
+      handleLayoutFail();
+    }
+  }, 1000);
+};
+
+const clearLayoutCountdown = () => {
+  if (layoutTimer) {
+    clearInterval(layoutTimer);
+    layoutTimer = null;
+  }
+};
+
+const handleLayoutChange = (layout) => {
+  siteLayout.value = layout;
+  startLayoutCountdown();
+};
+
+const handleLayoutAuto = () => {
+  siteLayout.value = "auto";
+  siteLayoutPending.value = false;
+  layoutConfirmVisible.value = false;
+  clearLayoutCountdown();
+};
+
+const handleLayoutFail = () => {
+  siteLayout.value = "auto";
+  siteLayoutPending.value = false;
+  layoutConfirmVisible.value = false;
+  clearLayoutCountdown();
+};
+
+const handleLayoutOk = () => {
+  siteLayoutPending.value = false;
+  layoutConfirmVisible.value = false;
+  clearLayoutCountdown();
+};
+
+// 恢复默认配置
+const showResetConfirm = ref(false);
+const resetWarnRef = ref(null);
+const scrollToResetWarn = () => {
+  nextTick(() => {
+    resetWarnRef.value?.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+};
+const handleResetConfig = () => {
+  localStorage.removeItem("siteData");
+  showResetConfirm.value = false;
+  location.reload();
+};
+
+// 打开设置面板时，如果"显示更多选项"未确认则重置为关闭
+watch(
+  () => store.showSettings,
+  (val) => {
+    if (val && showMoreSettings.value && !showMoreSettingsConfirmed.value) {
+      showMoreSettings.value = false;
+    }
+    if (!val) {
+      showResetConfirm.value = false;
+      if (siteLayoutPending.value) {
+        siteLayout.value = "auto";
+        siteLayoutPending.value = false;
+        layoutConfirmVisible.value = false;
+        clearLayoutCountdown();
+        if (typeof $message !== "undefined") {
+          $message.warning("选择的布局未确认，已恢复为自动选择", { duration: 3000 });
+        }
+      }
+    }
+  },
+);
 </script>
 
 <style lang="scss" scoped>
@@ -194,6 +435,9 @@ const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroun
         opacity: 1;
       }
     }
+    @media (min-width: 769px) {
+      display: none;
+    }
   }
 }
 .set-list {
@@ -210,6 +454,13 @@ const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroun
     &:first-child {
       margin-top: 0;
     }
+  }
+  .set-desc {
+    display: block;
+    font-size: 13px;
+    color: var(--main-font-color);
+    opacity: 0.6;
+    margin: -4px 0 12px;
   }
   .set-item {
     display: flex;
@@ -274,6 +525,79 @@ const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroun
             margin-left: 0;
           }
         }
+      }
+    }
+  }
+  .set-warn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    .warn-text {
+      font-size: 14px;
+      color: #dc2626;
+    }
+    .options {
+      flex-shrink: 0;
+      color: #dc2626;
+      background-color: transparent;
+      &:hover {
+        color: #b91c1c;
+        background-color: transparent;
+        box-shadow: none;
+      }
+    }
+  }
+  .set-warn-purple {
+    flex-direction: column;
+    align-items: stretch;
+    background-color: #f5f3ff;
+    border-color: #c4b5fd;
+    cursor: pointer;
+    .warn-text {
+      color: #7c3aed;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .warn-countdown {
+      font-size: 13px;
+      color: #7c3aed;
+      opacity: 0.8;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .warn-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .warn-no {
+      color: #7c3aed;
+      border: 1px solid #7c3aed;
+      border-radius: 8px;
+      padding: 6px 12px;
+      background-color: transparent;
+      &:hover {
+        color: #6d28d9;
+        border-color: #6d28d9;
+        background-color: transparent;
+        box-shadow: none;
+      }
+    }
+    .warn-yes {
+      color: #fff !important;
+      background-color: #7c3aed !important;
+      border-radius: 8px;
+      padding: 6px 12px;
+      &:hover {
+        background-color: #6d28d9 !important;
       }
     }
   }

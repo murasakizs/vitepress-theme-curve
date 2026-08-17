@@ -103,6 +103,22 @@ class Cursor {
     }
   }
 
+  enable() {
+    if (typeof document === 'undefined' || !this.cursor) return;
+    this.cursor.classList.remove("disabled");
+    if (this.scr) {
+      this.scr.sheet.disabled = false;
+    }
+  }
+
+  disable() {
+    if (typeof document === 'undefined' || !this.cursor) return;
+    this.cursor.classList.add("disabled");
+    if (this.scr) {
+      this.scr.sheet.disabled = true;
+    }
+  }
+
   refresh() {
     if (typeof document === 'undefined') return; // 确保在客户端
 

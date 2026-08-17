@@ -7,7 +7,8 @@ export const useDesktopAside = () => {
   let mediaQueryList;
 
   const updateAsideVisibility = () => {
-    isDesktopAsideVisible.value = Boolean(mediaQueryList?.matches);
+    const isForceMobile = document.documentElement.classList.contains("force-mobile");
+    isDesktopAsideVisible.value = !isForceMobile && Boolean(mediaQueryList?.matches);
   };
 
   onMounted(() => {
@@ -21,6 +22,11 @@ export const useDesktopAside = () => {
     } else {
       mediaQueryList.addListener(updateAsideVisibility);
     }
+
+    // 监听 html class 变化（force-mobile 切换）
+    const observer = new MutationObserver(updateAsideVisibility);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    onBeforeUnmount(() => observer.disconnect());
   });
 
   onBeforeUnmount(() => {

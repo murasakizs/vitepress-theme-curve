@@ -61,7 +61,7 @@
         </div>
         <div class="about-item info" style="align-items: center; justify-content: center; padding-left: 1.7rem">
           <span class="title2" style="white-space: nowrap">
-            <span>本站上线</span>&nbsp;&nbsp;<span style="color: var(--main-accent)">{{ daysOnline }}</span>&nbsp;&nbsp;<span>天</span>
+            <span>本站上线了</span>&nbsp;&nbsp;<span style="color: var(--main-accent)">{{ daysOnline }}</span>&nbsp;&nbsp;<span>天</span>
           </span>
         </div>
       </div>

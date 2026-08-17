@@ -3,8 +3,6 @@
   <Background />
   <!-- 加载提示 -->
   <Loading />
-  <!-- 中控台 -->
-  <Control />
   <!-- 导航栏 -->
   <Nav />
   <!-- 主内容 -->
@@ -50,7 +48,7 @@ import { ensureGlobalFontsLoaded } from "@/utils/fontLoader.mjs";
 const route = useRoute();
 const store = mainStore();
 const { frontmatter, page, theme } = useData();
-const { loadingStatus, footerIsShow, themeValue, themeType, backgroundType, fontFamily, fontSize } =
+const { loadingStatus, footerIsShow, themeValue, themeType, backgroundType, fontFamily, fontSize, siteLayout, siteLayoutPending } =
   storeToRefs(store);
 let fontSwitchTaskId = 0;
 
@@ -153,6 +151,21 @@ watch(
   () => changeSiteFont(),
 );
 
+// 切换站点布局
+const changeSiteLayout = () => {
+  const html = document.documentElement;
+  html.classList.remove("force-pc", "force-mobile");
+  if (siteLayout.value === "pc") {
+    html.classList.add("force-pc");
+  } else if (siteLayout.value === "mobile") {
+    html.classList.add("force-mobile");
+  }
+};
+watch(
+  () => siteLayout.value,
+  () => changeSiteLayout(),
+);
+
 onMounted(() => {
   initializeCursor();
   console.log(frontmatter.value, page.value, theme.value);
@@ -162,6 +175,17 @@ onMounted(() => {
   changeSiteThemeType();
   // 切换系统字体样式
   changeSiteFont();
+  // 切换站点布局
+  changeSiteLayout();
+  // 检查站点布局待确认状态
+  if (siteLayoutPending.value) {
+    siteLayout.value = "auto";
+    siteLayoutPending.value = false;
+    changeSiteLayout();
+    if (typeof $message !== "undefined") {
+      $message.warning("上次选择的布局未确认，已恢复为自动选择", { duration: 3000 });
+    }
+  }
   // 滚动监听
   window.addEventListener("scroll", calculateScroll);
   // 右键监听

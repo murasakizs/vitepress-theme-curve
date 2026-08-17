@@ -76,13 +76,25 @@
             <i class="iconfont icon-search"></i>
           </div>
           <!-- 中控台 -->
-          <div
-            id="open-control"
-            class="menu-btn nav-btn pc"
-            title="打开中控台"
-            @click="store.changeShowStatus('controlShow')"
-          >
+          <div id="open-control" class="menu-btn nav-btn pc control-menu" title="中控台">
             <i class="iconfont icon-dashboard" />
+            <div class="control-popup">
+              <div
+                :class="['control-item', { open: store.themeType !== 'auto' }]"
+                title="显示模式切换"
+                @click="store.changeThemeType"
+              >
+                <i :class="`iconfont icon-${store.themeType}`"></i>
+              </div>
+              <div
+                class="control-capsule"
+                title="个性化配置"
+                @click="store.changeShowStatus('showSettings')"
+              >
+                <i class="iconfont icon-style"></i>
+                <span class="capsule-text">个性化配置</span>
+              </div>
+            </div>
           </div>
           <!-- 返回顶部 -->
           <div
@@ -142,6 +154,14 @@ const SearchModal = defineAsyncComponent(async () => {
 });
 const { scrollData } = storeToRefs(store);
 const { site, theme, frontmatter, page } = useData();
+
+// 右键菜单开关
+const rightMenuSwitch = () => {
+  store.useRightMenu = !store.useRightMenu;
+  if (typeof $message !== "undefined") {
+    $message.info(`${store.useRightMenu ? "已开启" : "已关闭"}自定义右键菜单`);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -512,6 +532,115 @@ const { site, theme, frontmatter, page } = useData();
           }
           &.pc {
             display: none;
+          }
+        }
+      }
+      .control-menu {
+        position: relative;
+        .control-popup {
+          position: absolute;
+          top: 46px;
+          right: 0;
+          opacity: 0;
+          visibility: hidden;
+          transform-origin: right top;
+          transform: translateY(-10px) scale(0.8);
+          padding: 8px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          background-color: var(--main-card-background);
+          border: 1px solid var(--main-card-border);
+          box-shadow: 0 8px 12px -3px var(--main-color-bg);
+          border-radius: 50px;
+          transition:
+            opacity 0.3s,
+            visibility 0.3s,
+            transform 0.3s;
+          &::before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            right: 0;
+            width: 100%;
+            height: 30px;
+          }
+          .control-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 4px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid var(--main-card-border);
+            background-color: var(--main-card-background);
+            transition:
+              transform 0.3s,
+              background-color 0.3s;
+            cursor: pointer;
+            .iconfont {
+              font-size: 18px;
+              color: var(--main-font-color);
+              transition: color 0.3s;
+            }
+            &.open {
+              background-color: var(--main-color);
+              .iconfont {
+                color: #fff;
+              }
+            }
+            &:hover {
+              transform: scale(1.08);
+            }
+            &:active {
+              transform: scale(1);
+            }
+          }
+          .control-capsule {
+            display: flex;
+            align-items: center;
+            margin: 0 4px;
+            height: 42px;
+            padding: 0 16px;
+            border-radius: 50px;
+            border: 1px solid var(--main-card-border);
+            background-color: var(--main-card-background);
+            white-space: nowrap;
+            transition:
+              background-color 0.3s,
+              border-color 0.3s;
+            cursor: pointer;
+            .iconfont {
+              font-size: 18px;
+              flex-shrink: 0;
+              color: var(--main-font-color);
+              transition: color 0.3s;
+            }
+            .capsule-text {
+              font-size: 13px;
+              margin-left: 8px;
+              color: var(--main-font-color);
+              transition: color 0.3s;
+            }
+            &:hover {
+              background-color: var(--main-color);
+              border-color: var(--main-color);
+              .iconfont,
+              .capsule-text {
+                color: #fff;
+              }
+            }
+            &:active {
+              transform: scale(0.95);
+            }
+          }
+        }
+        &:hover {
+          .control-popup {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            visibility: visible;
           }
         }
       }

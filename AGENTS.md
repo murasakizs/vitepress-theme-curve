@@ -43,6 +43,9 @@ A VitePress blog theme with custom components, Pinia state management, and SCSS 
 - Comments system supports Twikoo or Artalk (configure in `themeConfig.mjs`)
 - Weather API requires Amap key or falls back to public API
 
+## TODO
+- [ ] 修复背景模糊功能：`filter: blur(20px)` 加在 `#app` 上会导致整个页面（含弹窗）被模糊，需改为只模糊背景层，弹窗和导航栏保持清晰
+
 ## File Structure
 ```
 ├── .vitepress/

@@ -23,8 +23,6 @@ export const mainStore = defineStore("main", {
       },
       // 页脚可见性
       footerIsShow: false,
-      // 中控台显示
-      controlShow: false,
       // 搜索框显示
       searchShow: false,
       // 个性化配置显示
@@ -41,6 +39,8 @@ export const mainStore = defineStore("main", {
       mobileMenuShow: false,
       // 使用自定义右键菜单
       useRightMenu: true,
+      // 使用自定义鼠标样式
+      useCustomCursor: true,
       // 背景模糊
       backgroundBlur: false,
       // 全站字体
@@ -54,6 +54,12 @@ export const mainStore = defineStore("main", {
       // 站点背景
       backgroundType: "patterns",
       backgroundUrl: "https://api.miaomc.cn/image/get",
+      // 显示更多设置
+      showMoreSettings: false,
+      showMoreSettingsConfirmed: false,
+      // 站点布局
+      siteLayout: "auto",
+      siteLayoutPending: false,
     };
   },
   getters: {},
@@ -164,6 +170,16 @@ export const mainStore = defineStore("main", {
         if (appCursorInstance) {
             appCursorInstance.setThemeType(this.themeType);
         }
+    },
+
+    // 切换自定义鼠标样式
+    toggleCustomCursor() {
+      if (typeof window === 'undefined' || !appCursorInstance) return;
+      if (this.useCustomCursor) {
+        appCursorInstance.enable();
+      } else {
+        appCursorInstance.disable();
+      }
     }
   },
   // 数据持久化
@@ -174,6 +190,7 @@ export const mainStore = defineStore("main", {
         "themeType",
         "bannerType",
         "useRightMenu",
+        "useCustomCursor",
         "playerShow",
         "playerVolume",
         "backgroundBlur",
@@ -182,6 +199,10 @@ export const mainStore = defineStore("main", {
         "fontSize",
         "infoPosition",
         "backgroundUrl",
+        "showMoreSettings",
+        "showMoreSettingsConfirmed",
+        "siteLayout",
+        "siteLayoutPending",
       ], 
     },
   ],
@@ -207,6 +228,11 @@ export const initializeCursor = () => {
 
   store.updateActualThemeValue();
   appCursorInstance.setThemeType(store.themeType);
+
+  // 根据 useCustomCursor 状态启用/禁用自定义鼠标
+  if (!store.useCustomCursor) {
+    appCursorInstance.disable();
+  }
 
   // 新增：设置 html 元素的字体大小
   document.documentElement.style.fontSize = store.fontSize + 'px';

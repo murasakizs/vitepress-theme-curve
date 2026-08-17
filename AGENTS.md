@@ -30,6 +30,7 @@ A VitePress blog theme with custom components, Pinia state management, and SCSS 
 - **Auto-imports**: Vue and VitePress APIs auto-imported (see `.vitepress/auto-imports.d.ts`)
 - **Components**: Auto-registered from `.vitepress/theme/components/` and `views/`
 - **Path alias**: `@` maps to `.vitepress/theme/`
+- **TypeScript**: `tsconfig.json` 中移除了 `"vite/client"` 类型（VitePress 自带类型声明，不需要额外声明）。如有问题，将 `"types": ["node"]` 改回 `"types": ["vite/client", "node"]` 即可
 
 ## Build & Deploy
 - **CI**: GitHub Actions workflow in `.github/workflows/deploy.yml`

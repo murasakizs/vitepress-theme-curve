@@ -3,17 +3,14 @@
     <h1 class="title">关于本站</h1>
     <div class="about-content" style="grid-template-columns: 3fr 2fr">
       <div class="about-item hello">
-        <span class="text1">你好，很高兴认识你👋</span>
-        <span class="text2 title2">我是 泠诗尘</span>
-        <span class="text3">是一个跨性别女孩子</span>
+        <span class="title2">一个莫名其妙的小站(?)</span>
         <span class="text4">
-          DIY HRT于2026.5.10，停止于6.21<br/>
-          获得小证于2026.6.19，已过去 {{ daysSinceCard }} 天<br/>
-          获得北医三院HRT处方于2026.7.28
+          欢迎来到泠の小站w<br/>
+          这里会有很多奇奇怪怪的东西哦（x<br/>
+          那就，请多指教啦
         </span>
       </div>
-      <div class="about-item skills">
-        <span class="tip">技能</span>
+      <div class="about-item skills" style="padding-top: 2rem">
         <span class="title2">我不会的玩意</span>
         <div class="skills-list">
           <a
@@ -59,60 +56,42 @@
       </div>
 
       <div class="about-item child">
-        <div class="about-item" style="padding-top: 1.2rem; padding-bottom: 0.8rem">
-          <span class="tip" style="margin-bottom: 4px">我在</span>
-          <span class="title2"><strong style="color: var(--main-accent)">重庆合川</strong>&<strong style="color: var(--main-color)">江苏苏州</strong></span>
+        <div class="about-item" style="padding: 1.2rem 1.2rem 1.2rem 1.8rem; justify-content: center">
+          <span class="title2"><strong>sgexilq</strong><strong style="color: var(--main-color)">.</strong><strong style="color: var(--main-color)">top</strong></span>
         </div>
-        <div class="about-item info">
-          <div class="info-item">
-            <span class="info-name">诞生于</span>
-            <span class="info-num" style="--color: var(--main-accent)">2009</span>
-          </div>
-          <div class="info-item">
-            <span class="info-name">生日</span>
-            <span class="info-num" style="--color: #e8558e">1010</span>
-          </div>
-          <div class="info-item">
-            <span class="info-name">距生日</span>
-            <span class="info-num" style="--color: #8c78e8">
-              <LiveDate mode="days-until" :date="birthDate" yearly /> 天
-            </span>
-          </div>
+        <div class="about-item info" style="align-items: center; justify-content: center; padding-left: 1.7rem">
+          <span class="title2" style="white-space: nowrap">
+            <span>本站上线</span>&nbsp;&nbsp;<span style="color: var(--main-accent)">{{ daysOnline }}</span>&nbsp;&nbsp;<span>天</span>
+          </span>
         </div>
       </div>
     </div>
-    <!-- 上方卡片 -->
+    <!-- 站点状态 -->
     <div class="about-content" style="display: flex">
-      <div class="about-item">
-        <span class="title2">我</span>
-      </div>
-    </div>
-    <!-- 关于这个站 -->
-    <div class="about-content" style="display: flex">
-      <div class="about-item">
-        <span class="tip">关于这个站</span>
-        <span class="title2" style="margin-bottom: 0.8rem">一个莫名其妙的小站（？）</span>
-        <p class="text">
-          愿每个人都被世界温柔以待~
-        </p>
-        <p class="text" style="opacity: 0.4">
-          年年岁岁花相似，岁岁年年人不同
-        </p>
-        <p class="text" style="color: var(--main-color); font-weight: bold">
-          我爱你们
-        </p>
+      <div class="about-item" style="padding: 1.2rem 2rem">
+        <p class="text" style="margin: 0.2rem 0; font-size: 1.6em"><strong style="color: var(--main-color)">本站仍在建设中</strong></p>
+        <p class="text" style="margin: 0.2rem 0">最近更新于 <strong style="color: var(--main-accent)">2026.8.17</strong></p>
+        <p class="text" style="margin: 0.2rem 0">修改以自用为主</p>
+        <p class="text" style="margin: 0.2rem 0">详见本站 <a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank" style="color: var(--main-color)"><strong>源码 </strong></a></p>
       </div>
     </div>
     <!-- 下方卡片 -->
     <div class="about-content" style="display: flex">
       <div class="about-item">
-        <p class="text">往前走</p>
-        <p class="text">路是很难走</p>
-        <p class="text">跟我们普通人相比</p>
-        <p class="text">这是条非常难的崎岖的路</p>
-        <p class="text" style="color: var(--main-color); font-weight: bold">但是不往前走怎么办</p>
-        <p class="text" style="color: var(--main-color); font-weight: bold">可能连路都没有</p>
-        <p class="text" style="text-align: right; opacity: 0.6">------潘柏林</p>
+        <span class="tip">上游致谢</span>
+        <span class="title2" style="margin-bottom: 0.8rem">vitepress-theme-curve</span>
+        <p class="text">
+          本站基于开源项目 <a href="https://github.com/kazukokawagawa/vitepress-theme-curve" target="_blank"><strong>vitepress-theme-curve</strong></a> 构建，感谢原作者 <a href="https://chiyu.it/" target="_blank"><strong>池鱼</strong></a> 的开源贡献
+        </p>
+        <p class="text">
+          本站遵循 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"><strong>AGPL v3</strong></a> 协议<a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank"><strong>开源</strong></a>
+        </p>
+        <p class="text" style="opacity: 0.4">
+          技术栈：<a href="https://vitepress.dev/" target="_blank">VitePress</a> · <a href="https://vuejs.org/" target="_blank">Vue 3</a> · <a href="https://pinia.vuejs.org/" target="_blank">Pinia</a> · <a href="https://sass-lang.com/" target="_blank">SCSS</a>
+        </p>
+        <p class="text" style="color: var(--main-accent); margin-top: 0.4rem">
+          本站的诞生离不开上游作者的开源贡献。
+        </p>
       </div>
     </div>
   </div>
@@ -121,11 +100,9 @@
 <script setup>
 import { loadScript } from "@/utils/commonTools";
 
-const birthDate = "2009-10-10";
-
-// 获得小证天数
-const daysSinceCard = computed(() => {
-  const start = new Date("2026-06-19");
+// 站点上线天数
+const daysOnline = computed(() => {
+  const start = new Date("2026-08-16");
   const now = new Date();
   return Math.floor((now - start) / (1000 * 60 * 60 * 24));
 });
@@ -194,10 +171,10 @@ const skillsData = [
     link: "https://www.adobe.com/cn/lead/creativecloud/business.html",
   },
   {
-    name: "ChatGPT",
-    color: "#4AA181",
-    icon: "chatgpt",
-    link: "https://chat.openai.com/",
+    name: "XiaomiMiMO",
+    color: "#FF6900",
+    icon: "tools",
+    link: "https://mimo.mi.com/",
   },
 ];
 
@@ -266,17 +243,12 @@ onMounted(() => {
       &.hello {
         justify-content: center;
         padding: 2rem;
-        color: #fff;
-        background-image: var(--hello-gradient);
-        background-size: 200% 200%;
-        animation: gradientFlow 6s ease infinite;
+        background-color: #f8f5ff;
         .title2 {
           line-height: 2;
         }
         .text4 {
-          margin-top: 0.5rem;
-          font-size: 0.9rem;
-          opacity: 0.8;
+          opacity: 0.5;
         }
       }
       &.pursuit {
@@ -572,6 +544,12 @@ onMounted(() => {
       }
     }
   }
+}
+</style>
+
+<style lang="scss">
+html.dark .about .about-item.hello {
+  background-color: #2a2035 !important;
 }
 </style>
 

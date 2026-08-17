@@ -4,7 +4,7 @@ aside: false
 ---
 
 <script setup>
-import About from "@/views/About.vue"
+import About from "@/views/AboutWebsite.vue"
 </script>
 
 <About />

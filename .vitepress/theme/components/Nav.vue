@@ -263,10 +263,17 @@ const { site, theme, frontmatter, page } = useData();
                 margin: 0 4px;
                 transition:
                   color 0.3s,
-                  background-color 0.3s;
+                  padding 0.3s,
+                  background-color 0.3s,
+                  box-shadow 0.3s;
                 &:hover {
                   color: var(--main-card-background);
                   background-color: var(--main-color);
+                  box-shadow: 0 8px 12px -3px var(--main-color-bg);
+                  padding: 0 1.8rem 0 2.4rem;
+                  .iconfont {
+                    color: var(--main-card-background);
+                  }
                 }
               }
             }
@@ -298,6 +305,7 @@ const { site, theme, frontmatter, page } = useData();
         white-space: nowrap;
         margin-left: 8px;
         margin-top: -1px;
+        transition: color 0.3s;
       }
     }
     .nav-center {
@@ -623,7 +631,8 @@ const { site, theme, frontmatter, page } = useData();
     }
     &:hover {
       background-color: var(--main-color);
-      .iconfont {
+      .iconfont,
+      .site-name {
         color: var(--main-card-background);
       }
     }

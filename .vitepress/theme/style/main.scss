@@ -500,4 +500,47 @@ html.force-mobile {
   .settings .set-btn {
     display: flex !important;
   }
+  // 响应式组件：让 768px 媒体查询的样式生效
+  .footer-link {
+    flex-direction: column !important;
+  }
+  .banner-content {
+    padding: 1rem !important;
+  }
+  .post-layout {
+    flex-direction: column !important;
+  }
+  .pagination {
+    flex-direction: column !important;
+  }
+  .copyright {
+    flex-direction: column !important;
+  }
+  .next-post {
+    flex-direction: column !important;
+  }
+  .player {
+    flex-direction: column !important;
+  }
+  .password-protect {
+    padding: 1rem !important;
+  }
+}
+
+// 强制桌面端布局
+html.force-pc {
+  .main-nav .nav-all .right-nav .menu-btn {
+    &.mobile {
+      display: none !important;
+    }
+    &.pc {
+      display: flex !important;
+    }
+  }
+  .main-aside {
+    display: block !important;
+  }
+  .settings .set-btn {
+    display: none !important;
+  }
 }

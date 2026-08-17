@@ -526,6 +526,9 @@ const rightMenuSwitch = () => {
         &.mobile {
           display: none;
         }
+        &.pc {
+          display: flex;
+        }
         @media (max-width: 768px) {
           &.mobile {
             display: flex;

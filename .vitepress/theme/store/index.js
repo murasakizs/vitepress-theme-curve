@@ -60,6 +60,11 @@ export const mainStore = defineStore("main", {
       // 站点布局
       siteLayout: "auto",
       siteLayoutPending: false,
+      // 消息样式
+      messageStyle: isMobile ? "bar" : "card",
+      messagePosition: isMobile ? "bar-top" : "left-bottom",
+      progressDirection: "normal",
+      messageDuration: 3000,
     };
   },
   getters: {},
@@ -203,6 +208,10 @@ export const mainStore = defineStore("main", {
         "showMoreSettingsConfirmed",
         "siteLayout",
         "siteLayoutPending",
+        "messageStyle",
+        "messagePosition",
+        "progressDirection",
+        "messageDuration",
       ], 
     },
   ],

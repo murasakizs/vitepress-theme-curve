@@ -42,6 +42,9 @@
 
 <script setup>
 import { getAdcode, getWeather } from '@/api'
+import { mainStore } from "@/store";
+
+const store = mainStore();
 
 // 声明会在请求出错时抛出的事件
 const emit = defineEmits(['fetch-error'])
@@ -50,13 +53,14 @@ const weatherData = ref(null)
 const loading     = ref(true)
 const error       = ref(false)
 
-const isMobileClient = () => {
-  if (typeof navigator === 'undefined') return false
-  return /Mobi|Android|iPhone|iPad|Pad|iPod/i.test(navigator.userAgent)
-}
+const isMobileLayout = computed(() => {
+  if (store.siteLayout === "mobile") return true;
+  if (store.siteLayout === "pc") return false;
+  return typeof window !== "undefined" && window.innerWidth <= 768;
+})
 
 onMounted(async () => {
-  if (isMobileClient()) {
+  if (isMobileLayout.value) {
     loading.value = false
     return
   }

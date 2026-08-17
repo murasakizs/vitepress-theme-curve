@@ -201,7 +201,7 @@
             <span class="title">实验性功能</span>
             <span class="set-desc">以下选项还处于开发/计划开发中，可能不稳定或暂时无法使用</span>
             <div class="set-item">
-              <span class="set-label">站点布局</span>
+              <span class="set-label">页面布局（beta）</span>
               <div class="set-options">
                 <span
                   :class="['options', { choose: siteLayout === 'auto' }]"
@@ -224,6 +224,12 @@
               </div>
             </div>
             <Transition name="fade-up">
+              <div v-if="layoutWarnVisible" class="set-warn">
+                <span class="warn-text">强制更改页面布局可能会导致未知的问题，你确定要继续吗</span>
+                <span class="options" @click.stop="handleLayoutWarnConfirm">确认</span>
+              </div>
+            </Transition>
+            <Transition name="fade-up">
               <div v-if="layoutConfirmVisible" class="set-warn set-warn-purple" @click="handleLayoutFail">
                 <span />
                 <span class="warn-text">网站能正常显示吗？</span>
@@ -231,6 +237,218 @@
                 <div class="warn-actions">
                   <span class="options warn-no" @click.stop="handleLayoutFail">不能</span>
                   <span class="options warn-yes" @click.stop="handleLayoutOk">是的</span>
+                </div>
+              </div>
+            </Transition>
+            <div class="set-item">
+              <span class="set-label">主题颜色（beta）</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: themeColorExpanded }]"
+                  @click="themeColorExpanded = !themeColorExpanded"
+                >
+                  {{ themeColorExpanded ? '收起' : '展开' }}
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="themeColorExpanded" class="set-expand-box">
+                <div class="set-item">
+                  <span class="set-label">占位</span>
+                  <div class="set-options">
+                    <span class="options">占位</span>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+            <div class="set-item">
+              <span class="set-label">消息样式</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: messageSettingsExpanded }]"
+                  @click="messageSettingsExpanded = !messageSettingsExpanded"
+                >
+                  {{ messageSettingsExpanded ? '收起' : '展开' }}
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="messageSettingsExpanded" class="set-expand-box">
+                <div class="set-item">
+                  <span class="set-label">消息样式</span>
+                  <div class="set-options">
+                    <span
+                      :class="['options', { choose: messageStyle === 'bar' }]"
+                      @click="messageStyle = 'bar'"
+                    >
+                      传统
+                    </span>
+                    <span
+                      :class="['options', { choose: messageStyle === 'card' }]"
+                      @click="messageStyle = 'card'"
+                    >
+                      卡片（beta）
+                    </span>
+                    <span
+                      :class="['options', { choose: messageStyle === 'island' }]"
+                      @click="messageStyle = 'island'"
+                    >
+                      超级岛（beta）
+                    </span>
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">消息位置</span>
+                  <div class="set-options">
+                    <template v-if="messageStyle === 'bar'">
+                      <span
+                        :class="['options', { choose: messagePosition === 'bar-top' }]"
+                        @click="messagePosition = 'bar-top'"
+                      >
+                        顶部
+                      </span>
+                      <span
+                        :class="['options', { choose: messagePosition === 'bar-bottom' }]"
+                        @click="messagePosition = 'bar-bottom'"
+                      >
+                        底部
+                      </span>
+                    </template>
+                    <template v-else>
+                      <span
+                        :class="['options', { choose: messagePosition === 'left-top' }]"
+                        @click="messagePosition = 'left-top'"
+                      >
+                        左上
+                      </span>
+                      <span
+                        :class="['options', { choose: messagePosition === 'left-bottom' }]"
+                        @click="messagePosition = 'left-bottom'"
+                      >
+                        左下
+                      </span>
+                      <span
+                        :class="['options', { choose: messagePosition === 'right-top' }]"
+                        @click="messagePosition = 'right-top'"
+                      >
+                        右上
+                      </span>
+                      <span
+                        :class="['options', { choose: messagePosition === 'right-bottom' }]"
+                        @click="messagePosition = 'right-bottom'"
+                      >
+                        右下
+                      </span>
+                      <span
+                        :class="['options', { choose: messagePosition === 'top-center' }]"
+                        @click="messagePosition = 'top-center'"
+                      >
+                        顶部居中
+                      </span>
+                      <span
+                        :class="['options', { choose: messagePosition === 'bottom-center' }]"
+                        @click="messagePosition = 'bottom-center'"
+                      >
+                        底部居中
+                      </span>
+                    </template>
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">进度条方向</span>
+                  <div class="set-options">
+                    <span
+                      v-if="messageDuration > 0"
+                      :class="['options', { choose: progressDirection === 'normal' }]"
+                      @click="progressDirection = 'normal'"
+                    >
+                      正向
+                    </span>
+                    <span
+                      v-if="messageDuration > 0"
+                      :class="['options', { choose: progressDirection === 'reverse' }]"
+                      @click="progressDirection = 'reverse'"
+                    >
+                      逆向
+                    </span>
+                    <span
+                      :class="['options', { choose: progressDirection === 'decorative' }]"
+                      @click="progressDirection = 'decorative'"
+                    >
+                      装饰
+                    </span>
+                    <span
+                      :class="['options', { choose: progressDirection === 'disabled' }]"
+                      @click="progressDirection = 'disabled'"
+                    >
+                      关闭
+                    </span>
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">显示时间</span>
+                  <div class="set-options">
+                    <span
+                      :class="['options', { choose: messageDuration === 1000 }]"
+                      @click="messageDuration = 1000"
+                    >
+                      1秒
+                    </span>
+                    <span
+                      :class="['options', { choose: messageDuration === 2000 }]"
+                      @click="messageDuration = 2000"
+                    >
+                      2秒
+                    </span>
+                    <span
+                      :class="['options', { choose: messageDuration === 3000 }]"
+                      @click="messageDuration = 3000"
+                    >
+                      3秒
+                    </span>
+                    <span
+                      :class="['options', { choose: messageDuration === 5000 }]"
+                      @click="messageDuration = 5000"
+                    >
+                      5秒
+                    </span>
+                    <span
+                      :class="['options', { choose: messageDuration === 0 }]"
+                      @click="messageDuration = 0"
+                    >
+                      手动关闭
+                    </span>
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">发送测试消息</span>
+                  <div class="set-options">
+                    <span class="options" @click="sendTestMessage('success')">成功</span>
+                    <span class="options" @click="sendTestMessage('warning')">警告</span>
+                    <span class="options" @click="sendTestMessage('error')">错误</span>
+                    <span class="options" @click="sendTestMessage('info')">信息</span>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+            <div class="set-item">
+              <span class="set-label">超级岛（beta）</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: islandSettingsExpanded }]"
+                  @click="islandSettingsExpanded = !islandSettingsExpanded"
+                >
+                  {{ islandSettingsExpanded ? '收起' : '展开' }}
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="islandSettingsExpanded" class="set-expand-box">
+                <div class="set-item">
+                  <span class="set-label">占位</span>
+                  <div class="set-options">
+                    <span class="options">占位</span>
+                  </div>
                 </div>
               </div>
             </Transition>
@@ -299,8 +517,15 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending } =
+const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, messageStyle, messagePosition, progressDirection, messageDuration } =
   storeToRefs(store);
+
+// 判断是否使用移动端布局
+const isMobileLayout = computed(() => {
+  if (store.siteLayout === "mobile") return true;
+  if (store.siteLayout === "pc") return false;
+  return typeof window !== "undefined" && window.innerWidth <= 768;
+});
 
 // 警告区域自动滚动
 const warnRef = ref(null);
@@ -310,9 +535,11 @@ const scrollToWarn = () => {
   });
 };
 
-// 站点布局确认逻辑
+// 页面布局确认逻辑
 const layoutConfirmVisible = ref(false);
 const layoutCountdown = ref(10);
+const layoutWarnVisible = ref(false);
+const layoutWarnTarget = ref("");
 let layoutTimer = null;
 
 const startLayoutCountdown = () => {
@@ -337,6 +564,12 @@ const clearLayoutCountdown = () => {
 
 const handleLayoutChange = (layout) => {
   siteLayout.value = layout;
+  layoutWarnTarget.value = layout;
+  layoutWarnVisible.value = true;
+};
+
+const handleLayoutWarnConfirm = () => {
+  layoutWarnVisible.value = false;
   startLayoutCountdown();
 };
 
@@ -360,6 +593,13 @@ const handleLayoutOk = () => {
   clearLayoutCountdown();
 };
 
+// 消息设置展开状态
+const messageSettingsExpanded = ref(false);
+// 超级岛设置展开状态
+const islandSettingsExpanded = ref(false);
+// 主题颜色设置展开状态
+const themeColorExpanded = ref(false);
+
 // 恢复默认配置
 const showResetConfirm = ref(false);
 const resetWarnRef = ref(null);
@@ -374,12 +614,74 @@ const handleResetConfig = () => {
   location.reload();
 };
 
+// 发送测试消息
+const sendTestMessage = (type = "info") => {
+  if (typeof $message !== "undefined") {
+    const isCard = messageStyle.value === "card" || messageStyle.value === "island";
+    $message[type]("这是一条测试消息，用于测试实验中功能", { card: isCard });
+  }
+};
+
 // 打开设置面板时，如果"显示更多选项"未确认则重置为关闭
+// 页面布局变化时自动切换消息样式
+watch(
+  () => siteLayout.value,
+  (val) => {
+    if (val === "pc") {
+      messageStyle.value = "card";
+    } else if (val === "mobile") {
+      messageStyle.value = "bar";
+    } else {
+      // auto 模式根据屏幕宽度判断
+      messageStyle.value = window.innerWidth <= 768 ? "bar" : "card";
+    }
+  },
+);
+
+// 监听窗口大小变化，auto 模式下自动切换消息样式
+let resizeTimer = null;
+const handleResize = () => {
+  if (siteLayout.value !== "auto") return;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    messageStyle.value = window.innerWidth <= 768 ? "bar" : "card";
+  }, 300);
+};
+
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+  clearTimeout(resizeTimer);
+});
+
+// 切换消息样式时重置位置
+watch(
+  () => messageStyle.value,
+  (val) => {
+    if (val === "bar") {
+      messagePosition.value = "bar-top";
+    } else {
+      messagePosition.value = "left-bottom";
+    }
+    progressDirection.value = "normal";
+  },
+);
+
 watch(
   () => store.showSettings,
   (val) => {
-    if (val && showMoreSettings.value && !showMoreSettingsConfirmed.value) {
-      showMoreSettings.value = false;
+    if (val) {
+      // 打开设置时重置合并菜单状态
+      messageSettingsExpanded.value = false;
+      islandSettingsExpanded.value = false;
+      themeColorExpanded.value = false;
+      layoutWarnVisible.value = false;
+      if (showMoreSettings.value && !showMoreSettingsConfirmed.value) {
+        showMoreSettings.value = false;
+      }
     }
     if (!val) {
       showResetConfirm.value = false;
@@ -523,6 +825,40 @@ watch(
         .options {
           &:first-child {
             margin-left: 0;
+          }
+        }
+      }
+    }
+  }
+  .set-expand-box {
+    border: none;
+    border-left: 4px solid var(--main-color);
+    border-radius: 0;
+    padding: 0 0 0 16px;
+    margin-bottom: 12px;
+    .set-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+      @media (max-width: 512px) {
+        flex-direction: column;
+        align-items: flex-start;
+        .set-options {
+          margin-top: 8px;
+          margin-bottom: 8px;
+          height: auto;
+          flex-wrap: wrap;
+          gap: 6px;
+          .options {
+            margin: 0;
+            &:first-child {
+              margin-left: 0;
+            }
           }
         }
       }

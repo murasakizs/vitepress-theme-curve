@@ -2,15 +2,22 @@
 <template>
   <Teleport to="body">
     <Transition name="fade" mode="out-in">
-      <div v-if="show" class="modal">
+      <div v-if="show" :class="['modal', { 'modal-wrapper-mobile': isMobileLayout }]">
         <div class="modal-mask" @click.stop="maskClick" />
         <div
           :style="{
             maxWidth: typeof maxWidth === 'string' ? maxWidth : `${maxWidth}px`,
           }"
-          class="modal-main s-card"
+          :class="['modal-main', 's-card', { 'modal-mobile': isMobileLayout }]"
           @click.stop
+          @touchstart.passive="onTouchStart"
+          @touchmove.passive="onTouchMove"
+          @touchend="onTouchEnd"
         >
+          <!-- 移动端下滑把手 -->
+          <div class="modal-drag-handle">
+            <div class="drag-bar" />
+          </div>
           <!-- 标题 -->
           <div v-if="title" class="title">
             <div class="title-left">
@@ -19,6 +26,8 @@
             </div>
             <!-- 关闭按钮 -->
             <i v-if="showClose" class="iconfont icon-close close" @click="modalClose" />
+            <!-- 移动端返回按钮 -->
+            <i class="iconfont icon-left back" @click="modalClose" />
           </div>
           <!-- 弹窗内容 -->
           <div class="modal-content" :style="{ '--height': maxHeight + 'vh' }">
@@ -31,6 +40,10 @@
 </template>
 
 <script setup>
+import { mainStore } from "@/store";
+
+const store = mainStore();
+
 const props = defineProps({
   // 是否显示
   show: {
@@ -64,12 +77,110 @@ const props = defineProps({
   },
 });
 
+// 判断是否使用移动端布局
+const isMobileLayout = computed(() => {
+  if (store.siteLayout === "mobile") return true;
+  if (store.siteLayout === "pc") return false;
+  return typeof window !== "undefined" && window.innerWidth <= 768;
+});
+
 // 发射事件
 const emit = defineEmits(["mask-click", "modal-close"]);
 
 // 遮罩层事件
 const maskClick = () => emit("mask-click");
 const modalClose = () => emit("modal-close");
+
+// 移动端下滑手势
+let touchStartY = 0;
+let touchCurrentY = 0;
+let isDragging = false;
+let startTime = 0;
+
+const onTouchStart = (e) => {
+  const modalContent = document.querySelector('.modal-content');
+  if (modalContent && modalContent.scrollTop > 0) {
+    isDragging = false;
+    return;
+  }
+  touchStartY = e.touches[0].clientY;
+  startTime = Date.now();
+  isDragging = true;
+};
+
+const onTouchMove = (e) => {
+  if (!isDragging) return;
+  touchCurrentY = e.touches[0].clientY;
+  const diff = Math.max(0, touchCurrentY - touchStartY);
+  const modalMain = document.querySelector('.modal-main');
+  if (modalMain) {
+    const progress = Math.min(diff / 300, 1);
+    const scale = 1 - progress * 0.05;
+    const opacity = 1 - progress * 0.3;
+    modalMain.style.transform = `translateY(${diff}px) scale(${scale})`;
+    modalMain.style.transition = 'none';
+    modalMain.style.opacity = opacity;
+    const mask = document.querySelector('.modal-mask');
+    if (mask) {
+      mask.style.opacity = opacity;
+    }
+  }
+};
+
+const onTouchEnd = () => {
+  if (!isDragging) return;
+  const diff = touchCurrentY - touchStartY;
+  const elapsed = Date.now() - startTime;
+  const velocity = diff / elapsed;
+  const modalMain = document.querySelector('.modal-main');
+  const mask = document.querySelector('.modal-mask');
+  const shouldClose = diff > 80 || velocity > 0.5;
+
+  if (shouldClose) {
+    if (modalMain) {
+      modalMain.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+      modalMain.style.transform = 'translateY(100vh) scale(0.95)';
+      modalMain.style.opacity = '0';
+    }
+    if (mask) {
+      mask.style.transition = 'opacity 0.3s ease-out';
+      mask.style.opacity = '0';
+    }
+    setTimeout(() => {
+      if (modalMain) {
+        modalMain.style.transform = '';
+        modalMain.style.transition = '';
+        modalMain.style.opacity = '';
+      }
+      if (mask) {
+        mask.style.opacity = '';
+        mask.style.transition = '';
+      }
+      modalClose();
+    }, 300);
+  } else {
+    if (modalMain) {
+      modalMain.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
+      modalMain.style.transform = '';
+      modalMain.style.opacity = '';
+    }
+    if (mask) {
+      mask.style.transition = 'opacity 0.25s ease-out';
+      mask.style.opacity = '';
+    }
+    setTimeout(() => {
+      if (modalMain) {
+        modalMain.style.transition = '';
+      }
+      if (mask) {
+        mask.style.transition = '';
+      }
+    }, 250);
+  }
+  touchStartY = 0;
+  touchCurrentY = 0;
+  isDragging = false;
+};
 
 // 监听开启
 watch(
@@ -99,6 +210,12 @@ watch(
     height: 100%;
     z-index: -1;
     background-color: var(--main-mask-background);
+  }
+  .modal-drag-handle {
+    display: none;
+  }
+  .back {
+    display: none;
   }
   .modal-main {
     position: absolute;
@@ -142,6 +259,84 @@ watch(
       padding: 20px;
       overflow: auto;
     }
+  }
+  .modal-mobile {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100vh - 48px);
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+    .modal-drag-handle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 0 4px;
+      cursor: grab;
+      touch-action: none;
+      .drag-bar {
+        width: 40px;
+        height: 4px;
+        border-radius: 2px;
+        background-color: var(--main-card-border);
+      }
+    }
+    .title {
+      position: relative;
+      justify-content: center;
+      .title-left {
+        text-align: center;
+      }
+      .back {
+        display: flex;
+        position: absolute;
+        left: 16px;
+        font-size: 1.25rem;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        &:active {
+          background-color: var(--main-card-border);
+        }
+      }
+      .close {
+        display: none;
+      }
+    }
+    .modal-content {
+      max-height: calc(100vh - 48px - 64px - 40px);
+    }
+  }
+}
+.modal-wrapper-mobile {
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-mobile.fade-enter-active {
+  animation: slide-up 0.3s ease-out forwards;
+}
+.modal-mobile.fade-leave-active {
+  animation: slide-down 0.3s ease-in forwards;
+}
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes slide-down {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
   }
 }
 </style>

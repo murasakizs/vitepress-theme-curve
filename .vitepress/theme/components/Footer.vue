@@ -42,7 +42,7 @@
         </a>
       </div>
       <div class="credit">
-        本站基于 <a href="https://github.com/kazukokawagawa/vitepress-theme-curve" target="_blank"><strong>vitepress-theme-curve</strong></a> 开源项目进行修改与部署，感谢上游作者的贡献。<br style="line-height: 1.8">本站遵循 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"><strong>AGPL v3</strong></a> 协议 <a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank" style="color: var(--main-color)"><strong>开源</strong></a> 。
+        本站的诞生离不开上游作者的开源贡献。本站遵循 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"><strong>AGPL v3</strong></a> 协议 <a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank" style="color: var(--main-color)"><strong>开源</strong></a> 。
       </div>
     </div>
   </footer>

@@ -42,7 +42,7 @@
         </a>
       </div>
       <div class="credit">
-        本站的诞生离不开上游作者的开源贡献。本站遵循 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"><strong>AGPL v3</strong></a> 协议 <a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank" style="color: var(--main-color)"><strong>开源</strong></a> 。
+        本站的诞生离不开上游作者的开源贡献。在此感谢他（她）们。本站遵循 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"><strong>AGPL v3</strong></a> 协议 <a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank" style="color: var(--main-color)"><strong>开源</strong></a> 。
       </div>
     </div>
   </footer>

@@ -16,7 +16,8 @@
           @click="closeMessage"
         >
           <div class="message-content">
-            <span class="text">{{ messageContent || "默认消息内容" }}</span>
+            <span v-if="messageHtml" class="text" v-html="messageContent"></span>
+            <span v-else class="text">{{ messageContent || "默认消息内容" }}</span>
             <span v-if="messageClose" class="close">
               <i class="iconfont icon-close"></i>
             </span>
@@ -55,11 +56,12 @@ const messageAlways = ref(false);
 const messageDuration = ref(0);
 const messageTimeOut = ref(null);
 const messageCard = ref(false);
+const messageHtml = ref(false);
 
 // 消息处理
 const showMessage = (text, type = "info", options = {}, func = null) => {
   // 解构配置
-  const { close = false, always = false, duration = store.messageDuration, card = useCardStyle.value } = options;
+  const { close = false, always = false, duration = store.messageDuration, card = useCardStyle.value, html = false } = options;
   // 先隐藏
   messageShow.value = false;
   clearTimeout(messageTimeOut.value);
@@ -73,6 +75,7 @@ const showMessage = (text, type = "info", options = {}, func = null) => {
     messageAlways.value = always || duration === 0;
     messageDuration.value = duration;
     messageCard.value = card;
+    messageHtml.value = html;
     // 自动关闭消息
     if (!always && duration > 0) {
       messageTimeOut.value = setTimeout(() => {
@@ -259,7 +262,6 @@ onMounted(() => {
     padding: 20px 80px 20px;
     border-radius: 16px;
     background-color: var(--main-card-background);
-    backdrop-filter: saturate(180%) blur(20px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     &::before {

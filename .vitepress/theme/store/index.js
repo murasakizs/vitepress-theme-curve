@@ -47,6 +47,7 @@ export const mainStore = defineStore("main", {
       fontFamily: "vsans",
       // 全站字体大小
       fontSize: isMobile ? 16 : 17,
+      fontSizePending: false,
       // 信息显示位置
       infoPosition: "fixed",
       // 上次滚动位置
@@ -202,6 +203,7 @@ export const mainStore = defineStore("main", {
         "backgroundType",
         "fontFamily",
         "fontSize",
+        "fontSizePending",
         "infoPosition",
         "backgroundUrl",
         "showMoreSettings",

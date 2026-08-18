@@ -183,8 +183,6 @@ const rightMenuSwitch = () => {
     width: 100vw;
     height: 60px;
     background: color-mix(in srgb, var(--main-card-background) 80%, transparent);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     transition:
       background-color 0.3s,
       backdrop-filter 0.3s;
@@ -201,8 +199,6 @@ const rightMenuSwitch = () => {
     }
     &.top {
       background: transparent;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
       outline: 0px;
       &::after {
         opacity: 0;

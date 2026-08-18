@@ -48,7 +48,7 @@ import { ensureGlobalFontsLoaded } from "@/utils/fontLoader.mjs";
 const route = useRoute();
 const store = mainStore();
 const { frontmatter, page, theme } = useData();
-const { loadingStatus, footerIsShow, themeValue, themeType, backgroundType, fontFamily, fontSize, siteLayout, siteLayoutPending } =
+const { loadingStatus, footerIsShow, themeValue, themeType, backgroundType, fontFamily, fontSize, fontSizePending, siteLayout, siteLayoutPending } =
   storeToRefs(store);
 let fontSwitchTaskId = 0;
 
@@ -177,6 +177,15 @@ onMounted(() => {
   changeSiteFont();
   // 切换站点布局
   changeSiteLayout();
+  // 检查字体大小待确认状态
+  if (fontSizePending.value) {
+    fontSize.value = 17;
+    fontSizePending.value = false;
+    document.documentElement.style.fontSize = "17px";
+    if (typeof $message !== "undefined") {
+      $message.warning("上次的字体大小未确认，已恢复为默认大小", { duration: 3000 });
+    }
+  }
   // 检查站点布局待确认状态
   if (siteLayoutPending.value) {
     siteLayout.value = "auto";

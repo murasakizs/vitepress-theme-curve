@@ -220,7 +220,7 @@ onBeforeUnmount(() => {
     }
   }
   .title {
-    font-family: "Site Title";
+    font-family: var(--main-font-family);
     font-weight: bold;
     font-size: 2.75rem;
   }
@@ -229,6 +229,7 @@ onBeforeUnmount(() => {
     font-size: 1.25rem;
     opacity: 0.8;
     animation: fade-up-opacity 0.6s 0.1s backwards;
+    font-family: "xiaolai", var(--main-font-family);
   .text {
     text-align: center;
     overflow: hidden;

@@ -140,7 +140,7 @@ const changeSiteFont = async () => {
 
     if (currentTaskId !== fontSwitchTaskId) return;
 
-    htmlElement.classList.remove("vsans", "hmos", "xlfont");
+    htmlElement.classList.remove("vsans", "hmos", "xlfont", "misans", "browserfont");
     htmlElement.classList.add(fontFamily.value);
   } catch (error) {
     console.error("切换系统字体样式失败", error);

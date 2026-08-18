@@ -44,7 +44,7 @@ export const mainStore = defineStore("main", {
       // 背景模糊
       backgroundBlur: false,
       // 全站字体
-      fontFamily: "vsans",
+      fontFamily: "misans",
       // 全站字体大小
       fontSize: isMobile ? 16 : 17,
       fontSizePending: false,

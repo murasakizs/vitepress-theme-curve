@@ -94,22 +94,22 @@
           <span class="set-label">全站字体</span>
           <div class="set-options">
             <span
-              :class="['options', { choose: fontFamily === 'vsans' }]"
-              @click="setFontFamily('vsans')"
+              :class="['options', { choose: fontFamily === 'misans' }]"
+              @click="setFontFamily('misans')"
             >
-              vivo Sans
-            </span>
-            <span
-              :class="['options', { choose: fontFamily === 'hmos' }]"
-              @click="setFontFamily('hmos')"
-            >
-              HarmonyOS Sans
+              MiSans
             </span>
             <span
               :class="['options', { choose: fontFamily === 'xlfont' }]"
               @click="setFontFamily('xlfont')"
             >
               小赖字体
+            </span>
+            <span
+              :class="['options', { choose: fontFamily === 'browserfont' }]"
+              @click="setFontFamily('browserfont')"
+            >
+              浏览器字体
             </span>
           </div>
         </div>
@@ -191,23 +191,55 @@
         <Transition name="fade-up">
           <div v-if="showMoreSettings && showMoreSettingsConfirmed" class="more-options">
             <div class="set-item">
-              <span class="set-label">全站字体大小</span>
+              <span class="set-label">更多字体选项</span>
               <div class="set-options">
-                <span v-if="!fontSizeEditing" class="options" @click="fontSizeWarnVisible = true">修改</span>
-                <template v-if="fontSizeEditing">
-                  <span v-if="fontSize !== 17" class="options" @click="resetFontSize">恢复默认</span>
-                  <span class="options" @click="store.changeFontSize(false)"> - </span>
-                  <span class="num">{{ fontSize }}</span>
-                  <span class="options" @click="store.changeFontSize(true)"> + </span>
-                  <span class="options" @click="cancelFontSizeEdit">取消</span>
-                  <span class="options" @click="confirmFontSizeEdit">确认</span>
-                </template>
+                <span
+                  :class="['options', { choose: moreFontsExpanded }]"
+                  @click="moreFontsExpanded = !moreFontsExpanded"
+                >
+                  {{ moreFontsExpanded ? '收起' : '展开' }}
+                </span>
               </div>
             </div>
             <Transition name="fade-up">
-              <div v-if="fontSizeWarnVisible" class="set-warn">
-                <span class="warn-text">修改字体大小可能导致未知的问题，你确定要继续吗</span>
-                <span class="options" @click.stop="fontSizeEditing = true; fontSizeWarnVisible = false; store.fontSizePending = true">确认</span>
+              <div v-if="moreFontsExpanded" class="set-expand-box">
+                <div class="set-item">
+                  <span class="set-label">更多字体</span>
+                  <div class="set-options">
+                    <span
+                      :class="['options', { choose: fontFamily === 'vsans' }]"
+                      @click="setFontFamily('vsans')"
+                    >
+                      vivo Sans
+                    </span>
+                    <span
+                      :class="['options', { choose: fontFamily === 'hmos' }]"
+                      @click="setFontFamily('hmos')"
+                    >
+                      HarmonyOS Sans
+                    </span>
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">全站字体大小</span>
+                  <div class="set-options">
+                    <span v-if="!fontSizeEditing" class="options" @click="fontSizeWarnVisible = true">修改</span>
+                    <template v-if="fontSizeEditing">
+                      <span v-if="fontSize !== 17" class="options" @click="resetFontSize">恢复默认</span>
+                      <span class="options" @click="store.changeFontSize(false)"> - </span>
+                      <span class="num">{{ fontSize }}</span>
+                      <span class="options" @click="store.changeFontSize(true)"> + </span>
+                      <span class="options" @click="cancelFontSizeEdit">取消</span>
+                      <span class="options" @click="confirmFontSizeEdit">确认</span>
+                    </template>
+                  </div>
+                </div>
+                <Transition name="fade-up">
+                  <div v-if="fontSizeWarnVisible" class="set-warn">
+                    <span class="warn-text">修改字体大小可能导致未知的问题，你确定要继续吗</span>
+                    <span class="options" @click.stop="fontSizeEditing = true; fontSizeWarnVisible = false; store.fontSizePending = true">确认</span>
+                  </div>
+                </Transition>
               </div>
             </Transition>
             <span class="title">实验性功能</span>
@@ -691,6 +723,7 @@ const handleLayoutOk = () => {
 
 // 消息设置展开状态
 const messageSettingsExpanded = ref(false);
+const moreFontsExpanded = ref(false);
 // 超级岛设置展开状态
 const islandSettingsExpanded = ref(false);
 // 主题颜色设置展开状态
@@ -801,7 +834,7 @@ const setThemeType = (type) => {
 // 设置全站字体
 const setFontFamily = (font) => {
   fontFamily.value = font;
-  const fontNames = { vsans: 'vivo Sans', hmos: 'HarmonyOS Sans', xlfont: '小赖字体' };
+  const fontNames = { vsans: 'vivo Sans', hmos: 'HarmonyOS Sans', xlfont: '小赖字体', misans: 'MiSans', browserfont: '浏览器字体' };
   if (typeof $message !== "undefined") {
     $message.success(`全站字体已切换为${fontNames[font]}`, { duration: 3000 });
   }
@@ -1029,6 +1062,7 @@ watch(
     if (val) {
       // 打开设置时重置合并菜单状态
       messageSettingsExpanded.value = false;
+      moreFontsExpanded.value = false;
       islandSettingsExpanded.value = false;
       themeColorExpanded.value = false;
       layoutWarnVisible.value = false;

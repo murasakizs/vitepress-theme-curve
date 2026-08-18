@@ -3,6 +3,7 @@ const FONT_STYLESHEET_MAP = {
   vsans: "https://cdn.jsdmirror.com/gh/CYYYY5/chiyupic@main/fonts/vivosans.css",
   hmos: "https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css",
   xlfont: "https://cdn.jsdmirror.com/gh/CYYYY5/chiyupic@main/fonts/xiaolai.css",
+  misans: "https://cdn.jsdmirror.com/npm/misans@4.1.0/lib/Normal/MiSans-Medium.min.css",
   firaCode: "https://use.sevencdn.com/css2?family=Fira+Code:wght@300..700&display=swap",
 };
 
@@ -11,6 +12,8 @@ const FONT_FAMILY_MAP = {
   vsans: "vivosans",
   hmos: "HarmonyOS_Regular",
   xlfont: "xiaolai",
+  misans: "MiSans",
+  browserfont: null,
   firaCode: "Fira Code",
 };
 
@@ -85,7 +88,7 @@ export const ensureGlobalFontsLoaded = (fontFamily) => {
 
   return new Promise((resolve) => {
     runWhenIdle(async () => {
-      const fontKeys = ["lexend"];
+      const fontKeys = ["lexend", "xlfont"];
 
       if (fontFamily && FONT_STYLESHEET_MAP[fontFamily]) {
         fontKeys.push(fontFamily);

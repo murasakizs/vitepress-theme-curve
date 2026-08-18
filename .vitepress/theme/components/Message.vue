@@ -1,33 +1,94 @@
 <!-- 全局消息 -->
 <template>
   <Teleport to="body">
-    <Transition name="fadeDown" mode="out-in">
+    <!-- 灵动模式 / 普通模式 -->
+    <div
+      v-if="!messageIsland || store.islandMode !== 'extended'"
+      class="message-wrapper"
+      :class="[
+        messageIsland ? 'island' : store.messagePosition,
+        messageShow ? 'show' : 'hide'
+      ]"
+      :style="{ '--duration': messageDuration + 'ms' }"
+    >
+      <span v-if="messageCard && !messageIsland" :class="['message-type', messageType]">
+        {{ { success: '成功 Success', warning: '警告 Warning', error: '错误 Error', info: '信息 Info' }[messageType] }}
+      </span>
       <div
-        v-if="messageShow"
-        class="message-wrapper"
-        :class="[store.messagePosition]"
-        :style="{ '--duration': messageDuration + 'ms' }"
+        :class="['message', messageType, store.progressDirection, store.messagePosition, { always: messageAlways, card: messageCard, island: messageIsland, 'island-theme-color': messageIsland && store.islandUseThemeColor }]"
+        @click="closeMessage"
       >
-        <span v-if="messageCard" :class="['message-type', messageType]">
-          {{ { success: '成功 Success', warning: '警告 Warning', error: '错误 Error', info: '信息 Info' }[messageType] }}
-        </span>
-        <div
-          :class="['message', messageType, store.progressDirection, store.messagePosition, { always: messageAlways, card: messageCard }]"
-          @click="closeMessage"
-        >
-          <div class="message-content">
-            <span v-if="messageHtml" class="text" v-html="messageContent"></span>
-            <span v-else class="text">{{ messageContent || "默认消息内容" }}</span>
-            <span v-if="messageClose" class="close">
-              <i class="iconfont icon-close"></i>
-            </span>
-          </div>
-        </div>
-        <div v-if="messageCard && store.progressDirection !== 'disabled'" :class="['message-progress', store.progressDirection]">
-          <div class="message-progress-bar" />
+        <div class="message-content">
+          <span v-if="messageIsland && store.progressDirection !== 'disabled'" class="island-progress">
+            <svg viewBox="0 0 24 24" class="island-progress-ring" :key="messageKey">
+              <circle cx="12" cy="12" r="10" fill="none" stroke-width="2.5" class="progress-track" />
+              <circle cx="12" cy="12" r="10" fill="none" stroke-width="2.5" class="progress-fill" />
+            </svg>
+          </span>
+          <span v-if="messageHtml" class="text" v-html="messageContent"></span>
+          <span v-else class="text">{{ messageContent || "默认消息内容" }}</span>
+          <span v-if="messageClose" class="close">
+            <i class="iconfont icon-close"></i>
+          </span>
         </div>
       </div>
-    </Transition>
+      <div v-if="messageCard && !messageIsland && store.progressDirection !== 'disabled'" :class="['message-progress', store.progressDirection]" :key="messageKey">
+        <div class="message-progress-bar" />
+      </div>
+    </div>
+    <!-- 拓展模式 -->
+    <div
+      v-show="messageIsland && store.islandMode === 'extended' && islandWrapperShow"
+      class="island-extended-wrapper"
+      :class="{ 'show': islandWrapperShow }"
+    >
+      <TransitionGroup name="island-stack" tag="div" class="island-stack">
+        <div
+          v-for="msg in islandMessages.slice().reverse()"
+          :key="msg.key"
+          :class="['message', msg.type, 'island', 'island-extended', { 'island-theme-color': store.islandUseThemeColor }]"
+          :style="{ '--duration': msg.duration + 'ms' }"
+          @click="closeIslandMessage(msg.key)"
+        >
+          <div class="message-content">
+            <span v-if="msg.html" class="text" v-html="msg.content"></span>
+            <span v-else class="text">{{ msg.content }}</span>
+          </div>
+        </div>
+      </TransitionGroup>
+      <!-- 子药丸（跟随最下面一条消息） -->
+      <div v-if="islandMessages.length > 0" class="island-pills">
+        <div :class="['island-pill', bottomMessageType, { 'island-theme-color': store.islandUseThemeColor }]">
+          <span v-if="store.progressDirection !== 'disabled'" class="island-progress pill-progress">
+            <svg viewBox="0 0 24 24" class="island-progress-ring">
+              <circle cx="12" cy="12" r="10" fill="none" stroke-width="2.5" class="progress-track" />
+              <circle cx="12" cy="12" r="10" fill="none" stroke-width="2.5" class="progress-fill" :style="{ strokeDashoffset: 62.83 - (62.83 * bottomMessageElapsed / bottomMessageDuration) }" />
+            </svg>
+          </span>
+          <span class="pill-text">{{ { success: '成功 Success', warning: '警告 Warning', error: '错误 Error', info: '信息 Info' }[bottomMessageType] }}</span>
+        </div>
+        <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
+          <span class="pill-text" v-if="store.islandShowDate">
+            <span class="time-date">{{ currentDate }}</span>&nbsp;
+            <span v-if="store.islandShowSeconds">
+              <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
+            </span>
+            <span v-else>
+              <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
+            </span>
+          </span>
+          <span class="pill-text" v-else-if="store.islandShowSeconds">
+            <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
+          </span>
+          <span class="pill-text" v-else>
+            <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
+          </span>
+        </div>
+        <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
+          <span class="pill-text">sgexilq<span class="pill-domain">.top</span></span>
+        </div>
+      </div>
+    </div>
   </Teleport>
 </template>
 
@@ -44,7 +105,11 @@ const isMobileLayout = computed(() => {
 });
 
 const useCardStyle = computed(() => {
-  return store.messageStyle === "card" || store.messageStyle === "island";
+  return store.messageStyle === "card";
+});
+
+const useIslandStyle = computed(() => {
+  return store.messageStyle === "island";
 });
 
 // 消息数据
@@ -56,35 +121,142 @@ const messageAlways = ref(false);
 const messageDuration = ref(0);
 const messageTimeOut = ref(null);
 const messageCard = ref(false);
+const messageIsland = ref(false);
 const messageHtml = ref(false);
+const messageKey = ref(0);
+const currentTime = ref("");
+const currentHours = ref("");
+const currentMinutes = ref("");
+const currentSeconds = ref("");
+const currentDate = ref("");
+let timeInterval = null;
+let progressInterval = null;
+
+// 拓展模式消息数组
+const islandMessages = ref([]);
+const islandMessageTimeouts = ref({});
+const islandWrapperShow = ref(false);
+const progressUpdateKey = ref(0);
+
+// 计算最下面一条消息的类型和key（数组第一条，因为显示是倒序）
+const bottomMessageType = computed(() => {
+  if (islandMessages.value.length === 0) return 'info';
+  return islandMessages.value[0].type;
+});
+const bottomMessageKey = computed(() => {
+  if (islandMessages.value.length === 0) return 0;
+  progressUpdateKey.value; // 触发重新计算
+  return islandMessages.value[0].key;
+});
+const bottomMessageDuration = computed(() => {
+  if (islandMessages.value.length === 0) return 0;
+  return islandMessages.value[0].duration;
+});
+const bottomMessageElapsed = computed(() => {
+  if (islandMessages.value.length === 0) return 0;
+  progressUpdateKey.value; // 触发重新计算
+  const msg = islandMessages.value[0];
+  if (msg.always) return 0;
+  return Math.min(Date.now() - msg.createdAt, msg.duration);
+});
+
+// 关闭拓展模式消息
+const closeIslandMessage = (key) => {
+  const index = islandMessages.value.findIndex(m => m.key === key);
+  if (index !== -1) {
+    islandMessages.value.splice(index, 1);
+    clearTimeout(islandMessageTimeouts.value[key]);
+    delete islandMessageTimeouts.value[key];
+    // 如果是最后一条消息，延迟关闭容器以播放动画
+    if (islandMessages.value.length === 0) {
+      setTimeout(() => {
+        islandWrapperShow.value = false;
+      }, 300);
+    }
+  }
+};
 
 // 消息处理
 const showMessage = (text, type = "info", options = {}, func = null) => {
   // 解构配置
-  const { close = false, always = false, duration = store.messageDuration, card = useCardStyle.value, html = false } = options;
-  // 先隐藏
-  messageShow.value = false;
+  const { close = false, always = false, duration = store.messageDuration, card = useCardStyle.value, island = useIslandStyle.value, html = false } = options;
+
+  // 清除之前的超时
   clearTimeout(messageTimeOut.value);
-  // 显示弹窗
-  nextTick().then(() => {
-    // 更改默认配置
-    messageClose.value = card ? false : (close || duration === 0);
-    messageContent.value = text;
-    messageType.value = type;
+
+  // 拓展模式
+  if (island && store.islandMode === 'extended') {
+    const newKey = Date.now();
+    islandMessages.value.push({
+      key: newKey,
+      type,
+      content: text,
+      html,
+      duration,
+      close: close || duration === 0,
+      always: always || duration === 0,
+      createdAt: Date.now()
+    });
     messageShow.value = true;
-    messageAlways.value = always || duration === 0;
-    messageDuration.value = duration;
-    messageCard.value = card;
-    messageHtml.value = html;
-    // 自动关闭消息
+    messageIsland.value = true;
+    messageKey.value = newKey;
+    // 延迟显示容器以触发动画
+    nextTick(() => {
+      islandWrapperShow.value = true;
+    });
+
+    // 自动关闭
     if (!always && duration > 0) {
-      messageTimeOut.value = setTimeout(() => {
-        messageShow.value = false;
-        // 执行函数
+      islandMessageTimeouts.value[newKey] = setTimeout(() => {
+        closeIslandMessage(newKey);
         if (typeof func === "function") func();
       }, duration);
     }
-  });
+  }
+  // 灵动模式或卡片模式且当前有消息显示，快速切换
+  else if ((island || card) && messageShow.value) {
+    messageShow.value = false;
+    setTimeout(() => {
+      messageIsland.value = island;
+      messageClose.value = card || island ? false : (close || duration === 0);
+      messageContent.value = text;
+      messageType.value = type;
+      messageAlways.value = always || duration === 0;
+      messageDuration.value = duration;
+      messageCard.value = card;
+      messageHtml.value = html;
+      messageKey.value++;
+      messageShow.value = true;
+      if (!always && duration > 0) {
+        messageTimeOut.value = setTimeout(() => {
+          messageShow.value = false;
+          if (typeof func === "function") func();
+        }, duration);
+      }
+    }, 150);
+  }
+  // 普通模式
+  else {
+    messageShow.value = false;
+    nextTick().then(() => {
+      messageIsland.value = island;
+      messageClose.value = card || island ? false : (close || duration === 0);
+      messageContent.value = text;
+      messageType.value = type;
+      messageAlways.value = always || duration === 0;
+      messageDuration.value = duration;
+      messageCard.value = card;
+      messageHtml.value = html;
+      messageKey.value++;
+      messageShow.value = true;
+      if (!always && duration > 0) {
+        messageTimeOut.value = setTimeout(() => {
+          messageShow.value = false;
+          if (typeof func === "function") func();
+        }, duration);
+      }
+    });
+  }
 };
 
 // 弹出消息
@@ -113,9 +285,39 @@ const closeMessage = () => {
   clearTimeout(messageTimeOut.value);
 };
 
+// 更新时间
+const updateTime = () => {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  currentTime.value = `${hours}:${minutes}:${seconds}`;
+  currentHours.value = hours;
+  currentMinutes.value = minutes;
+  currentSeconds.value = seconds;
+  currentDate.value = `${year}.${month}.${day}`;
+};
+
 onMounted(() => {
   // 挂载全局
   window.$message = message;
+  // 启动时间更新
+  updateTime();
+  timeInterval = setInterval(updateTime, 1000);
+  // 启动进度条更新（每帧更新）
+  progressInterval = setInterval(() => {
+    if (islandMessages.value.length > 0) {
+      progressUpdateKey.value++;
+    }
+  }, 50);
+});
+
+onUnmounted(() => {
+  clearInterval(timeInterval);
+  clearInterval(progressInterval);
 });
 </script>
 
@@ -126,33 +328,65 @@ onMounted(() => {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  &.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
   &.left-bottom {
     bottom: 32px;
     left: 32px;
+    transform: translateY(-10px);
+    &.show { transform: translateY(0); }
   }
   &.left-top {
     top: 32px;
     left: 32px;
+    transform: translateY(-10px);
+    &.show { transform: translateY(0); }
   }
   &.right-bottom {
     bottom: 32px;
     right: 32px;
+    transform: translateY(-10px);
+    &.show { transform: translateY(0); }
   }
   &.right-top {
     top: 32px;
     right: 32px;
+    transform: translateY(-10px);
+    &.show { transform: translateY(0); }
   }
   &.bottom-center {
     bottom: 32px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(10px);
     align-items: center;
+    &.show { transform: translateX(-50%) translateY(0); }
   }
   &.top-center {
     top: 32px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(-10px);
     align-items: center;
+    &.show { transform: translateX(-50%) translateY(0); }
+  }
+  // 超级岛样式
+  &.island {
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-40px) scale(0.85);
+    align-items: center;
+    transition:
+      opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    &.show {
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
   }
 }
 .message {
@@ -303,6 +537,211 @@ onMounted(() => {
       }
     }
   }
+  // 超级岛样式
+  &.island {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: auto;
+    min-width: 200px;
+    max-width: 400px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 11px;
+    border-radius: 50px;
+    background-color: var(--main-card-background);
+    border: 1px solid var(--main-card-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    overflow: visible;
+    // 使用主题色
+    &.island-theme-color {
+      background-color: var(--main-color);
+      border-color: var(--main-color);
+      .message-content .text {
+        color: #ffffff;
+      }
+      .message-content .close .iconfont {
+        color: #ffffff;
+      }
+      .progress-track {
+        stroke: rgba(255, 255, 255, 0.3) !important;
+      }
+      .progress-fill {
+        stroke: #ffffff !important;
+      }
+    }
+    &::before {
+      display: none;
+    }
+    &::after {
+      display: none;
+    }
+    .message-content {
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      .text {
+        color: var(--main-font-color);
+      }
+      .close .iconfont {
+        color: var(--main-font-color);
+        opacity: 0.6;
+        font-size: 12px;
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+    // 环形进度条
+    &.success .progress-track { stroke: rgba(103, 194, 58, 0.2); }
+    &.success .progress-fill { stroke: var(--main-success-color); }
+    &.warning .progress-track { stroke: rgba(230, 162, 60, 0.2); }
+    &.warning .progress-fill { stroke: var(--main-warning-color); }
+    &.error .progress-track { stroke: rgba(245, 108, 108, 0.2); }
+    &.error .progress-fill { stroke: var(--main-error-color); }
+    &.info .progress-track { stroke: rgba(144, 147, 153, 0.2); }
+    &.info .progress-fill { stroke: var(--main-info-color); }
+    // 拓展模式
+    &.island-extended {
+      width: 700px;
+      min-width: 700px;
+      max-width: 700px;
+      cursor: pointer;
+      @media (max-width: 750px) {
+        width: 90vw;
+        min-width: 90vw;
+        max-width: 90vw;
+      }
+    }
+    @media (max-width: 768px) {
+      min-width: 160px;
+      max-width: 85vw;
+      padding: 8px 12px;
+      .message-content {
+        font-size: 13px;
+      }
+    }
+  }
+}
+// 超级岛子药丸
+.island-pills {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  @media (max-width: 768px) {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .island-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 50px;
+    background-color: var(--main-card-background);
+    border: 1px solid var(--main-card-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    .pill-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--main-font-color);
+      white-space: nowrap;
+      .pill-domain {
+        color: var(--main-color);
+      }
+      .time-separator,
+      .time-seconds {
+        color: var(--main-color);
+      }
+    }
+    .pill-progress {
+      width: 20px;
+      height: 20px;
+    }
+    @media (max-width: 768px) {
+      padding: 8px 12px;
+      .pill-text {
+        font-size: 13px;
+      }
+    }
+    // 消息类型颜色
+    &.success .pill-text { color: var(--main-success-color); }
+    &.warning .pill-text { color: var(--main-warning-color); }
+    &.error .pill-text { color: var(--main-error-color); }
+    &.info .pill-text { color: var(--main-info-color); }
+    &.success .progress-fill { stroke: var(--main-success-color); }
+    &.warning .progress-fill { stroke: var(--main-warning-color); }
+    &.error .progress-fill { stroke: var(--main-error-color); }
+    &.info .progress-fill { stroke: var(--main-info-color); }
+    // 使用主题色
+    &.island-theme-color {
+      background-color: var(--main-color);
+      border-color: var(--main-color);
+      .pill-text {
+        color: #ffffff;
+        .pill-domain,
+        .time-separator,
+        .time-seconds {
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}
+// 超级岛拓展模式容器
+.island-extended-wrapper {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateX(-50%) translateY(-40px) scale(0.85);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  &.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+.island-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+// 超级岛堆叠动画
+.island-stack-enter-active {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.island-stack-leave-active {
+  transition: all 0.25s ease-in;
+  position: absolute;
+}
+.island-stack-enter-from {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.9);
+}
+.island-stack-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+.island-stack-move {
+  transition: transform 0.3s ease;
 }
 .message-type {
   margin-bottom: 8px;
@@ -335,4 +774,45 @@ onMounted(() => {
 }
 .message-progress-bar { background-color: var(--main-color); }
 .message-wrapper .message.always ~ .message-progress .message-progress-bar { animation: loading 1.5s infinite; }
+
+// 超级岛环形进度条
+.island-progress {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.island-progress-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  .progress-track {
+    stroke: var(--main-card-border);
+  }
+  .progress-fill {
+    stroke: var(--main-font-color);
+    stroke-dasharray: 62.83;
+    stroke-dashoffset: 62.83;
+    stroke-linecap: round;
+    // 灵动模式使用动画
+    animation: island-ring-progress var(--duration, 3000ms) linear forwards;
+  }
+}
+
+// 拓展模式进度条（使用内联样式控制）
+.island-pills .island-progress-ring .progress-fill {
+  animation: none;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+@keyframes island-ring-progress {
+  from {
+    stroke-dashoffset: 62.83;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
 </style>

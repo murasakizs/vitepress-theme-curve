@@ -376,6 +376,14 @@ html.high-contrast {
   .message-wrapper .message-card {
     border: 2px solid var(--main-card-border);
   }
+  // 超级岛高对比度
+  .message.island {
+    border: 2px solid var(--main-card-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  .island-pill {
+    border: 2px solid var(--main-card-border);
+  }
 }
 html.dark.high-contrast {
   --main-font-color: #ffffff;

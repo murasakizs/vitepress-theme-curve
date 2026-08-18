@@ -71,10 +71,15 @@ export const mainStore = defineStore("main", {
       // 主题颜色
       themeColor: "pink",
       // 消息样式
-      messageStyle: "card",
+      messageStyle: "island",
       messagePosition: isMobile ? "top-center" : "left-bottom",
       progressDirection: "normal",
       messageDuration: 3000,
+      // 超级岛模式
+      islandMode: "extended",
+      islandUseThemeColor: false,
+      islandShowSeconds: true,
+      islandShowDate: !isMobile,
     };
   },
   getters: {},
@@ -259,6 +264,10 @@ export const mainStore = defineStore("main", {
         "messagePosition",
         "progressDirection",
         "messageDuration",
+        "islandMode",
+        "islandUseThemeColor",
+        "islandShowSeconds",
+        "islandShowDate",
       ], 
     },
   ],

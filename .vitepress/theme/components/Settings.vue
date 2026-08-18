@@ -349,7 +349,7 @@
                       :class="['options', { choose: messageStyle === 'bar' }]"
                       @click="setMessageStyle('bar')"
                     >
-                      传统
+                      传统（不推荐）
                     </span>
                     <span
                       :class="['options', { choose: messageStyle === 'card' }]"
@@ -361,14 +361,17 @@
                       :class="['options', { choose: messageStyle === 'island' }]"
                       @click="setMessageStyle('island')"
                     >
-                      超级岛（dev）
+                      超级岛（beta）
                     </span>
                   </div>
                 </div>
                 <div class="set-item">
                   <span class="set-label">消息位置</span>
                   <div class="set-options">
-                    <template v-if="messageStyle === 'bar'">
+                    <template v-if="messageStyle === 'island'">
+                      <span class="options choose">顶部居中</span>
+                    </template>
+                    <template v-else-if="messageStyle === 'bar'">
                       <span
                         :class="['options', { choose: messagePosition === 'bar-top' }]"
                         @click="setMessagePosition('bar-top')"
@@ -516,6 +519,99 @@
               </div>
             </Transition>
             <div class="set-item">
+              <span class="set-label">超级岛（beta）</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: islandSettingsExpanded }]"
+                  @click="islandSettingsExpanded = !islandSettingsExpanded"
+                >
+                  {{ islandSettingsExpanded ? '收起' : '展开' }}
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="islandSettingsExpanded" class="set-expand-box">
+                <template v-if="messageStyle === 'island'">
+                  <div class="set-item">
+                    <span class="set-label">超级岛模式</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: islandMode === 'dynamic' }]"
+                        @click="setIslandMode('dynamic')"
+                      >
+                        灵动
+                      </span>
+                      <span
+                        :class="['options', { choose: islandMode === 'extended' }]"
+                        @click="setIslandMode('extended')"
+                      >
+                        拓展
+                      </span>
+                    </div>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">使用主题色</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !islandUseThemeColor }]"
+                        @click="setIslandUseThemeColor(false)"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: islandUseThemeColor }]"
+                        @click="setIslandUseThemeColor(true)"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">时间读秒</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !islandShowSeconds }]"
+                        @click="setIslandShowSeconds(false)"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: islandShowSeconds }]"
+                        @click="setIslandShowSeconds(true)"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">显示日期</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !islandShowDate }]"
+                        @click="setIslandShowDate(false)"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: islandShowDate }]"
+                        @click="setIslandShowDate(true)"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="set-item">
+                    <span class="set-label">需要先将消息类型切换为 超级岛（beta）</span>
+                    <div class="set-options">
+                      <span class="options" @click="setMessageStyle('island')">确认</span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </Transition>
+            <div class="set-item">
               <span class="set-label">显示开发中的功能（dev）</span>
               <div class="set-options">
                 <span
@@ -539,27 +635,6 @@
               </div>
             </Transition>
             <template v-if="showDevFeatures && showDevFeaturesConfirmed">
-              <div class="set-item">
-                <span class="set-label">超级岛（dev）</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: islandSettingsExpanded }]"
-                    @click="islandSettingsExpanded = !islandSettingsExpanded"
-                  >
-                    {{ islandSettingsExpanded ? '收起' : '展开' }}
-                  </span>
-                </div>
-              </div>
-              <Transition name="fade-up">
-                <div v-if="islandSettingsExpanded" class="set-expand-box">
-                  <div class="set-item">
-                    <span class="set-label">占位</span>
-                    <div class="set-options">
-                      <span class="options">占位</span>
-                    </div>
-                  </div>
-                </div>
-              </Transition>
               <div class="set-item">
                 <span class="set-label">Features under development or maintenance</span>
                 <div class="set-options">
@@ -642,7 +717,7 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate } =
   storeToRefs(store);
 
 // 判断是否使用移动端布局
@@ -932,6 +1007,12 @@ const getMessageStyleName = (style) => {
   return names[style] || style;
 };
 
+// 获取超级岛模式名称
+const getIslandModeName = (mode) => {
+  const names = { dynamic: '灵动', extended: '拓展' };
+  return names[mode] || mode;
+};
+
 // 获取消息位置名称
 const getMessagePositionName = (position) => {
   const names = {
@@ -958,13 +1039,18 @@ const getMessageDurationName = (duration) => {
 // 显示消息设置成功消息
 const showMessageSettingsSuccess = () => {
   if (typeof $message !== "undefined") {
-    $message.success(`消息样式已切换为 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`);
+    const islandModeText = messageStyle.value === "island" ? ` ${getIslandModeName(islandMode.value)}` : '';
+    $message.success(`消息样式已切换为 ${getMessageStyleName(messageStyle.value)}${islandModeText} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`);
   }
 };
 
 // 设置消息样式
 const setMessageStyle = (style) => {
   messageStyle.value = style;
+  // 超级岛样式强制顶部居中
+  if (style === "island") {
+    messagePosition.value = "top-center";
+  }
   showMessageSettingsSuccess();
 };
 
@@ -986,11 +1072,42 @@ const setMessageDuration = (duration) => {
   showMessageSettingsSuccess();
 };
 
+// 设置超级岛模式
+const setIslandMode = (mode) => {
+  islandMode.value = mode;
+  showMessageSettingsSuccess();
+};
+
+// 设置超级岛使用主题色
+const setIslandUseThemeColor = (value) => {
+  islandUseThemeColor.value = value;
+  if (typeof $message !== "undefined") {
+    $message.success(`超级岛使用主题色已${value ? '开启' : '关闭'}`);
+  }
+};
+
+// 设置超级岛时间读秒
+const setIslandShowSeconds = (value) => {
+  islandShowSeconds.value = value;
+  if (typeof $message !== "undefined") {
+    $message.success(`超级岛时间读秒已${value ? '开启' : '关闭'}`);
+  }
+};
+
+// 设置超级岛显示日期
+const setIslandShowDate = (value) => {
+  islandShowDate.value = value;
+  if (typeof $message !== "undefined") {
+    $message.success(`超级岛显示日期已${value ? '开启' : '关闭'}`);
+  }
+};
+
 // 发送测试消息
 const sendTestMessage = (type = "info") => {
   if (typeof $message !== "undefined") {
-    const isCard = messageStyle.value === "card" || messageStyle.value === "island";
-    $message[type](`测试消息 | 当前设置 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`, { card: isCard });
+    const isCard = messageStyle.value === "card";
+    const isIsland = messageStyle.value === "island";
+    $message[type](`测试消息 | 当前设置 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`, { card: isCard, island: isIsland });
   }
 };
 
@@ -1017,10 +1134,10 @@ watch(
   (val) => {
     siteLayoutDisplay.value = val;
     if (val === "pc") {
-      messageStyle.value = "card";
+      messageStyle.value = "island";
       normalizeDesktopPosition();
     } else if (val === "mobile") {
-      messageStyle.value = "card";
+      messageStyle.value = "island";
       normalizeMobilePosition();
     }
   },
@@ -1056,10 +1173,10 @@ const updateMessageStyleByLayout = () => {
   // 如果布局发生了变化，更新消息样式为对应的默认值
   if (currentLayout !== lastSiteLayout.value) {
     if (currentLayout === "pc") {
-      messageStyle.value = "card";
+      messageStyle.value = "island";
       normalizeDesktopPosition();
     } else if (currentLayout === "mobile") {
-      messageStyle.value = "card";
+      messageStyle.value = "island";
       normalizeMobilePosition();
     }
     // 更新上次布局记录
@@ -1079,6 +1196,8 @@ watch(
   (val) => {
     if (val === "bar") {
       messagePosition.value = "bar-top";
+    } else if (val === "island") {
+      messagePosition.value = "top-center";
     } else {
       messagePosition.value = "left-bottom";
     }

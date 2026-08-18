@@ -169,3 +169,26 @@
   opacity: 0;
   transform: translateY(10px);
 }
+
+// island - 超级岛动画
+.island-enter-active {
+  transition:
+    opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.island-leave-active {
+  transition:
+    opacity 0.25s ease-in,
+    transform 0.25s ease-in;
+}
+
+.island-enter-from {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-60px) scale(0.85);
+}
+
+.island-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-30px) scale(0.9);
+}

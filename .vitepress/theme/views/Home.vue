@@ -180,7 +180,7 @@ watch(
       width: 300px;
       padding-left: 1rem;
     }
-    @media (max-width: 1200px) {
+    @media (max-width: 768px) {
       .posts-content {
         width: 100%;
       }

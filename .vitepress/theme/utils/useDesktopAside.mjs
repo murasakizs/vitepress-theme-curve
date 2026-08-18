@@ -1,6 +1,6 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
-const ASIDE_MEDIA_QUERY = "(min-width: 1201px)";
+const ASIDE_MEDIA_QUERY = "(min-width: 769px)";
 
 export const useDesktopAside = () => {
   const isDesktopAsideVisible = ref(false);

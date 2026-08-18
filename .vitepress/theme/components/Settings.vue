@@ -570,14 +570,14 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, messageStyle, messagePosition, progressDirection, messageDuration } =
+const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration } =
   storeToRefs(store);
 
 // 判断是否使用移动端布局
 const isMobileLayout = computed(() => {
   if (store.siteLayout === "mobile") return true;
   if (store.siteLayout === "pc") return false;
-  return typeof window !== "undefined" && window.innerWidth <= 768;
+  return store.windowWidth <= 768;
 });
 
 // 警告区域自动滚动
@@ -891,7 +891,7 @@ const setMessageDuration = (duration) => {
 const sendTestMessage = (type = "info") => {
   if (typeof $message !== "undefined") {
     const isCard = messageStyle.value === "card" || messageStyle.value === "island";
-    $message[type]("这是一条测试消息，用于测试实验中功能", { card: isCard });
+    $message[type](`测试消息 | 当前设置为 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`, { card: isCard });
   }
 };
 
@@ -915,16 +915,45 @@ watch(
 // 监听窗口大小变化，auto 模式下自动切换消息样式
 let resizeTimer = null;
 const handleResize = () => {
-  if (siteLayout.value !== "auto") return;
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    messageStyle.value = window.innerWidth <= 768 ? "bar" : "card";
+    // 更新窗口宽度
+    store.windowWidth = window.innerWidth;
+    if (siteLayout.value !== "auto") return;
+    const newStyle = window.innerWidth <= 768 ? "bar" : "card";
+    // 只有当消息样式需要变化时才更新
+    if (messageStyle.value !== newStyle) {
+      messageStyle.value = newStyle;
+      // 更新上次布局记录
+      lastSiteLayout.value = "auto";
+    }
   }, 300);
 };
 
 onMounted(() => {
   window.addEventListener("resize", handleResize);
+  // 页面加载时判断布局是否发生变化，如果变化则更新消息样式
+  updateMessageStyleByLayout();
 });
+
+// 根据页面布局更新消息样式
+const updateMessageStyleByLayout = () => {
+  const currentLayout = siteLayout.value;
+  // 如果布局发生了变化，更新消息样式为对应的默认值
+  if (currentLayout !== lastSiteLayout.value) {
+    if (currentLayout === "pc") {
+      messageStyle.value = "card";
+    } else if (currentLayout === "mobile") {
+      messageStyle.value = "bar";
+    } else {
+      // auto 模式根据屏幕宽度判断
+      messageStyle.value = window.innerWidth <= 768 ? "bar" : "card";
+    }
+    // 更新上次布局记录
+    lastSiteLayout.value = currentLayout;
+  }
+  // 如果布局没有变化，保持先前的设置
+};
 
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);

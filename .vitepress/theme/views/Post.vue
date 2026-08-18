@@ -395,7 +395,7 @@ onMounted(() => {
       width: 300px;
       padding-left: 1rem;
     }
-    @media (max-width: 1200px) {
+    @media (max-width: 768px) {
       .post-article {
         width: 100%;
       }

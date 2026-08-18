@@ -42,7 +42,7 @@ const API_URL = import.meta.env.VITE_HELLOGITHUB_API_URL;
 const isMobile = computed(() => {
   if (store.siteLayout === "mobile") return true;
   if (store.siteLayout === "pc") return false;
-  return typeof window !== "undefined" && window.innerWidth <= 768;
+  return store.windowWidth <= 768;
 });
 
 // 将 ISO 时间解析成 'YYYY-MM-DD HH:mm:ss'

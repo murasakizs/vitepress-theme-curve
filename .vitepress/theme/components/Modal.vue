@@ -81,7 +81,7 @@ const props = defineProps({
 const isMobileLayout = computed(() => {
   if (store.siteLayout === "mobile") return true;
   if (store.siteLayout === "pc") return false;
-  return typeof window !== "undefined" && window.innerWidth <= 768;
+  return store.windowWidth <= 768;
 });
 
 // 发射事件

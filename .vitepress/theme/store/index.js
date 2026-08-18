@@ -61,6 +61,8 @@ export const mainStore = defineStore("main", {
       // 站点布局
       siteLayout: "auto",
       siteLayoutPending: false,
+      lastSiteLayout: "auto",
+      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 1024,
       // 消息样式
       messageStyle: isMobile ? "bar" : "card",
       messagePosition: isMobile ? "bar-top" : "left-bottom",
@@ -210,6 +212,7 @@ export const mainStore = defineStore("main", {
         "showMoreSettingsConfirmed",
         "siteLayout",
         "siteLayoutPending",
+        "lastSiteLayout",
         "messageStyle",
         "messagePosition",
         "progressDirection",

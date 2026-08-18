@@ -249,7 +249,7 @@ const commentCopyData = ref(null);
 const openRightMenu = (e) => {
   // 检测是否可开启
   if (e.ctrlKey || !useRightMenu.value) return true;
-  const isMobileLayout = store.siteLayout === "mobile" || (store.siteLayout !== "pc" && window.innerWidth < 768);
+  const isMobileLayout = store.siteLayout === "mobile" || (store.siteLayout !== "pc" && store.windowWidth < 768);
   if (isMobileLayout) return true;
   e.preventDefault();
   rightMenuShow.value = false;

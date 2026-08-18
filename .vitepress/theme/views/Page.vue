@@ -80,7 +80,7 @@ onMounted(() => {
       padding-left: 1rem;
     }
   }
-  @media (max-width: 1200px) {
+  @media (max-width: 768px) {
     .page-content {
       width: 100% !important;
     }

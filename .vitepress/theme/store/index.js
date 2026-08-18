@@ -71,8 +71,8 @@ export const mainStore = defineStore("main", {
       // 主题颜色
       themeColor: "pink",
       // 消息样式
-      messageStyle: isMobile ? "bar" : "card",
-      messagePosition: isMobile ? "bar-top" : "left-bottom",
+      messageStyle: "card",
+      messagePosition: isMobile ? "top-center" : "left-bottom",
       progressDirection: "normal",
       messageDuration: 3000,
     };
@@ -115,9 +115,7 @@ export const mainStore = defineStore("main", {
       // 禁止壁纸模式切换
       if (this.backgroundType === "image") {
         if (typeof $message !== "undefined") { 
-          $message.warning("无法在壁纸模式下切换明暗模式", {
-            duration: 1500,
-          });
+          $message.warning("无法在壁纸模式下切换明暗模式");
         }
         return false;
       }
@@ -138,9 +136,7 @@ export const mainStore = defineStore("main", {
             : this.themeType === "dark"
               ? "深色模式"
               : "跟随系统";
-        $message.info("当前主题为" + text, {
-          duration: 1500,
-        });
+        $message.info("当前主题为" + text);
       }
 
       // 通知光标更新主题
@@ -180,7 +176,7 @@ export const mainStore = defineStore("main", {
           pink: '泠粉', purple: '幻紫', blue: '栈蓝',
           red: '火红', green: '春绿', gray: '失灰'
         };
-        $message.success(`主题色已切换为${colorNames[color]}`, { duration: 1500 });
+        $message.success(`主题色已切换为${colorNames[color]}`);
       }
     },
 

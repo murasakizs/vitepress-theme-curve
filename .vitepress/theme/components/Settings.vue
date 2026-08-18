@@ -355,7 +355,7 @@
                       :class="['options', { choose: messageStyle === 'card' }]"
                       @click="setMessageStyle('card')"
                     >
-                      卡片（beta）
+                      卡片
                     </span>
                     <span
                       :class="['options', { choose: messageStyle === 'island' }]"
@@ -383,6 +383,21 @@
                       </span>
                     </template>
                     <template v-else>
+                      <template v-if="isMobileLayout">
+                        <span
+                          :class="['options', { choose: messagePosition === 'top-center' }]"
+                          @click="setMessagePosition('top-center')"
+                        >
+                          顶部
+                        </span>
+                        <span
+                          :class="['options', { choose: messagePosition === 'bottom-center' }]"
+                          @click="setMessagePosition('bottom-center')"
+                        >
+                          底部
+                        </span>
+                      </template>
+                      <template v-else>
                       <span
                         :class="['options', { choose: messagePosition === 'left-top' }]"
                         @click="setMessagePosition('left-top')"
@@ -419,6 +434,7 @@
                       >
                         底部居中
                       </span>
+                      </template>
                     </template>
                   </div>
                 </div>
@@ -696,7 +712,7 @@ const handleLayoutAuto = () => {
   layoutConfirmVisible.value = false;
   clearLayoutCountdown();
   if (typeof $message !== "undefined") {
-    $message.success("页面布局切换为自动选择", { duration: 3000 });
+    $message.success("页面布局切换为自动选择");
   }
 };
 
@@ -707,7 +723,7 @@ const handleLayoutFail = () => {
   layoutConfirmVisible.value = false;
   clearLayoutCountdown();
   if (typeof $message !== "undefined") {
-    $message.warning("页面布局未确认，已恢复为自动选择", { duration: 3000 });
+    $message.warning("页面布局未确认，已恢复为自动选择");
   }
 };
 
@@ -717,7 +733,7 @@ const handleLayoutOk = () => {
   clearLayoutCountdown();
   const layoutName = siteLayout.value === "pc" ? "桌面端" : "移动端";
   if (typeof $message !== "undefined") {
-    $message.success(`页面布局已强制切换为 ${layoutName}`, { duration: 3000 });
+    $message.success(`页面布局已强制切换为 ${layoutName}`);
   }
 };
 
@@ -756,7 +772,7 @@ const confirmFontSizeEdit = () => {
   fontSizeEditing.value = false;
   store.fontSizePending = false;
   if (typeof $message !== "undefined") {
-    $message.success(`全站字体大小已修改为 <span style="color: var(--main-color-blue)">${fontSize.value}</span>`, { duration: 3000, html: true });
+    $message.success(`全站字体大小已修改为 <span style="color: var(--main-color-blue)">${fontSize.value}</span>`, { html: true });
   }
 };
 // 恢复默认配置
@@ -778,7 +794,7 @@ const handleResetConfig = () => {
 // 显示恢复默认配置警告
 const showResetWarning = () => {
   if (typeof $message !== "undefined") {
-    $message.warning("即将恢复默认配置，请再次确认", { duration: 3000 });
+    $message.warning("即将恢复默认配置，请再次确认");
   }
 };
 
@@ -786,7 +802,7 @@ const showResetWarning = () => {
 const setBannerType = (type) => {
   bannerType.value = type;
   if (typeof $message !== "undefined") {
-    $message.success(`首页Banner高度已切换为${type === 'half' ? '半屏' : '全屏'}`, { duration: 3000 });
+    $message.success(`首页Banner高度已切换为${type === 'half' ? '半屏' : '全屏'}`);
   }
 };
 
@@ -798,7 +814,7 @@ const setBackgroundType = (type) => {
   }
   const typeNames = { close: '关闭', patterns: '纹理', image: '自定义图片' };
   if (typeof $message !== "undefined") {
-    $message.success(`全站背景已切换为${typeNames[type]}`, { duration: 3000 });
+    $message.success(`全站背景已切换为${typeNames[type]}`);
   }
 };
 
@@ -818,7 +834,7 @@ const setHighContrast = (enabled) => {
     }
   }
   if (typeof $message !== "undefined") {
-    $message.success(`已${enabled ? '开启' : '关闭'}高对比度模式`, { duration: 3000 });
+    $message.success(`已${enabled ? '开启' : '关闭'}高对比度模式`);
   }
 };
 
@@ -827,7 +843,7 @@ const setThemeType = (type) => {
   themeType.value = type;
   const typeNames = { auto: '跟随系统', dark: '深色', light: '浅色' };
   if (typeof $message !== "undefined") {
-    $message.success(`显示外观已切换为${typeNames[type]}`, { duration: 3000 });
+    $message.success(`显示外观已切换为${typeNames[type]}`);
   }
 };
 
@@ -836,7 +852,7 @@ const setFontFamily = (font) => {
   fontFamily.value = font;
   const fontNames = { vsans: 'vivo Sans', hmos: 'HarmonyOS Sans', xlfont: '小赖字体', misans: 'MiSans', browserfont: '浏览器字体' };
   if (typeof $message !== "undefined") {
-    $message.success(`全站字体已切换为${fontNames[font]}`, { duration: 3000 });
+    $message.success(`全站字体已切换为${fontNames[font]}`);
   }
 };
 
@@ -844,7 +860,7 @@ const setFontFamily = (font) => {
 const setInfoPosition = (position) => {
   infoPosition.value = position;
   if (typeof $message !== "undefined") {
-    $message.success(`额外信息显示位置已切换为${position === 'normal' ? '默认位置' : '右下角'}`, { duration: 3000 });
+    $message.success(`额外信息显示位置已切换为${position === 'normal' ? '默认位置' : '右下角'}`);
   }
 };
 
@@ -852,7 +868,7 @@ const setInfoPosition = (position) => {
 const setRightMenu = (enabled) => {
   useRightMenu.value = enabled;
   if (typeof $message !== "undefined") {
-    $message.success(`已${enabled ? '开启' : '关闭'}自定义右键菜单`, { duration: 3000 });
+    $message.success(`已${enabled ? '开启' : '关闭'}自定义右键菜单`);
   }
 };
 
@@ -861,7 +877,7 @@ const setCustomCursor = (enabled) => {
   useCustomCursor.value = enabled;
   store.toggleCustomCursor();
   if (typeof $message !== "undefined") {
-    $message.success(`已${enabled ? '开启' : '关闭'}自定义光标样式`, { duration: 3000 });
+    $message.success(`已${enabled ? '开启' : '关闭'}自定义光标样式`);
   }
 };
 
@@ -875,7 +891,7 @@ const setShowMoreSettings = (show) => {
     fontSizeEditing.value = false;
     store.fontSizePending = false;
     if (typeof $message !== "undefined") {
-      $message.warning("已隐藏更多选项，并恢复默认配置", { duration: 3000 });
+      $message.warning("已隐藏更多选项，并恢复默认配置");
     }
   } else {
     showMoreSettings.value = true;
@@ -887,7 +903,7 @@ const setShowMoreSettings = (show) => {
 const confirmShowMoreSettings = () => {
   showMoreSettingsConfirmed.value = true;
   if (typeof $message !== "undefined") {
-    $message.warning("已显示更多选项", { duration: 3000 });
+    $message.warning("已显示更多选项");
   }
 };
 
@@ -897,7 +913,7 @@ const setShowDevFeatures = (show) => {
   if (!show) {
     showDevFeaturesConfirmed.value = false;
     if (typeof $message !== "undefined") {
-      $message.warning("已隐藏并关闭开发中的功能", { duration: 3000 });
+      $message.warning("已隐藏并关闭开发中的功能");
     }
   }
 };
@@ -906,7 +922,7 @@ const setShowDevFeatures = (show) => {
 const confirmShowDevFeatures = () => {
   showDevFeaturesConfirmed.value = true;
   if (typeof $message !== "undefined") {
-    $message.warning("已显示开发中的功能", { duration: 3000 });
+    $message.warning("已显示开发中的功能");
   }
 };
 
@@ -942,7 +958,7 @@ const getMessageDurationName = (duration) => {
 // 显示消息设置成功消息
 const showMessageSettingsSuccess = () => {
   if (typeof $message !== "undefined") {
-    $message.success(`消息样式已切换为 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`, { duration: 3000 });
+    $message.success(`消息样式已切换为 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`);
   }
 };
 
@@ -974,11 +990,27 @@ const setMessageDuration = (duration) => {
 const sendTestMessage = (type = "info") => {
   if (typeof $message !== "undefined") {
     const isCard = messageStyle.value === "card" || messageStyle.value === "island";
-    $message[type](`测试消息 | 当前设置为 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`, { card: isCard });
+    $message[type](`测试消息 | 当前设置 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`, { card: isCard });
   }
 };
 
 // 打开设置面板时，如果"显示更多选项"未确认则重置为关闭
+// 移动端自动修正卡片消息位置为居中底部
+const normalizeMobilePosition = () => {
+  const cornerPositions = ["left-top", "left-bottom", "right-top", "right-bottom"];
+  if (cornerPositions.includes(messagePosition.value)) {
+    messagePosition.value = "top-center";
+  }
+};
+
+// 桌面端自动修正卡片消息位置为左下
+const normalizeDesktopPosition = () => {
+  const centerPositions = ["top-center", "bottom-center"];
+  if (centerPositions.includes(messagePosition.value)) {
+    messagePosition.value = "left-bottom";
+  }
+};
+
 // 页面布局变化时自动切换消息样式
 watch(
   () => siteLayout.value,
@@ -986,11 +1018,10 @@ watch(
     siteLayoutDisplay.value = val;
     if (val === "pc") {
       messageStyle.value = "card";
+      normalizeDesktopPosition();
     } else if (val === "mobile") {
-      messageStyle.value = "bar";
-    } else {
-      // auto 模式根据屏幕宽度判断
-      messageStyle.value = window.innerWidth <= 768 ? "bar" : "card";
+      messageStyle.value = "card";
+      normalizeMobilePosition();
     }
   },
 );
@@ -1003,13 +1034,13 @@ const handleResize = () => {
     // 更新窗口宽度
     store.windowWidth = window.innerWidth;
     if (siteLayout.value !== "auto") return;
-    const newStyle = window.innerWidth <= 768 ? "bar" : "card";
-    // 只有当消息样式需要变化时才更新
-    if (messageStyle.value !== newStyle) {
-      messageStyle.value = newStyle;
-      // 更新上次布局记录
-      lastSiteLayout.value = "auto";
+    if (window.innerWidth <= 768) {
+      normalizeMobilePosition();
+    } else {
+      normalizeDesktopPosition();
     }
+    // 更新上次布局记录
+    lastSiteLayout.value = "auto";
   }, 300);
 };
 
@@ -1026,11 +1057,10 @@ const updateMessageStyleByLayout = () => {
   if (currentLayout !== lastSiteLayout.value) {
     if (currentLayout === "pc") {
       messageStyle.value = "card";
+      normalizeDesktopPosition();
     } else if (currentLayout === "mobile") {
-      messageStyle.value = "bar";
-    } else {
-      // auto 模式根据屏幕宽度判断
-      messageStyle.value = window.innerWidth <= 768 ? "bar" : "card";
+      messageStyle.value = "card";
+      normalizeMobilePosition();
     }
     // 更新上次布局记录
     lastSiteLayout.value = currentLayout;
@@ -1083,7 +1113,7 @@ watch(
         fontSizeEditing.value = false;
         store.fontSizePending = false;
         if (typeof $message !== "undefined") {
-          $message.warning("字体大小未确认，已恢复为默认大小", { duration: 3000 });
+          $message.warning("字体大小未确认，已恢复为默认大小");
         }
       }
       if (siteLayoutPending.value) {
@@ -1092,7 +1122,7 @@ watch(
         layoutConfirmVisible.value = false;
         clearLayoutCountdown();
         if (typeof $message !== "undefined") {
-          $message.warning("选择的布局未确认，已恢复为自动选择", { duration: 3000 });
+          $message.warning("选择的布局未确认，已恢复为自动选择");
         }
       }
     }

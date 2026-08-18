@@ -68,7 +68,7 @@ const showMessage = (text, type = "info", options = {}, func = null) => {
   // 显示弹窗
   nextTick().then(() => {
     // 更改默认配置
-    messageClose.value = close || duration === 0;
+    messageClose.value = card ? false : (close || duration === 0);
     messageContent.value = text;
     messageType.value = type;
     messageShow.value = true;
@@ -294,6 +294,14 @@ onMounted(() => {
     &.warning::before { background-color: var(--main-warning-color); }
     &.error::before { background-color: var(--main-error-color); }
     &.info::before { background-color: var(--main-info-color); }
+    @media (max-width: 768px) {
+      width: 85vw;
+      padding: 16px 24px;
+      border-radius: 12px;
+      .message-content {
+        font-size: 15px;
+      }
+    }
   }
 }
 .message-type {

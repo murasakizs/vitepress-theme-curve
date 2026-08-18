@@ -243,7 +243,7 @@ onMounted(() => {
       &.hello {
         justify-content: center;
         padding: 2rem;
-        background-color: #f8f5ff;
+        background: var(--main-site-background);
         .title2 {
           line-height: 2;
         }
@@ -549,7 +549,7 @@ onMounted(() => {
 
 <style lang="scss">
 html.dark .about .about-item.hello {
-  background-color: #2a2035 !important;
+  color: var(--main-font-color);
 }
 </style>
 

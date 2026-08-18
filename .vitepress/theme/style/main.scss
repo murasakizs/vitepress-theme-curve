@@ -58,6 +58,333 @@ html.dark {
   --main-color-opacity: rgba(0, 0, 0, 0.15);
 }
 
+// ===== 主题色 =====
+// 幻紫：紫色为主，淡紫色为辅
+html.theme-purple {
+  --main-color: #8000ff;
+  --main-color-bg: #8000ff0d;
+  --main-accent: #b39ddb;
+  --main-accent-bg: #b39ddb1a;
+  --hello-gradient: linear-gradient(120deg, #b39ddb 0%, #f3e5f5 50%, #8000ff 100%);
+  --main-site-background: linear-gradient(135deg, #ede7f6 0%, #f3e5f5 100%);
+  --main-card-second-background: #ede7f6;
+  --main-card-border: #d1c4e9;
+}
+html.dark.theme-purple {
+  --main-color: #b388ff;
+  --main-color-bg: #b388ff23;
+  --main-accent: #b39ddb;
+  --main-accent-bg: #b39ddb1a;
+  --hello-gradient: linear-gradient(120deg, #3a1a4a 0%, #2a1f2e 50%, #4a1a35 100%);
+  --main-site-background: linear-gradient(135deg, #2a1f33 0%, #251e2a 100%);
+  --main-card-background: #251e2a;
+  --main-card-second-background: #2e1a35;
+  --main-card-border: #3d2e4a;
+}
+
+// 栈蓝：天蓝为主，青色为辅
+html.theme-blue {
+  --main-color: #4fc3f7;
+  --main-color-bg: #4fc3f70d;
+  --main-accent: #4dd0e1;
+  --main-accent-bg: #4dd0e11a;
+  --hello-gradient: linear-gradient(120deg, #4dd0e1 0%, #e1f5fe 50%, #4fc3f7 100%);
+  --main-site-background: linear-gradient(135deg, #e1f5fe 0%, #e0f7fa 100%);
+  --main-card-second-background: #e0f7fa;
+  --main-card-border: #b2ebf2;
+}
+html.dark.theme-blue {
+  --main-color: #81d4fa;
+  --main-color-bg: #81d4fa23;
+  --main-accent: #4dd0e1;
+  --main-accent-bg: #4dd0e11a;
+  --hello-gradient: linear-gradient(120deg, #0d2137 0%, #1a2a3e 50%, #0d3340 100%);
+  --main-site-background: linear-gradient(135deg, #1a2533 0%, #152033 100%);
+  --main-card-background: #1a2533;
+  --main-card-second-background: #1a2a40;
+  --main-card-border: #2a3a4a;
+}
+
+// 火红：红色为主，橙色为辅
+html.theme-red {
+  --main-color: #ef5350;
+  --main-color-bg: #ef53500d;
+  --main-accent: #ffa726;
+  --main-accent-bg: #ffa7261a;
+  --hello-gradient: linear-gradient(120deg, #ffa726 0%, #ffebee 50%, #ef5350 100%);
+  --main-site-background: linear-gradient(135deg, #ffebee 0%, #fff3e0 100%);
+  --main-card-second-background: #fff3e0;
+  --main-card-border: #ef9a9a;
+}
+html.dark.theme-red {
+  --main-color: #ef9a9a;
+  --main-color-bg: #ef9a9a23;
+  --main-accent: #ffcc80;
+  --main-accent-bg: #ffcc801a;
+  --hello-gradient: linear-gradient(120deg, #3a1515 0%, #2a1a1a 50%, #3a2515 100%);
+  --main-site-background: linear-gradient(135deg, #2a1a1a 0%, #2a201a 100%);
+  --main-card-background: #2a1a1a;
+  --main-card-second-background: #332019;
+  --main-card-border: #4a2a2a;
+}
+
+// 春绿：主要颜色不变，次要颜色比主要颜色更浅一点
+html.theme-green {
+  --main-color: #66bb6a;
+  --main-color-bg: #66bb6a0d;
+  --main-accent: #81c784;
+  --main-accent-bg: #81c7841a;
+  --hello-gradient: linear-gradient(120deg, #81c784 0%, #e8f5e9 50%, #66bb6a 100%);
+  --main-site-background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  --main-card-second-background: #c8e6c9;
+  --main-card-border: #a5d6a7;
+}
+html.dark.theme-green {
+  --main-color: #a5d6a7;
+  --main-color-bg: #a5d6a723;
+  --main-accent: #c8e6c9;
+  --main-accent-bg: #c8e6c91a;
+  --hello-gradient: linear-gradient(120deg, #1a3a1a 0%, #1a2e1a 50%, #2a3a2a 100%);
+  --main-site-background: linear-gradient(135deg, #1a2e1a 0%, #152515 100%);
+  --main-card-background: #1a2e1a;
+  --main-card-second-background: #1a331a;
+  --main-card-border: #2a4a2a;
+}
+
+// 失灰：灰色搭黑白，营造死去感，不出现任何彩色元素
+html.theme-gray {
+  --main-color: #9e9e9e;
+  --main-color-bg: #9e9e9e0d;
+  --main-accent: #424242;
+  --main-accent-bg: #4242421a;
+  --hello-gradient: linear-gradient(120deg, #424242 0%, #e0e0e0 50%, #9e9e9e 100%);
+  --main-site-background: linear-gradient(135deg, #e8e8e8 0%, #d5d5d5 100%);
+  --main-card-background: #f5f5f5;
+  --main-card-second-background: #e0e0e0;
+  --main-card-border: #bdbdbd;
+  --main-info-color: #9e9e9e;
+  --main-info-color-gray: #9e9e9e60;
+  --main-warning-color: #9e9e9e;
+  --main-warning-color-gray: #9e9e9e60;
+  --main-success-color: #9e9e9e;
+  --main-success-color-gray: #9e9e9e60;
+  --main-error-color: #9e9e9e;
+  --main-error-color-gray: #9e9e9e60;
+  --main-color-blue: #9e9e9e;
+  --main-color-red: #9e9e9e;
+}
+html.dark.theme-gray {
+  --main-color: #757575;
+  --main-color-bg: #75757523;
+  --main-accent: #616161;
+  --main-accent-bg: #6161611a;
+  --hello-gradient: linear-gradient(120deg, #1a1a1a 0%, #222222 50%, #2a2a2a 100%);
+  --main-site-background: linear-gradient(135deg, #1a1a1a 0%, #151515 100%);
+  --main-card-background: #1c1c1c;
+  --main-card-second-background: #252525;
+  --main-card-border: #333333;
+  --main-info-color: #757575;
+  --main-info-color-gray: #75757560;
+  --main-warning-color: #757575;
+  --main-warning-color-gray: #75757560;
+  --main-success-color: #757575;
+  --main-success-color-gray: #75757560;
+  --main-error-color: #757575;
+  --main-error-color-gray: #75757560;
+  --main-color-blue: #757575;
+  --main-color-red: #757575;
+}
+
+// 失灰：逐个元素灰度，营造死去感
+html.theme-gray {
+  // 图片和媒体
+  img,
+  video,
+  picture,
+  canvas,
+  .social-icon-img {
+    filter: grayscale(100%);
+  }
+  // 技能图标
+  .skills-item .skills-logo {
+    filter: grayscale(100%) !important;
+  }
+  // 计时组件 emoji
+  .item-icon {
+    filter: grayscale(100%);
+  }
+  // 底部徽标 emoji
+  .badge-icon {
+    filter: grayscale(100%);
+  }
+  // Made with ❤️
+  .made-with-love > span {
+    filter: grayscale(100%);
+  }
+  // 密码保护 emoji
+  .lock-emoji,
+  .unlock-emoji {
+    filter: grayscale(100%);
+  }
+  // 赞赏按钮 emoji
+  .thank {
+    filter: grayscale(100%);
+  }
+  // 关于我页面 emoji
+  .about-item.hello .text1 {
+    filter: grayscale(100%);
+  }
+  // 警告区域去除彩色
+  .set-warn {
+    background-color: #f5f5f5 !important;
+    border-color: #cccccc !important;
+    .warn-text,
+    .options {
+      color: #666666 !important;
+    }
+    .options:hover {
+      color: #333333 !important;
+    }
+  }
+  .set-warn-purple {
+    background-color: #f0f0f0 !important;
+    border-color: #cccccc !important;
+    .warn-text,
+    .warn-countdown,
+    .options {
+      color: #666666 !important;
+    }
+    .warn-no {
+      color: #666666 !important;
+      border-color: #666666 !important;
+    }
+    .warn-yes {
+      background-color: #666666 !important;
+    }
+  }
+}
+html.dark.theme-gray {
+  .set-warn {
+    background-color: #2a2a2a !important;
+    border-color: #444444 !important;
+    .warn-text,
+    .options {
+      color: #999999 !important;
+    }
+    .options:hover {
+      color: #cccccc !important;
+    }
+  }
+  .set-warn-purple {
+    background-color: #222222 !important;
+    border-color: #444444 !important;
+    .warn-text,
+    .warn-countdown,
+    .options {
+      color: #999999 !important;
+    }
+    .warn-no {
+      color: #999999 !important;
+      border-color: #999999 !important;
+    }
+    .warn-yes {
+      background-color: #999999 !important;
+    }
+  }
+}
+
+// 高对比度模式
+html.high-contrast {
+  --main-font-color: #000000;
+  --main-font-second-color: #1a1a1acc;
+  --main-card-border: #555555;
+  --main-card-background: #ffffff;
+  --main-card-second-background: #f0f0f0;
+  a {
+    text-decoration: underline;
+  }
+  // 卡片加边框
+  .s-card {
+    border: 2px solid var(--main-card-border);
+  }
+  // 设置按钮加边框
+  .set-list .set-item .set-options .options {
+    background-color: transparent;
+    border: 1px solid var(--main-card-border);
+    &.choose {
+      background-color: var(--main-color);
+      border-color: var(--main-color);
+    }
+  }
+  // 输入框加边框
+  input,
+  textarea {
+    border: 2px solid var(--main-card-border) !important;
+  }
+  // 标签加边框
+  .tag-item {
+    border: 1px solid var(--main-card-border);
+  }
+  // 分页加边框
+  .pagination .page-item {
+    border: 1px solid var(--main-card-border);
+  }
+  // 导航栏加边框
+  .main-nav {
+    border-bottom: 2px solid var(--main-card-border);
+  }
+  // 页脚加边框
+  .main-footer {
+    border-top: 2px solid var(--main-card-border);
+  }
+  // 按钮加边框
+  button,
+  .nav-btn,
+  .menu-btn {
+    border: 1px solid var(--main-card-border);
+  }
+  // 导航栏按钮加边框
+  .main-nav .nav-btn,
+  .main-nav .menu-btn {
+    border: 1px solid var(--main-card-border);
+  }
+  // 导航栏中间链接按钮加边框
+  .main-nav .nav-center .link-btn {
+    border: 1px solid var(--main-card-border);
+  }
+  // 导航栏弹出菜单加边框
+  .main-nav .more-card {
+    border: 2px solid var(--main-card-border);
+  }
+  .main-nav .more-link {
+    border: 1px solid var(--main-card-border);
+  }
+  .main-nav .link-child {
+    border: 2px solid var(--main-card-border);
+  }
+  .main-nav .link-child-btn {
+    border: 1px solid var(--main-card-border);
+  }
+  // 设置面板警告区域按钮加边框
+  .set-warn .options {
+    border: 1px solid var(--main-card-border);
+  }
+  // 消息通知加边框
+  .message {
+    border: 2px solid var(--main-card-border);
+  }
+  .message-wrapper .message-card {
+    border: 2px solid var(--main-card-border);
+  }
+}
+html.dark.high-contrast {
+  --main-font-color: #ffffff;
+  --main-font-second-color: #e0e0e0cc;
+  --main-card-border: #888888;
+  --main-card-background: #1a1a1a;
+  --main-card-second-background: #2a2a2a;
+}
+
 // 字体
 html {
   &.vsans {

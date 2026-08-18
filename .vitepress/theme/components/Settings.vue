@@ -253,6 +253,51 @@
               </div>
             </Transition>
             <div class="set-item">
+              <span class="set-label">主题颜色</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: themeColorExpanded }]"
+                  @click="themeColorExpanded = !themeColorExpanded"
+                >
+                  {{ themeColorExpanded ? '收起' : '展开' }}
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="themeColorExpanded" class="set-expand-box">
+                <div class="set-item">
+                  <span class="set-label">主题色</span>
+                  <div class="set-options">
+                    <span
+                      v-for="color in themeColorList"
+                      :key="color.value"
+                      :class="['options', { choose: themeColor === color.value }]"
+                      @click="setThemeColor(color.value)"
+                    >
+                      {{ color.label }}
+                    </span>
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">高对比度模式</span>
+                  <div class="set-options">
+                    <span
+                      :class="['options', { choose: !highContrast }]"
+                      @click="setHighContrast(false)"
+                    >
+                      关闭
+                    </span>
+                    <span
+                      :class="['options', { choose: highContrast }]"
+                      @click="setHighContrast(true)"
+                    >
+                      开启
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+            <div class="set-item">
               <span class="set-label">消息样式</span>
               <div class="set-options">
                 <span
@@ -284,7 +329,7 @@
                       :class="['options', { choose: messageStyle === 'island' }]"
                       @click="setMessageStyle('island')"
                     >
-                      超级岛（beta）
+                      超级岛（dev）
                     </span>
                   </div>
                 </div>
@@ -433,40 +478,19 @@
                 </span>
                 <span
                   :class="['options', { choose: showDevFeatures }]"
-                  @click="showDevFeaturesWarnVisible = true"
+                  @click="setShowDevFeatures(true)"
                 >
                   开启
                 </span>
               </div>
             </div>
             <Transition name="fade-up">
-              <div v-if="showDevFeaturesWarnVisible" class="set-warn">
+              <div v-if="showDevFeatures && !showDevFeaturesConfirmed" class="set-warn">
                 <span class="warn-text">这些功能还处于开发阶段，可能出现未知的问题，你确定要继续吗</span>
                 <span class="options" @click.stop="confirmShowDevFeatures">确认</span>
               </div>
             </Transition>
-            <template v-if="showDevFeatures">
-              <div class="set-item">
-                <span class="set-label">主题颜色（dev）</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: themeColorExpanded }]"
-                    @click="themeColorExpanded = !themeColorExpanded"
-                  >
-                    {{ themeColorExpanded ? '收起' : '展开' }}
-                  </span>
-                </div>
-              </div>
-              <Transition name="fade-up">
-                <div v-if="themeColorExpanded" class="set-expand-box">
-                  <div class="set-item">
-                    <span class="set-label">占位</span>
-                    <div class="set-options">
-                      <span class="options">占位</span>
-                    </div>
-                  </div>
-                </div>
-              </Transition>
+            <template v-if="showDevFeatures && showDevFeaturesConfirmed">
               <div class="set-item">
                 <span class="set-label">超级岛（dev）</span>
                 <div class="set-options">
@@ -570,7 +594,7 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration } =
   storeToRefs(store);
 
 // 判断是否使用移动端布局
@@ -671,6 +695,14 @@ const messageSettingsExpanded = ref(false);
 const islandSettingsExpanded = ref(false);
 // 主题颜色设置展开状态
 const themeColorExpanded = ref(false);
+const themeColorList = [
+  { value: 'pink', label: '泠粉' },
+  { value: 'purple', label: '幻紫' },
+  { value: 'blue', label: '栈蓝' },
+  { value: 'red', label: '火红' },
+  { value: 'green', label: '春绿' },
+  { value: 'gray', label: '失灰' },
+];
 // 功能维护展开状态
 const featuresExpanded = ref(false);
 // 字体大小调整状态
@@ -694,9 +726,7 @@ const confirmFontSizeEdit = () => {
     $message.success(`全站字体大小已修改为 <span style="color: var(--main-color-blue)">${fontSize.value}</span>`, { duration: 3000, html: true });
   }
 };
-// 显示开发中的功能
-const showDevFeatures = ref(false);
-const showDevFeaturesWarnVisible = ref(false);
+// 恢复默认配置
 
 // 恢复默认配置
 const showResetConfirm = ref(false);
@@ -736,6 +766,26 @@ const setBackgroundType = (type) => {
   const typeNames = { close: '关闭', patterns: '纹理', image: '自定义图片' };
   if (typeof $message !== "undefined") {
     $message.success(`全站背景已切换为${typeNames[type]}`, { duration: 3000 });
+  }
+};
+
+// 设置主题颜色
+const setThemeColor = (color) => {
+  store.changeThemeColor(color);
+};
+
+// 设置高对比度模式
+const setHighContrast = (enabled) => {
+  highContrast.value = enabled;
+  if (typeof document !== 'undefined') {
+    if (enabled) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
+  }
+  if (typeof $message !== "undefined") {
+    $message.success(`已${enabled ? '开启' : '关闭'}高对比度模式`, { duration: 3000 });
   }
 };
 
@@ -812,6 +862,7 @@ const confirmShowMoreSettings = () => {
 const setShowDevFeatures = (show) => {
   showDevFeatures.value = show;
   if (!show) {
+    showDevFeaturesConfirmed.value = false;
     if (typeof $message !== "undefined") {
       $message.warning("已隐藏并关闭开发中的功能", { duration: 3000 });
     }
@@ -820,8 +871,7 @@ const setShowDevFeatures = (show) => {
 
 // 确认显示开发中的功能
 const confirmShowDevFeatures = () => {
-  showDevFeatures.value = true;
-  showDevFeaturesWarnVisible.value = false;
+  showDevFeaturesConfirmed.value = true;
   if (typeof $message !== "undefined") {
     $message.warning("已显示开发中的功能", { duration: 3000 });
   }
@@ -986,6 +1036,9 @@ watch(
       fontSizeWarnVisible.value = false;
       if (showMoreSettings.value && !showMoreSettingsConfirmed.value) {
         showMoreSettings.value = false;
+      }
+      if (showDevFeatures.value && !showDevFeaturesConfirmed.value) {
+        showDevFeatures.value = false;
       }
     }
     if (!val) {
@@ -1170,9 +1223,8 @@ watch(
           margin-bottom: 8px;
           height: auto;
           flex-wrap: wrap;
-          gap: 6px;
+          align-items: flex-start;
           .options {
-            margin: 0;
             &:first-child {
               margin-left: 0;
             }
@@ -1252,6 +1304,47 @@ watch(
       &:hover {
         background-color: #6d28d9 !important;
       }
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+html.theme-gray .set-warn.set-warn-purple {
+  background-color: #f0f0f0 !important;
+  border-color: #cccccc !important;
+  .warn-text,
+  .warn-countdown {
+    color: #666666 !important;
+  }
+  .warn-no {
+    color: #666666 !important;
+    border-color: #666666 !important;
+  }
+  .warn-yes {
+    color: #fff !important;
+    background-color: #666666 !important;
+    &:hover {
+      background-color: #555555 !important;
+    }
+  }
+}
+html.dark.theme-gray .set-warn.set-warn-purple {
+  background-color: #222222 !important;
+  border-color: #444444 !important;
+  .warn-text,
+  .warn-countdown {
+    color: #999999 !important;
+  }
+  .warn-no {
+    color: #999999 !important;
+    border-color: #999999 !important;
+  }
+  .warn-yes {
+    color: #fff !important;
+    background-color: #666666 !important;
+    &:hover {
+      background-color: #888888 !important;
     }
   }
 }

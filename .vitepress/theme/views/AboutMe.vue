@@ -70,11 +70,11 @@
           </div>
           <div class="info-item">
             <span class="info-name">生日</span>
-            <span class="info-num" style="--color: #e8558e">1010</span>
+            <span class="info-num" style="--color: var(--main-color)">1010</span>
           </div>
           <div class="info-item">
             <span class="info-name">距生日</span>
-            <span class="info-num" style="--color: #8c78e8">
+            <span class="info-num" style="--color: var(--main-accent)">
               <LiveDate mode="days-until" :date="birthDate" yearly /> 天
             </span>
           </div>

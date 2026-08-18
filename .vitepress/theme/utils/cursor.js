@@ -83,23 +83,30 @@ class Cursor {
     }
   }
 
-  updateCursorStyle(themeType) {
-    if (typeof window === 'undefined' || !this.scr) return; // 确保在客户端且 style 标签已创建
+  updateCursorStyle(themeType, themeColor = 'pink') {
+    if (typeof window === 'undefined' || !this.scr) return;
 
-    let cursorColor;
+    const cursorColorMap = {
+      light: { pink: '%23e8558e', purple: '%238000ff', blue: '%234fc3f7', red: '%23ef5350', green: '%2366bb6a', gray: '%239e9e9e' },
+      dark:  { pink: '%23f06292', purple: '%23b388ff', blue: '%2381d4fa', red: '%23ef9a9a', green: '%23a5d6a7', gray: '%23757575' }
+    };
+
+    let actualTheme;
     if (themeType === 'auto') {
-      const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      cursorColor = prefersDarkMode ? '%23f06292' : '%23e8558e';
+      actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     } else {
-      cursorColor = themeType === 'dark' ? '%23f06292' : '%23e8558e';
+      actualTheme = themeType;
     }
+
+    const cursorColor = cursorColorMap[actualTheme][themeColor] || cursorColorMap[actualTheme].pink;
     this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'><circle cx='4' cy='4' r='4' fill='${cursorColor}' /></svg>") 4 4, auto !important}`;
   }
 
-  setThemeType(newThemeType) {
+  setThemeType(newThemeType, themeColor = 'pink') {
     this.currentThemeType = newThemeType;
+    this.currentThemeColor = themeColor;
     if (typeof window !== 'undefined' && this.cursor && !/Mobi|Android/i.test(navigator.userAgent)) {
-        this.updateCursorStyle(newThemeType);
+        this.updateCursorStyle(newThemeType, themeColor);
     }
   }
 

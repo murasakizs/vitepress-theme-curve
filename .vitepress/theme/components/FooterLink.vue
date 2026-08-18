@@ -219,6 +219,7 @@ const toggleBadge = (index) => {
       .social-icon-img {
         width: 20px;
         height: 20px;
+        filter: brightness(0) invert(1);
       }
       &:hover {
         transform: scale(1.15);
@@ -381,10 +382,7 @@ const toggleBadge = (index) => {
 </style>
 
 <style lang="scss">
-.social-icon-img {
-  filter: brightness(0) invert(1);
-}
-html.dark .social-icon-img {
+html.dark .footer-social .social-icon-img {
   filter: none;
 }
 </style>

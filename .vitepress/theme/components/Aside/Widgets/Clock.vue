@@ -112,3 +112,20 @@ onBeforeUnmount(() => {
   }
 }
 </style>
+
+<style lang="scss">
+html.theme-gray .clock .clock-content {
+  .pointer.second,
+  .pointer.second::after,
+  &::after {
+    background-color: #9e9e9e !important;
+  }
+}
+html.dark.theme-gray .clock .clock-content {
+  .pointer.second,
+  .pointer.second::after,
+  &::after {
+    background-color: #757575 !important;
+  }
+}
+</style>

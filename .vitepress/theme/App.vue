@@ -48,7 +48,7 @@ import { ensureGlobalFontsLoaded } from "@/utils/fontLoader.mjs";
 const route = useRoute();
 const store = mainStore();
 const { frontmatter, page, theme } = useData();
-const { loadingStatus, footerIsShow, themeValue, themeType, backgroundType, fontFamily, fontSize, fontSizePending, siteLayout, siteLayoutPending } =
+const { loadingStatus, footerIsShow, themeValue, themeType, themeColor, highContrast, backgroundType, fontFamily, fontSize, fontSizePending, siteLayout, siteLayoutPending } =
   storeToRefs(store);
 let fontSwitchTaskId = 0;
 
@@ -122,6 +122,12 @@ const changeSiteThemeType = () => {
   } else {
     htmlElement.classList.remove("image");
   }
+  // 应用主题色
+  const themeColors = ['theme-purple', 'theme-blue', 'theme-red', 'theme-green', 'theme-gray'];
+  themeColors.forEach(cls => htmlElement.classList.remove(cls));
+  if (themeColor.value !== 'pink') {
+    htmlElement.classList.add(`theme-${themeColor.value}`);
+  }
 };
 
 // 切换系统字体样式
@@ -173,6 +179,10 @@ onMounted(() => {
   specialDayGray();
   // 更改主题类别
   changeSiteThemeType();
+  // 高对比度模式
+  if (highContrast.value) {
+    document.documentElement.classList.add('high-contrast');
+  }
   // 切换系统字体样式
   changeSiteFont();
   // 切换站点布局

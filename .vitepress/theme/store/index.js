@@ -58,11 +58,18 @@ export const mainStore = defineStore("main", {
       // 显示更多设置
       showMoreSettings: false,
       showMoreSettingsConfirmed: false,
+      // 显示开发中的功能
+      showDevFeatures: false,
+      showDevFeaturesConfirmed: false,
+      // 高对比度模式
+      highContrast: false,
       // 站点布局
       siteLayout: "auto",
       siteLayoutPending: false,
       lastSiteLayout: "auto",
       windowWidth: typeof window !== 'undefined' ? window.innerWidth : 1024,
+      // 主题颜色
+      themeColor: "pink",
       // 消息样式
       messageStyle: isMobile ? "bar" : "card",
       messagePosition: isMobile ? "bar-top" : "left-bottom",
@@ -138,7 +145,42 @@ export const mainStore = defineStore("main", {
 
       // 通知光标更新主题
       if (appCursorInstance) {
-        appCursorInstance.setThemeType(this.themeType);
+        appCursorInstance.setThemeType(this.themeType, this.themeColor);
+      }
+    },
+
+    // 切换主题颜色
+    changeThemeColor(color) {
+      if (typeof document === 'undefined') return;
+
+      this.themeColor = color;
+      const html = document.documentElement;
+      // 移除所有主题色 class
+      const themeColors = ['theme-purple', 'theme-blue', 'theme-red', 'theme-green', 'theme-gray'];
+      themeColors.forEach(cls => html.classList.remove(cls));
+      // 添加新的主题色 class（粉色为默认，不需要 class）
+      if (color !== 'pink') {
+        html.classList.add(`theme-${color}`);
+      }
+
+      // 更新光标颜色（CSS 变量 + SVG）
+      const cursorColors = {
+        light: { pink: '#e8558e', purple: '#8000ff', blue: '#4fc3f7', red: '#ef5350', green: '#66bb6a', gray: '#9e9e9e' },
+        dark:  { pink: '#f06292', purple: '#b388ff', blue: '#81d4fa', red: '#ef9a9a', green: '#a5d6a7', gray: '#757575' }
+      };
+      const actualTheme = this.themeValue || 'light';
+      html.style.setProperty('--cursor-bg-color', cursorColors[actualTheme][color] || cursorColors[actualTheme].pink);
+      if (appCursorInstance) {
+        appCursorInstance.setThemeType(this.themeType, color);
+      }
+
+      // 弹窗提示
+      if (typeof $message !== "undefined") {
+        const colorNames = {
+          pink: '泠粉', purple: '幻紫', blue: '栈蓝',
+          red: '火红', green: '春绿', gray: '失灰'
+        };
+        $message.success(`主题色已切换为${colorNames[color]}`, { duration: 1500 });
       }
     },
 
@@ -156,11 +198,11 @@ export const mainStore = defineStore("main", {
       this.themeValue = actualTheme;
 
       const root = document.documentElement;
-      if (actualTheme === 'light') {
-        root.style.setProperty('--cursor-bg-color', '#e8558e');
-      } else {
-        root.style.setProperty('--cursor-bg-color', '#f06292');
-      }
+      const cursorColors = {
+        light: { pink: '#e8558e', purple: '#8000ff', blue: '#4fc3f7', red: '#ef5350', green: '#66bb6a', gray: '#9e9e9e' },
+        dark:  { pink: '#f06292', purple: '#b388ff', blue: '#81d4fa', red: '#ef9a9a', green: '#a5d6a7', gray: '#757575' }
+      };
+      root.style.setProperty('--cursor-bg-color', cursorColors[actualTheme][this.themeColor] || cursorColors[actualTheme].pink);
       
       if (actualTheme === 'dark') {
           root.classList.add('dark');
@@ -176,7 +218,7 @@ export const mainStore = defineStore("main", {
         if (typeof window === 'undefined') return; // 确保在客户端
         this.updateActualThemeValue();
         if (appCursorInstance) {
-            appCursorInstance.setThemeType(this.themeType);
+            appCursorInstance.setThemeType(this.themeType, this.themeColor);
         }
     },
 
@@ -196,6 +238,7 @@ export const mainStore = defineStore("main", {
       key: "siteData",
       paths: [
         "themeType",
+        "themeColor",
         "bannerType",
         "useRightMenu",
         "useCustomCursor",
@@ -210,6 +253,9 @@ export const mainStore = defineStore("main", {
         "backgroundUrl",
         "showMoreSettings",
         "showMoreSettingsConfirmed",
+        "showDevFeatures",
+        "showDevFeaturesConfirmed",
+        "highContrast",
         "siteLayout",
         "siteLayoutPending",
         "lastSiteLayout",
@@ -241,7 +287,7 @@ export const initializeCursor = () => {
   }
 
   store.updateActualThemeValue();
-  appCursorInstance.setThemeType(store.themeType);
+  appCursorInstance.setThemeType(store.themeType, store.themeColor);
 
   // 根据 useCustomCursor 状态启用/禁用自定义鼠标
   if (!store.useCustomCursor) {

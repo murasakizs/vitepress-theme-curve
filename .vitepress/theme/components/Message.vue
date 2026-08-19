@@ -57,7 +57,8 @@
         </div>
       </TransitionGroup>
       <!-- 子药丸（跟随最下面一条消息） -->
-      <div v-if="islandMessages.length > 0" class="island-pills">
+      <Transition name="island-pills">
+        <div v-if="islandMessages.length > 0" class="island-pills">
         <div :class="['island-pill', bottomMessageType, { 'island-theme-color': store.islandUseThemeColor }]">
           <span v-if="store.progressDirection !== 'disabled'" class="island-progress pill-progress">
             <svg viewBox="0 0 24 24" class="island-progress-ring">
@@ -88,6 +89,7 @@
           <span class="pill-text">sgexilq<span class="pill-domain">.top</span></span>
         </div>
       </div>
+      </Transition>
     </div>
   </Teleport>
 </template>
@@ -699,6 +701,21 @@ onUnmounted(() => {
       }
     }
   }
+}
+// 超级岛子药丸动画
+.island-pills-enter-active {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.island-pills-leave-active {
+  transition: all 0.25s ease-in;
+}
+.island-pills-enter-from {
+  opacity: 0;
+  transform: translateY(-15px) scale(0.9);
+}
+.island-pills-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
 }
 // 超级岛拓展模式容器
 .island-extended-wrapper {

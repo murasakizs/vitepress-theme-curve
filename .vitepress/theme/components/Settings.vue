@@ -298,22 +298,30 @@
             <Transition name="fade-up">
               <div v-if="themeColorExpanded" class="set-expand-box">
                 <template v-if="highContrast !== 'max'">
-                  <div class="set-item">
-                    <span class="set-label">主题色</span>
+                  <template v-if="!customThemeEnabled">
+                    <div class="set-item">
+                      <span class="set-label">预设主题</span>
+                      <div class="set-options">
+                        <span
+                          v-for="color in themeColorList"
+                          :key="color.value"
+                          :class="['options', { choose: themeColor === color.value }]"
+                          @click="setThemeColor(color.value)"
+                        >
+                          {{ color.label }}
+                        </span>
+                      </div>
+                    </div>
+                  </template>
+                  <div v-else class="set-item">
+                    <span class="set-label">启用预设主题需要先关闭 自定义主题</span>
                     <div class="set-options">
-                      <span
-                        v-for="color in themeColorList"
-                        :key="color.value"
-                        :class="['options', { choose: themeColor === color.value }]"
-                        @click="setThemeColor(color.value)"
-                      >
-                        {{ color.label }}
-                      </span>
+                      <span class="options" @click="toggleCustomTheme(false)">确认</span>
                     </div>
                   </div>
                 </template>
                 <div v-else class="set-item">
-                  <span class="set-label">需要先关闭 高对比度模式（最高）</span>
+                  <span class="set-label">切换主题需要先关闭 高对比度模式（最高）</span>
                   <div class="set-options">
                     <span class="options" @click="setHighContrast(false)">确认</span>
                   </div>
@@ -341,6 +349,72 @@
                     </span>
                   </div>
                 </div>
+                <template v-if="highContrast !== 'max'">
+                  <div class="set-item">
+                    <span class="set-label">自定义主题</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !customThemeEnabled }]"
+                        @click="toggleCustomTheme(false)"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: customThemeEnabled }]"
+                        @click="toggleCustomTheme(true)"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <template v-if="customThemeEnabled">
+                    <div class="set-item">
+                      <span class="set-label">自定义主要色（#RRGGBB）</span>
+                      <div class="set-options">
+                        <div class="color-preview" :style="{ backgroundColor: customPrimaryColor }" @click="$refs.primaryColorInput.click()"></div>
+                        <input
+                          ref="primaryColorInput"
+                          v-model="customPrimaryColor"
+                          type="color"
+                          class="color-input-hidden"
+                        />
+                        <input
+                          v-model="customPrimaryColor"
+                          type="text"
+                          class="text-input"
+                          placeholder="#RRGGBB"
+                          maxlength="7"
+                        />
+                      </div>
+                    </div>
+                    <div class="set-item">
+                      <span class="set-label">自定义辅助色（#RRGGBB）</span>
+                      <div class="set-options">
+                        <div class="color-preview" :style="{ backgroundColor: customSecondaryColor }" @click="$refs.secondaryColorInput.click()"></div>
+                        <input
+                          ref="secondaryColorInput"
+                          v-model="customSecondaryColor"
+                          type="color"
+                          class="color-input-hidden"
+                        />
+                        <input
+                          v-model="customSecondaryColor"
+                          type="text"
+                          class="text-input"
+                          placeholder="#RRGGBB"
+                          maxlength="7"
+                        />
+                      </div>
+                    </div>
+                    <div class="set-item">
+                      <span class="set-label">保存当前自定义主题色</span>
+                      <div class="set-options">
+                        <span class="options" @click="revertCustomTheme">撤销</span>
+                        <span class="options" @click="applyCustomTheme">应用</span>
+                      </div>
+                    </div>
+                  </template>
+                </template>
               </div>
             </Transition>
             <div class="set-item">
@@ -731,7 +805,7 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast } =
   storeToRefs(store);
 
 // 判断是否使用移动端布局
@@ -914,6 +988,10 @@ const setThemeColor = (color) => {
 
 // 设置高对比度模式
 const setHighContrast = (enabled) => {
+  // 记录开启前的自定义主题色状态
+  if (enabled === 'max' && !customThemeBeforeHighContrast.value) {
+    customThemeBeforeHighContrast.value = customThemeEnabled.value;
+  }
   highContrast.value = enabled;
   if (typeof document !== 'undefined') {
     document.documentElement.classList.remove('high-contrast', 'high-contrast-max');
@@ -923,10 +1001,60 @@ const setHighContrast = (enabled) => {
       document.documentElement.classList.add('high-contrast');
     }
   }
+  // 关闭最高对比度时，恢复之前的自定义主题色状态
+  if (enabled === false && customThemeBeforeHighContrast.value) {
+    customThemeBeforeHighContrast.value = false;
+    toggleCustomTheme(true);
+  }
   if (typeof $message !== "undefined") {
     const labels = { false: '关闭', true: '开启', max: '最高' };
-    $message.success(`已切换高对比度模式为：${labels[String(enabled)]}`);
+    $message.success(`已切换高对比度模式为：${labels[String(enabled)]}`, { duration: 3000 });
   }
+};
+
+// 切换自定义主题色
+const toggleCustomTheme = (enabled) => {
+  if (enabled) {
+    // 开启自定义主题色
+    customThemeEnabled.value = true;
+    // 保存当前颜色作为上次的值
+    lastCustomPrimaryColor.value = customPrimaryColor.value;
+    lastCustomSecondaryColor.value = customSecondaryColor.value;
+    // 应用自定义颜色
+    store.applyCustomThemeColor(customPrimaryColor.value, customSecondaryColor.value);
+  } else {
+    // 关闭自定义主题色
+    customThemeEnabled.value = false;
+    // 恢复上次选择的主题色
+    if (typeof document !== 'undefined') {
+      const html = document.documentElement;
+      // 清除自定义颜色
+      html.style.removeProperty('--main-color');
+      html.style.removeProperty('--main-color-bg');
+      html.style.removeProperty('--main-accent');
+      html.style.removeProperty('--main-accent-bg');
+    }
+    // 恢复默认主题色
+    store.changeThemeColor(themeColor.value);
+  }
+};
+
+// 撤销自定义主题色
+const revertCustomTheme = () => {
+  customPrimaryColor.value = lastCustomPrimaryColor.value;
+  customSecondaryColor.value = lastCustomSecondaryColor.value;
+  if (typeof $message !== "undefined") {
+    $message.success('已撤销自定义主题色', { duration: 3000 });
+  }
+};
+
+// 应用自定义主题色
+const applyCustomTheme = () => {
+  // 保存当前颜色作为上次的值
+  lastCustomPrimaryColor.value = customPrimaryColor.value;
+  lastCustomSecondaryColor.value = customSecondaryColor.value;
+  // 应用自定义颜色
+  store.applyCustomThemeColor(customPrimaryColor.value, customSecondaryColor.value);
 };
 
 // 设置显示外观
@@ -1503,6 +1631,44 @@ watch(
       &:hover {
         background-color: #6d28d9 !important;
       }
+    }
+  }
+  .color-input-hidden {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    border: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .color-preview {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--main-card-border);
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.3s;
+    &:hover {
+      border-color: var(--main-color);
+    }
+  }
+  .text-input {
+    width: 110px;
+    height: 24px;
+    border: 1px solid var(--main-card-border);
+    border-radius: 6px;
+    padding: 0 8px;
+    font-size: 14px;
+    font-family: var(--main-font-family);
+    color: var(--main-font-color);
+    background-color: var(--main-card-background);
+    margin-left: 8px;
+    box-sizing: border-box;
+    &:focus {
+      outline: none;
+      border-color: var(--main-color);
     }
   }
 }

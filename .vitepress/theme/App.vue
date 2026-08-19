@@ -185,6 +185,14 @@ onMounted(() => {
   } else if (highContrast.value) {
     document.documentElement.classList.add('high-contrast');
   }
+  // 自定义主题色
+  if (store.customThemeEnabled) {
+    const html = document.documentElement;
+    html.style.setProperty('--main-color', store.customPrimaryColor);
+    html.style.setProperty('--main-color-bg', store.customPrimaryColor + '0d');
+    html.style.setProperty('--main-accent', store.customSecondaryColor);
+    html.style.setProperty('--main-accent-bg', store.customSecondaryColor + '1a');
+  }
   // 切换系统字体样式
   changeSiteFont();
   // 切换站点布局

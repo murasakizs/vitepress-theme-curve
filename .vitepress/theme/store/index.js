@@ -80,6 +80,13 @@ export const mainStore = defineStore("main", {
       islandUseThemeColor: false,
       islandShowSeconds: true,
       islandShowDate: !isMobile,
+      // 自定义主题色
+      customThemeEnabled: false,
+      customPrimaryColor: "#e8558e",
+      customSecondaryColor: "#64b5f6",
+      lastCustomPrimaryColor: "#e8558e",
+      lastCustomSecondaryColor: "#64b5f6",
+      customThemeBeforeHighContrast: false,
     };
   },
   getters: {},
@@ -134,19 +141,18 @@ export const mainStore = defineStore("main", {
       this.updateActualThemeValue();
 
       // 弹窗提示
-      if (typeof $message !== "undefined") { 
-        const text =
-          this.themeType === "light"
-            ? "浅色模式"
-            : this.themeType === "dark"
-              ? "深色模式"
-              : "跟随系统";
-        $message.info("当前主题为" + text);
+      if (typeof $message !== "undefined") {
+        const typeNames = { auto: '跟随系统', dark: '深色', light: '浅色' };
+        $message.success(`显示外观已切换为${typeNames[this.themeType]}`);
       }
 
       // 通知光标更新主题
       if (appCursorInstance) {
-        appCursorInstance.setThemeType(this.themeType, this.themeColor);
+        if (this.customThemeEnabled) {
+          appCursorInstance.setCursorColor(this.customPrimaryColor);
+        } else {
+          appCursorInstance.setThemeType(this.themeType, this.themeColor);
+        }
       }
     },
 
@@ -203,8 +209,12 @@ export const mainStore = defineStore("main", {
         light: { pink: '#e8558e', purple: '#8000ff', blue: '#4fc3f7', red: '#ef5350', green: '#66bb6a', gray: '#9e9e9e' },
         dark:  { pink: '#f06292', purple: '#b388ff', blue: '#81d4fa', red: '#ef9a9a', green: '#a5d6a7', gray: '#757575' }
       };
-      root.style.setProperty('--cursor-bg-color', cursorColors[actualTheme][this.themeColor] || cursorColors[actualTheme].pink);
-      
+      if (this.customThemeEnabled) {
+        root.style.setProperty('--cursor-bg-color', this.customPrimaryColor);
+      } else {
+        root.style.setProperty('--cursor-bg-color', cursorColors[actualTheme][this.themeColor] || cursorColors[actualTheme].pink);
+      }
+
       if (actualTheme === 'dark') {
           root.classList.add('dark');
           root.classList.remove('light');
@@ -219,7 +229,11 @@ export const mainStore = defineStore("main", {
         if (typeof window === 'undefined') return; // 确保在客户端
         this.updateActualThemeValue();
         if (appCursorInstance) {
-            appCursorInstance.setThemeType(this.themeType, this.themeColor);
+            if (this.customThemeEnabled) {
+                appCursorInstance.setCursorColor(this.customPrimaryColor);
+            } else {
+                appCursorInstance.setThemeType(this.themeType, this.themeColor);
+            }
         }
     },
 
@@ -230,6 +244,28 @@ export const mainStore = defineStore("main", {
         appCursorInstance.enable();
       } else {
         appCursorInstance.disable();
+      }
+    },
+    // 应用自定义主题色
+    applyCustomThemeColor(primary, secondary) {
+      if (typeof document === 'undefined') return;
+      const html = document.documentElement;
+      // 移除所有预设主题 class
+      const themeColors = ['theme-purple', 'theme-blue', 'theme-red', 'theme-green', 'theme-gray'];
+      themeColors.forEach(cls => html.classList.remove(cls));
+      // 设置 CSS 变量
+      html.style.setProperty('--main-color', primary);
+      html.style.setProperty('--main-color-bg', primary + '0d');
+      html.style.setProperty('--main-accent', secondary);
+      html.style.setProperty('--main-accent-bg', secondary + '1a');
+      // 更新光标颜色
+      html.style.setProperty('--cursor-bg-color', primary);
+      if (appCursorInstance) {
+        appCursorInstance.setCursorColor(primary);
+      }
+      // 弹窗提示
+      if (typeof $message !== "undefined") {
+        $message.success('自定义主题色已应用', { duration: 3000 });
       }
     }
   },
@@ -268,6 +304,12 @@ export const mainStore = defineStore("main", {
         "islandUseThemeColor",
         "islandShowSeconds",
         "islandShowDate",
+        "customThemeEnabled",
+        "customPrimaryColor",
+        "customSecondaryColor",
+        "lastCustomPrimaryColor",
+        "lastCustomSecondaryColor",
+        "customThemeBeforeHighContrast",
       ], 
     },
   ],
@@ -292,7 +334,11 @@ export const initializeCursor = () => {
   }
 
   store.updateActualThemeValue();
-  appCursorInstance.setThemeType(store.themeType, store.themeColor);
+  if (store.customThemeEnabled) {
+    appCursorInstance.setCursorColor(store.customPrimaryColor);
+  } else {
+    appCursorInstance.setThemeType(store.themeType, store.themeColor);
+  }
 
   // 根据 useCustomCursor 状态启用/禁用自定义鼠标
   if (!store.useCustomCursor) {

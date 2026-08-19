@@ -110,6 +110,12 @@ class Cursor {
     }
   }
 
+  setCursorColor(hexColor) {
+    if (typeof window === 'undefined' || !this.scr) return;
+    const encoded = hexColor.replace('#', '%23');
+    this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'><circle cx='4' cy='4' r='4' fill='${encoded}' /></svg>") 4 4, auto !important}`;
+  }
+
   enable() {
     if (typeof document === 'undefined' || !this.cursor) return;
     this.cursor.classList.remove("disabled");

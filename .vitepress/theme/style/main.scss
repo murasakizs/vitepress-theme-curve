@@ -378,11 +378,11 @@ html.high-contrast {
   }
   // 超级岛高对比度
   .message.island {
-    border: 2px solid var(--main-card-border);
+    border: 1px solid var(--main-card-border);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
   .island-pill {
-    border: 2px solid var(--main-card-border);
+    border: 1px solid var(--main-card-border);
   }
 }
 html.dark.high-contrast {
@@ -391,6 +391,838 @@ html.dark.high-contrast {
   --main-card-border: #888888;
   --main-card-background: #1a1a1a;
   --main-card-second-background: #2a2a2a;
+}
+
+// 高对比度模式（最高）- 纯黑白极致对比
+html.high-contrast-max {
+  --main-color: #000000;
+  --main-color-bg: #ffffff;
+  --main-color-light: #000000;
+  --main-color-deep: #000000;
+  --main-accent: #000000;
+  --main-accent-bg: #000000;
+  --main-font-color: #000000;
+  --main-font-second-color: #000000;
+  --main-card-border: #000000;
+  --main-card-background: #ffffff;
+  --main-card-second-background: #ffffff;
+  --main-site-background: #ffffff;
+  --main-border-shadow: transparent;
+  --main-mask-background: #ffffff;
+  --main-mask-Inverse-background: #000000;
+  --main-mask-second-background: #ffffff;
+  --main-color-opacity: #000000;
+  --main-dark-opacity: #000000;
+  --main-dark-shadow: transparent;
+  --main-success-color: #000000;
+  --main-warning-color: #000000;
+  --main-error-color: #000000;
+  --main-info-color: #000000;
+  --main-color-blue: #000000;
+  --main-color-white: #000000;
+  --main-color-gray: #000000;
+  --main-color-red: #000000;
+  --main-scrollbar-bar: #000000;
+  --cursor-bg-color: #000000 !important;
+
+  // 全面移除阴影
+  .s-card, .message, .message.island, .message-card, .island-pill,
+  .main-nav, .main-footer, .more-card, .link-child, .set-expand-box,
+  button, .nav-btn, .menu-btn, .right-menu, .music-player,
+  .password-protect, .clock, .hello, .count-down, .widget-card,
+  .reward-btn, .link-card, .tag-item, .pagination .page-item,
+  .set-warn, .search-box, .modal, .modal-content {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  // 卡片
+  .s-card {
+    background: #ffffff !important;
+    border: 3px solid #000000 !important;
+  }
+
+  // 设置面板标题 - 使用边框
+  .set-list .title {
+    border: 2px solid #000000 !important;
+    border-left: 2px solid #000000 !important;
+    border-radius: 6px;
+    padding: 4px 12px;
+    background: transparent !important;
+    color: #000000 !important;
+  }
+
+  // 设置选项 - 悬停反色
+  .set-list .set-item .set-options .options {
+    background: transparent !important;
+    border: 2px solid #000000 !important;
+    &:hover {
+      background: #000000 !important;
+      color: #ffffff !important;
+    }
+    &.choose {
+      background: #000000 !important;
+      color: #ffffff !important;
+    }
+  }
+
+  // 合并菜单 - 左侧竖线
+  .set-expand-box {
+    border: none !important;
+    border-left: 4px solid #000000 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  // 警告区域 - 黑白
+  .set-warn {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    .warn-text,
+    .warn-countdown,
+    .options {
+      color: #000000 !important;
+    }
+    .warn-no {
+      color: #000000 !important;
+      border-color: #000000 !important;
+      background: transparent !important;
+    }
+    .warn-yes {
+      color: #ffffff !important;
+      background: #000000 !important;
+      border-color: #000000 !important;
+    }
+  }
+
+  // 按钮 - 悬停反色
+  button,
+  .nav-btn,
+  .menu-btn {
+    background: transparent !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+    &:hover {
+      background: #000000 !important;
+      color: #ffffff !important;
+    }
+  }
+
+  // 导航栏 - 统一边框
+  .main-nav {
+    background: #ffffff !important;
+    border-bottom: 2px solid #000000 !important;
+    box-shadow: none !important;
+  }
+
+  // 中控台弹出菜单
+  .control-popup {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+    .control-item {
+      background: #ffffff !important;
+      border: 2px solid #000000 !important;
+      .iconfont { color: #000000 !important; }
+      &.open {
+        background: #000000 !important;
+        .iconfont { color: #ffffff !important; }
+      }
+      &:hover {
+        background: #000000 !important;
+        .iconfont { color: #ffffff !important; }
+      }
+    }
+    .control-capsule {
+      background: #ffffff !important;
+      border: 2px solid #000000 !important;
+      .iconfont { color: #000000 !important; }
+      .capsule-text { color: #000000 !important; }
+      &:hover {
+        background: #000000 !important;
+        border-color: #000000 !important;
+        .iconfont { color: #ffffff !important; }
+        .capsule-text { color: #ffffff !important; }
+      }
+    }
+  }
+
+  // 导航栏弹出菜单
+  .more-card,
+  .link-child {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+  }
+
+  // 页脚
+  .main-footer {
+    background: #ffffff !important;
+    border-top: 2px solid #000000 !important;
+  }
+
+  // 页脚元素 - 方框
+  .footer-links a,
+  .footer-badge,
+  .system-status {
+    border: 2px solid #000000 !important;
+    background: transparent !important;
+    color: #000000 !important;
+  }
+
+  // 消息通知 - 条形/传统
+  .message {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+    .text { color: #000000 !important; }
+  }
+
+  // 超级岛 - 确保有背景
+  .message.island,
+  .message.island.island-theme-color {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+    .text { color: #000000 !important; }
+    .message-content .text { color: #000000 !important; }
+  }
+
+  // 传统消息样式
+  .message-wrapper {
+    .message-card {
+      background: #ffffff !important;
+      border: 2px solid #000000 !important;
+      .text { color: #000000 !important; }
+    }
+    .message-progress-bar {
+      background: #000000 !important;
+    }
+  }
+
+  .island-pill {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    .pill-text { color: #000000 !important; }
+  }
+
+  // 输入框
+  input,
+  textarea {
+    background: transparent !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+  }
+
+  // 分页
+  .pagination .page-item {
+    background: transparent !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    &.active {
+      background: #000000 !important;
+      color: #ffffff !important;
+    }
+  }
+
+  // 标签
+  .tag-item {
+    background: transparent !important;
+    border: 2px solid #000000 !important;
+  }
+
+  // 链接卡片
+  .link-card {
+    background: transparent !important;
+    border: 2px solid #000000 !important;
+  }
+
+  // 搜索高亮
+  .search-highlight {
+    background: transparent !important;
+    border-bottom: 2px solid #000000 !important;
+  }
+
+  // 进度条 - 轨道白色，进度条黑色
+  .message-progress {
+    background-color: #ffffff !important;
+    border: 1px solid #000000 !important;
+  }
+  .message-progress-bar {
+    background-color: #000000 !important;
+  }
+
+  // 超级岛环形进度条
+  .island-progress-ring {
+    .progress-track {
+      stroke: #ffffff !important;
+    }
+    .progress-fill {
+      stroke: #000000 !important;
+    }
+  }
+
+  // 文章目录
+  .toc-item.active {
+    background: transparent !important;
+    border-left: 3px solid #000000 !important;
+  }
+
+  // 侧边栏小组件
+  .widget-card {
+    background: transparent !important;
+    border: 2px solid #000000 !important;
+  }
+
+  // 右键菜单
+  .right-menu {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+  }
+
+  // 模态框
+  .modal-main {
+    .title {
+      background: #ffffff !important;
+      border-bottom: 2px solid #000000 !important;
+      color: #000000 !important;
+      .close {
+        color: #000000 !important;
+        &:hover {
+          background: #000000 !important;
+          color: #ffffff !important;
+        }
+      }
+    }
+  }
+
+  // 加载动画
+  .loading-bar {
+    background: #000000 !important;
+  }
+
+  // 复选框/单选框
+  .checkbox-checked,
+  .radio-checked {
+    background: #000000 !important;
+    border-color: #000000 !important;
+  }
+
+  // 文章引用
+  blockquote {
+    border-left: 4px solid #000000 !important;
+    background: transparent !important;
+  }
+
+  // 代码块
+  code {
+    background: transparent !important;
+    border: 1px solid #000000 !important;
+  }
+  pre {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+  }
+
+  // 赞赏按钮
+  .reward-btn {
+    background: transparent !important;
+    border: 2px solid #000000 !important;
+  }
+
+  // 音乐播放器
+  .music-player {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+  }
+
+  // 密码保护
+  .password-protect {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+  }
+
+  // 时钟组件 - 浅色为主
+  .clock {
+    border: 3px solid #000000 !important;
+    background: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    .clock-content {
+      background: #ffffff !important;
+      border: 1px solid #000000 !important;
+      box-shadow: none !important;
+      .pointer {
+        box-shadow: none !important;
+        &.hour { background-color: #000000 !important; }
+        &.minute { background-color: #333333 !important; }
+        &.second { background-color: #000000 !important; border: none !important; }
+        &.second::after { background-color: #000000 !important; }
+      }
+      &::after { background-color: #000000 !important; border: none !important; }
+    }
+  }
+
+  // Hello 小组件
+  .hello {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 3px solid #000000 !important;
+    .tip {
+      background-color: transparent !important;
+      border: 2px solid #000000 !important;
+      color: #000000 !important;
+      &:hover {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+      }
+    }
+    .social-link {
+      background-color: transparent !important;
+      border: 2px solid #000000 !important;
+      .iconfont { color: #000000 !important; }
+      &:hover {
+        background-color: #000000 !important;
+        .iconfont { color: #ffffff !important; }
+      }
+    }
+    .author, .desc { color: #000000 !important; }
+    .site-desc { color: #000000 !important; }
+  }
+
+  // 系统状态组件
+  .system-status {
+    border: 2px solid #000000 !important;
+    background: transparent !important;
+    .status-dot,
+    .status-dot-ping {
+      background-color: #000000 !important;
+    }
+    .status-label { color: #000000 !important; }
+  }
+
+  // 自定义光标
+  #cursor {
+    background: #000000 !important;
+  }
+  * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'%3E%3Ccircle cx='4' cy='4' r='4' fill='%23000000' /%3E%3C/svg%3E") 4 4, auto !important;
+  }
+}
+html.dark.high-contrast-max {
+  --main-color: #ffffff;
+  --main-color-bg: #000000;
+  --main-color-light: #ffffff;
+  --main-color-deep: #ffffff;
+  --main-accent: #ffffff;
+  --main-accent-bg: #ffffff;
+  --main-font-color: #ffffff;
+  --main-font-second-color: #ffffff;
+  --main-card-border: #ffffff;
+  --main-card-background: #000000;
+  --main-card-second-background: #000000;
+  --main-site-background: #000000;
+  --main-border-shadow: transparent;
+  --main-mask-background: #000000;
+  --main-mask-Inverse-background: #ffffff;
+  --main-mask-second-background: #000000;
+  --main-color-opacity: #ffffff;
+  --main-dark-opacity: #ffffff;
+  --main-dark-shadow: transparent;
+  --main-success-color: #ffffff;
+  --main-warning-color: #ffffff;
+  --main-error-color: #ffffff;
+  --main-info-color: #ffffff;
+  --main-color-blue: #ffffff;
+  --main-color-white: #ffffff;
+  --main-color-gray: #ffffff;
+  --main-color-red: #ffffff;
+  --main-scrollbar-bar: #ffffff;
+  --cursor-bg-color: #ffffff !important;
+
+  // 全面移除阴影
+  .s-card, .message, .message.island, .message-card, .island-pill,
+  .main-nav, .main-footer, .more-card, .link-child, .set-expand-box,
+  button, .nav-btn, .menu-btn, .right-menu, .music-player,
+  .password-protect, .clock, .hello, .count-down, .widget-card,
+  .reward-btn, .link-card, .tag-item, .pagination .page-item,
+  .set-warn, .search-box, .modal, .modal-content {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  // 卡片
+  .s-card {
+    background: #000000 !important;
+    border: 3px solid #ffffff !important;
+  }
+
+  // 设置面板标题 - 使用边框
+  .set-list .title {
+    border: 2px solid #ffffff !important;
+    border-left: 2px solid #ffffff !important;
+    border-radius: 6px;
+    padding: 4px 12px;
+    background: transparent !important;
+    color: #ffffff !important;
+  }
+
+  // 设置选项 - 悬停反色
+  .set-list .set-item .set-options .options {
+    background: transparent !important;
+    border: 2px solid #ffffff !important;
+    &:hover {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+    &.choose {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+  }
+
+  // 合并菜单 - 左侧竖线
+  .set-expand-box {
+    border: none !important;
+    border-left: 4px solid #ffffff !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  // 警告区域 - 黑白
+  .set-warn {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    .warn-text,
+    .warn-countdown,
+    .options {
+      color: #ffffff !important;
+    }
+    .warn-no {
+      color: #ffffff !important;
+      border-color: #ffffff !important;
+      background: transparent !important;
+    }
+    .warn-yes {
+      color: #000000 !important;
+      background: #ffffff !important;
+      border-color: #ffffff !important;
+    }
+  }
+
+  // 按钮 - 悬停反色
+  button,
+  .nav-btn,
+  .menu-btn {
+    background: transparent !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+    &:hover {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+  }
+
+  // 导航栏 - 统一边框
+  .main-nav {
+    background: #000000 !important;
+    border-bottom: 2px solid #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  // 中控台弹出菜单
+  .control-popup {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+    .control-item {
+      background: #000000 !important;
+      border: 2px solid #ffffff !important;
+      .iconfont { color: #ffffff !important; }
+      &.open {
+        background: #ffffff !important;
+        .iconfont { color: #000000 !important; }
+      }
+      &:hover {
+        background: #ffffff !important;
+        .iconfont { color: #000000 !important; }
+      }
+    }
+    .control-capsule {
+      background: #000000 !important;
+      border: 2px solid #ffffff !important;
+      .iconfont { color: #ffffff !important; }
+      .capsule-text { color: #ffffff !important; }
+      &:hover {
+        background: #ffffff !important;
+        border-color: #ffffff !important;
+        .iconfont { color: #000000 !important; }
+        .capsule-text { color: #000000 !important; }
+      }
+    }
+  }
+
+  // 导航栏弹出菜单
+  .more-card,
+  .link-child {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  // 页脚
+  .main-footer {
+    background: #000000 !important;
+    border-top: 2px solid #ffffff !important;
+  }
+
+  // 页脚元素 - 方框
+  .footer-links a,
+  .footer-badge,
+  .system-status {
+    border: 2px solid #ffffff !important;
+    background: transparent !important;
+    color: #ffffff !important;
+  }
+
+  // 消息通知 - 条形/传统
+  .message {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+    .text { color: #ffffff !important; }
+  }
+
+  // 超级岛 - 确保有背景
+  .message.island,
+  .message.island.island-theme-color {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+    .text { color: #ffffff !important; }
+    .message-content .text { color: #ffffff !important; }
+  }
+
+  // 传统消息样式
+  .message-wrapper {
+    .message-card {
+      background: #000000 !important;
+      border: 2px solid #ffffff !important;
+      .text { color: #ffffff !important; }
+    }
+    .message-progress-bar {
+      background: #ffffff !important;
+    }
+  }
+
+  .island-pill {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    .pill-text { color: #ffffff !important; }
+  }
+
+  // 输入框
+  input,
+  textarea {
+    background: transparent !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+  }
+
+  // 分页
+  .pagination .page-item {
+    background: transparent !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+    &.active {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+  }
+
+  // 标签
+  .tag-item {
+    background: transparent !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  // 链接卡片
+  .link-card {
+    background: transparent !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  // 搜索高亮
+  .search-highlight {
+    background: transparent !important;
+    border-bottom: 2px solid #ffffff !important;
+  }
+
+  // 进度条 - 轨道黑色，进度条白色
+  .message-progress {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff !important;
+  }
+  .message-progress-bar {
+    background-color: #ffffff !important;
+  }
+
+  // 超级岛环形进度条
+  .island-progress-ring {
+    .progress-track {
+      stroke: #000000 !important;
+    }
+    .progress-fill {
+      stroke: #ffffff !important;
+    }
+  }
+
+  // 文章目录
+  .toc-item.active {
+    background: transparent !important;
+    border-left: 3px solid #ffffff !important;
+  }
+
+  // 侧边栏小组件
+  .widget-card {
+    background: transparent !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  // 右键菜单
+  .right-menu {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  // 模态框
+  .modal-main {
+    .title {
+      background: #000000 !important;
+      border-bottom: 2px solid #ffffff !important;
+      color: #ffffff !important;
+      .close {
+        color: #ffffff !important;
+        &:hover {
+          background: #ffffff !important;
+          color: #000000 !important;
+        }
+      }
+    }
+  }
+
+  // 加载动画
+  .loading-bar {
+    background: #ffffff !important;
+  }
+
+  // 复选框/单选框
+  .checkbox-checked,
+  .radio-checked {
+    background: #ffffff !important;
+    border-color: #ffffff !important;
+  }
+
+  // 文章引用
+  blockquote {
+    border-left: 4px solid #ffffff !important;
+    background: transparent !important;
+  }
+
+  // 代码块
+  code {
+    background: transparent !important;
+    border: 1px solid #ffffff !important;
+  }
+  pre {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  // 赞赏按钮
+  .reward-btn {
+    background: transparent !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  // 音乐播放器
+  .music-player {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  // 密码保护
+  .password-protect {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  // 时钟组件 - 深色为主
+  .clock {
+    border: 3px solid #ffffff !important;
+    background: #000000 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    .clock-content {
+      background: #000000 !important;
+      border: 1px solid #ffffff !important;
+      box-shadow: none !important;
+      .pointer {
+        box-shadow: none !important;
+        &.hour { background-color: #ffffff !important; }
+        &.minute { background-color: #cccccc !important; }
+        &.second { background-color: #ffffff !important; border: none !important; }
+        &.second::after { background-color: #ffffff !important; }
+      }
+      &::after { background-color: #ffffff !important; border: none !important; }
+    }
+  }
+
+  // Hello 小组件
+  .hello {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 3px solid #ffffff !important;
+    .tip {
+      background-color: transparent !important;
+      border: 2px solid #ffffff !important;
+      color: #ffffff !important;
+      &:hover {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+      }
+    }
+    .social-link {
+      background-color: transparent !important;
+      border: 2px solid #ffffff !important;
+      .iconfont { color: #ffffff !important; }
+      &:hover {
+        background-color: #ffffff !important;
+        .iconfont { color: #000000 !important; }
+      }
+    }
+    .author, .desc { color: #ffffff !important; }
+    .site-desc { color: #ffffff !important; }
+  }
+
+  // 系统状态组件
+  .system-status {
+    border: 2px solid #ffffff !important;
+    background: transparent !important;
+    .status-dot,
+    .status-dot-ping {
+      background-color: #ffffff !important;
+    }
+    .status-label { color: #ffffff !important; }
+  }
+
+  // 自定义光标
+  #cursor {
+    background: #ffffff !important;
+  }
+  * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'%3E%3Ccircle cx='4' cy='4' r='4' fill='%23ffffff' /%3E%3C/svg%3E") 4 4, auto !important;
+  }
 }
 
 // 字体

@@ -170,3 +170,65 @@ onBeforeUnmount(() => {
   }
 }
 </style>
+
+<style lang="scss">
+// 最高对比度模式 - 倒计时组件
+html.high-contrast-max {
+  .count-down .count-left {
+    .time { color: #000000 !important; }
+    .text, .name { color: #000000 !important; }
+    .date { color: #000000 !important; opacity: 1 !important; }
+    &::after { background-color: #000000 !important; }
+  }
+  .count-down .count-right .count-item {
+    .item-name { color: #000000 !important; }
+    .item-progress {
+      background-color: transparent !important;
+      border: 1px solid #000000 !important;
+      .progress-bar {
+        background-color: #000000 !important;
+        opacity: 1 !important;
+        width: 2px !important;
+      }
+      .percentage { color: #000000 !important; }
+      .remaining {
+        color: #000000 !important;
+        .tip { opacity: 1 !important; }
+      }
+    }
+  }
+  .count-down:hover .count-right .count-item .item-progress {
+    .remaining { opacity: 1 !important; }
+    .percentage { opacity: 0 !important; }
+  }
+}
+html.dark.high-contrast-max {
+  .count-down .count-left {
+    .time { color: #ffffff !important; }
+    .text, .name { color: #ffffff !important; }
+    .date { color: #ffffff !important; opacity: 1 !important; }
+    &::after { background-color: #ffffff !important; }
+  }
+  .count-down .count-right .count-item {
+    .item-name { color: #ffffff !important; }
+    .item-progress {
+      background-color: transparent !important;
+      border: 1px solid #ffffff !important;
+      .progress-bar {
+        background-color: #ffffff !important;
+        opacity: 1 !important;
+        width: 2px !important;
+      }
+      .percentage { color: #ffffff !important; }
+      .remaining {
+        color: #ffffff !important;
+        .tip { opacity: 1 !important; }
+      }
+    }
+  }
+  .count-down:hover .count-right .count-item .item-progress {
+    .remaining { opacity: 1 !important; }
+    .percentage { opacity: 0 !important; }
+  }
+}
+</style>

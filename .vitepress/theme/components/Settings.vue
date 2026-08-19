@@ -297,17 +297,25 @@
             </div>
             <Transition name="fade-up">
               <div v-if="themeColorExpanded" class="set-expand-box">
-                <div class="set-item">
-                  <span class="set-label">主题色</span>
+                <template v-if="highContrast !== 'max'">
+                  <div class="set-item">
+                    <span class="set-label">主题色</span>
+                    <div class="set-options">
+                      <span
+                        v-for="color in themeColorList"
+                        :key="color.value"
+                        :class="['options', { choose: themeColor === color.value }]"
+                        @click="setThemeColor(color.value)"
+                      >
+                        {{ color.label }}
+                      </span>
+                    </div>
+                  </div>
+                </template>
+                <div v-else class="set-item">
+                  <span class="set-label">需要先关闭 高对比度模式（最高）</span>
                   <div class="set-options">
-                    <span
-                      v-for="color in themeColorList"
-                      :key="color.value"
-                      :class="['options', { choose: themeColor === color.value }]"
-                      @click="setThemeColor(color.value)"
-                    >
-                      {{ color.label }}
-                    </span>
+                    <span class="options" @click="setHighContrast(false)">确认</span>
                   </div>
                 </div>
                 <div class="set-item">
@@ -320,10 +328,16 @@
                       关闭
                     </span>
                     <span
-                      :class="['options', { choose: highContrast }]"
+                      :class="['options', { choose: highContrast === true }]"
                       @click="setHighContrast(true)"
                     >
                       开启
+                    </span>
+                    <span
+                      :class="['options', { choose: highContrast === 'max' }]"
+                      @click="setHighContrast('max')"
+                    >
+                      最高
                     </span>
                   </div>
                 </div>
@@ -902,14 +916,16 @@ const setThemeColor = (color) => {
 const setHighContrast = (enabled) => {
   highContrast.value = enabled;
   if (typeof document !== 'undefined') {
-    if (enabled) {
+    document.documentElement.classList.remove('high-contrast', 'high-contrast-max');
+    if (enabled === 'max') {
+      document.documentElement.classList.add('high-contrast', 'high-contrast-max');
+    } else if (enabled) {
       document.documentElement.classList.add('high-contrast');
-    } else {
-      document.documentElement.classList.remove('high-contrast');
     }
   }
   if (typeof $message !== "undefined") {
-    $message.success(`已${enabled ? '开启' : '关闭'}高对比度模式`);
+    const labels = { false: '关闭', true: '开启', max: '最高' };
+    $message.success(`已切换高对比度模式为：${labels[String(enabled)]}`);
   }
 };
 
@@ -1529,6 +1545,46 @@ html.dark.theme-gray .set-warn.set-warn-purple {
     &:hover {
       background-color: #888888 !important;
     }
+  }
+}
+
+// 最高对比度 - 警告区域黑白
+html.high-contrast-max .set-warn {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  .warn-text,
+  .warn-countdown,
+  .options {
+    color: #000000 !important;
+  }
+  .warn-no {
+    color: #000000 !important;
+    border-color: #000000 !important;
+    background: transparent !important;
+  }
+  .warn-yes {
+    color: #ffffff !important;
+    background: #000000 !important;
+    border-color: #000000 !important;
+  }
+}
+html.dark.high-contrast-max .set-warn {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  .warn-text,
+  .warn-countdown,
+  .options {
+    color: #ffffff !important;
+  }
+  .warn-no {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    background: transparent !important;
+  }
+  .warn-yes {
+    color: #000000 !important;
+    background: #ffffff !important;
+    border-color: #ffffff !important;
   }
 }
 </style>

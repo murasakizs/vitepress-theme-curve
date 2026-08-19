@@ -180,7 +180,9 @@ onMounted(() => {
   // 更改主题类别
   changeSiteThemeType();
   // 高对比度模式
-  if (highContrast.value) {
+  if (highContrast.value === 'max') {
+    document.documentElement.classList.add('high-contrast', 'high-contrast-max');
+  } else if (highContrast.value) {
     document.documentElement.classList.add('high-contrast');
   }
   // 切换系统字体样式

@@ -383,6 +383,6 @@ const toggleBadge = (index) => {
 
 <style lang="scss">
 html.dark .footer-social .social-icon-img {
-  filter: none;
+  filter: none !important;
 }
 </style>

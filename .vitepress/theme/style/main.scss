@@ -784,6 +784,7 @@ html.high-contrast-max {
       &:hover {
         background-color: #000000 !important;
         .iconfont { color: #ffffff !important; }
+        .social-icon-img { filter: brightness(0) invert(1) !important; }
       }
     }
     .author, .desc { color: #000000 !important; }
@@ -1196,9 +1197,11 @@ html.dark.high-contrast-max {
       background-color: transparent !important;
       border: 2px solid #ffffff !important;
       .iconfont { color: #ffffff !important; }
+      .social-icon-img { filter: brightness(0) invert(1) !important; }
       &:hover {
         background-color: #ffffff !important;
         .iconfont { color: #000000 !important; }
+        .social-icon-img { filter: none !important; }
       }
     }
     .author, .desc { color: #ffffff !important; }

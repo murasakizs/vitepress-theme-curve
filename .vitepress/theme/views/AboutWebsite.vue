@@ -70,8 +70,9 @@
     <div class="about-content" style="display: flex">
       <div class="about-item" style="padding: 1.2rem 2rem">
         <p class="text" style="margin: 0.2rem 0; font-size: 1.6em"><strong style="color: var(--main-color)">本站仍在建设中</strong></p>
-        <p class="text" style="margin: 0.2rem 0">最近一次功能性或质量性更新于 <strong style="color: var(--main-accent)">2026.8.19</strong></p>
+        <p class="text" style="margin: 0.2rem 0">最近一次功能性或质量性更新于 <strong style="color: var(--main-accent)">{{ theme.siteVersionDate }}</strong></p>
         <p class="text" style="margin: 0.2rem 0">定义版本为 <strong style="color: var(--main-accent)">{{ theme.siteVersion }}</strong></p>
+        <p class="text" style="margin: 0.2rem 0">定义版本随 <strong style="color: var(--main-color)">release</strong> 推送更新</p>
         <p class="text" style="margin: 0.2rem 0">详见本站 <a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank" style="color: var(--main-color)"><strong>源码 </strong></a></p>
       </div>
     </div>

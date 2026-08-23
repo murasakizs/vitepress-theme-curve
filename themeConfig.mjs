@@ -2,7 +2,8 @@
 // 仅定义需要覆盖的字段，未定义的字段使用默认值
 export const themeConfig = {
   // ===== 站点版本 =====
-  siteVersion: "V1.0",
+  siteVersion: "V1.1",
+  siteVersionDate: "2026.8.24",
   // ===== 站点信息 =====
   siteMeta: {
     title: "泠の小站",

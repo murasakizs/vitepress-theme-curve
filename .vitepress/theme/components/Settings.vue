@@ -183,7 +183,7 @@
           </div>
         </div>
         <Transition name="fade-up">
-          <div v-if="showMoreSettings && !showMoreSettingsConfirmed" ref="warnRef" class="set-warn" @click="showMoreSettings = false">
+          <div v-if="showMoreSettingsWarnVisible" ref="warnRef" class="set-warn" @click="showMoreSettings = false; showMoreSettingsWarnVisible = false">
             <span class="warn-text">更改这些选项可能导致未知的问题，你确定要继续吗</span>
             <span class="options" @click.stop="confirmShowMoreSettings">确认</span>
           </div>
@@ -414,6 +414,29 @@
                       </div>
                     </div>
                   </template>
+                  <div class="set-item">
+                    <span class="set-label">移除动画（beta）</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !removeAnimations }]"
+                        @click="setRemoveAnimations(false)"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: removeAnimations }]"
+                        @click="removeAnimations = true; removeAnimationsWarnVisible = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <Transition name="fade-up">
+                    <div v-if="removeAnimationsWarnVisible" class="set-warn" @click="removeAnimations = false; removeAnimationsWarnVisible = false">
+                      <span class="warn-text">开启此选项将移除所有过渡动画，你确定要继续吗？</span>
+                      <span class="options" @click.stop="applyRemoveAnimations">确认</span>
+                    </div>
+                  </Transition>
                 </template>
               </div>
             </Transition>
@@ -717,7 +740,7 @@
               </div>
             </div>
             <Transition name="fade-up">
-              <div v-if="showDevFeatures && !showDevFeaturesConfirmed" class="set-warn" @click="showDevFeatures = false">
+              <div v-if="showDevFeaturesWarnVisible" class="set-warn" @click="showDevFeatures = false; showDevFeaturesWarnVisible = false">
                 <span class="warn-text">这些功能还处于开发阶段，可能出现未知的问题，你确定要继续吗</span>
                 <span class="options" @click.stop="confirmShowDevFeatures">确认</span>
               </div>
@@ -805,7 +828,7 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations } =
   storeToRefs(store);
 
 // 判断是否使用移动端布局
@@ -920,6 +943,9 @@ const featuresExpanded = ref(false);
 // 字体大小调整状态
 const fontSizeEditing = ref(false);
 const fontSizeWarnVisible = ref(false);
+const removeAnimationsWarnVisible = ref(false);
+const showMoreSettingsWarnVisible = ref(false);
+const showDevFeaturesWarnVisible = ref(false);
 const resetFontSize = () => {
   store.fontSize = 17;
   if (typeof document !== 'undefined') {
@@ -1057,6 +1083,27 @@ const applyCustomTheme = () => {
   store.applyCustomThemeColor(customPrimaryColor.value, customSecondaryColor.value);
 };
 
+// 移除动画
+const setRemoveAnimations = (enabled) => {
+  removeAnimations.value = enabled;
+  if (typeof document !== 'undefined') {
+    document.documentElement.classList.toggle('remove-animations', enabled);
+  }
+  if (typeof $message !== "undefined") {
+    $message.success(`已${enabled ? '开启' : '关闭'}移除动画`);
+  }
+};
+
+const applyRemoveAnimations = () => {
+  removeAnimationsWarnVisible.value = false;
+  if (typeof document !== 'undefined') {
+    document.documentElement.classList.add('remove-animations');
+  }
+  if (typeof $message !== "undefined") {
+    $message.success('已开启移除动画');
+  }
+};
+
 // 设置显示外观
 const setThemeType = (type) => {
   themeType.value = type;
@@ -1106,6 +1153,7 @@ const setShowMoreSettings = (show) => {
     // 关闭时恢复默认设置并显示消息
     showMoreSettings.value = false;
     showMoreSettingsConfirmed.value = false;
+    showMoreSettingsWarnVisible.value = false;
     resetFontSize();
     fontSizeEditing.value = false;
     store.fontSizePending = false;
@@ -1114,6 +1162,7 @@ const setShowMoreSettings = (show) => {
     }
   } else {
     showMoreSettings.value = true;
+    showMoreSettingsWarnVisible.value = true;
     scrollToWarn();
   }
 };
@@ -1121,6 +1170,7 @@ const setShowMoreSettings = (show) => {
 // 确认显示更多选项
 const confirmShowMoreSettings = () => {
   showMoreSettingsConfirmed.value = true;
+  showMoreSettingsWarnVisible.value = false;
   if (typeof $message !== "undefined") {
     $message.warning("已显示更多选项");
   }
@@ -1131,15 +1181,19 @@ const setShowDevFeatures = (show) => {
   showDevFeatures.value = show;
   if (!show) {
     showDevFeaturesConfirmed.value = false;
+    showDevFeaturesWarnVisible.value = false;
     if (typeof $message !== "undefined") {
       $message.warning("已隐藏并关闭开发中的功能");
     }
+  } else {
+    showDevFeaturesWarnVisible.value = true;
   }
 };
 
 // 确认显示开发中的功能
 const confirmShowDevFeatures = () => {
   showDevFeaturesConfirmed.value = true;
+  showDevFeaturesWarnVisible.value = false;
   if (typeof $message !== "undefined") {
     $message.warning("已显示开发中的功能");
   }
@@ -1361,6 +1415,9 @@ watch(
       layoutWarnVisible.value = false;
       fontSizeEditing.value = false;
       fontSizeWarnVisible.value = false;
+      removeAnimationsWarnVisible.value = false;
+      showMoreSettingsWarnVisible.value = false;
+      showDevFeaturesWarnVisible.value = false;
       if (showMoreSettings.value && !showMoreSettingsConfirmed.value) {
         showMoreSettings.value = false;
       }
@@ -1793,5 +1850,15 @@ html.dark.high-contrast-max .set-warn {
     background: #ffffff !important;
     border-color: #ffffff !important;
   }
+}
+
+// 移除动画
+html.remove-animations *,
+html.remove-animations *::before,
+html.remove-animations *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
 }
 </style>

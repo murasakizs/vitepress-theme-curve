@@ -48,7 +48,7 @@ import { ensureGlobalFontsLoaded } from "@/utils/fontLoader.mjs";
 const route = useRoute();
 const store = mainStore();
 const { frontmatter, page, theme } = useData();
-const { loadingStatus, footerIsShow, themeValue, themeType, themeColor, highContrast, backgroundType, fontFamily, fontSize, fontSizePending, siteLayout, siteLayoutPending, messagePosition } =
+const { loadingStatus, footerIsShow, themeValue, themeType, themeColor, highContrast, backgroundType, fontFamily, fontSize, fontSizePending, siteLayout, siteLayoutPending, messagePosition, removeAnimations } =
   storeToRefs(store);
 let fontSwitchTaskId = 0;
 
@@ -225,6 +225,10 @@ onMounted(() => {
     if (typeof $message !== "undefined") {
       $message.warning("上次选择的布局未确认，已恢复为自动选择");
     }
+  }
+  // 恢复移除动画设置
+  if (removeAnimations.value) {
+    document.documentElement.classList.add("remove-animations");
   }
   // 滚动监听
   window.addEventListener("scroll", calculateScroll);

@@ -116,10 +116,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (error) {
     console.error("Fetch status failed:", error);
+    console.error("Token exists:", !!apiToken);
+    console.error("Token length:", apiToken?.length);
     return res.status(200).json({
       status: "error",
       label: "无法获取状态",
       updatedAt: null,
+      debug: error instanceof Error ? error.message : String(error),
     });
   }
 }

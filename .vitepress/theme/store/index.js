@@ -87,6 +87,8 @@ export const mainStore = defineStore("main", {
       lastCustomPrimaryColor: "#e8558e",
       lastCustomSecondaryColor: "#64b5f6",
       customThemeBeforeHighContrast: false,
+      // 移除动画
+      removeAnimations: false,
     };
   },
   getters: {},
@@ -109,11 +111,11 @@ export const mainStore = defineStore("main", {
       if (typeof document === 'undefined') return; // 确保在客户端
 
       if (isAdd) {
-        if (this.fontSize < 20) {
+        if (this.fontSize < 24) {
           this.fontSize++;
         }
       } else {
-        if (this.fontSize > 14) {
+        if (this.fontSize > 10) {
           this.fontSize--;
         }
       }
@@ -310,6 +312,7 @@ export const mainStore = defineStore("main", {
         "lastCustomPrimaryColor",
         "lastCustomSecondaryColor",
         "customThemeBeforeHighContrast",
+        "removeAnimations",
       ], 
     },
   ],

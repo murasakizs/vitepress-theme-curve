@@ -36,6 +36,19 @@
   <RightMenu ref="rightMenuRef" />
   <!-- 全局消息 -->
   <Message />
+  <!-- 导入后检查弹窗 -->
+  <Teleport to="body">
+    <div v-if="importCheckVisible" class="import-check-overlay">
+      <div class="import-check-dialog">
+        <span class="import-check-title">网站能正常工作吗？</span>
+        <span class="import-check-countdown">{{ importCheckCountdown }}秒后将恢复原配置</span>
+        <div class="import-check-actions">
+          <span class="import-check-btn import-check-no" @click="importCheckFail">不能</span>
+          <span class="import-check-btn import-check-yes" @click="importCheckPass">能</span>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -51,6 +64,11 @@ const { frontmatter, page, theme } = useData();
 const { loadingStatus, footerIsShow, themeValue, themeType, themeColor, highContrast, backgroundType, fontFamily, fontSize, fontSizePending, siteLayout, siteLayoutPending, messagePosition, removeAnimations } =
   storeToRefs(store);
 let fontSwitchTaskId = 0;
+
+// 导入后检查
+const importCheckVisible = ref(false);
+const importCheckCountdown = ref(10);
+let importCheckTimer = null;
 
 //2025.06.12更新：在 Next.js 的服务端渲染过程中，应用会在服务器端先进行渲染
   //而在服务器端的 JavaScript 环境中，并没有浏览器提供的 window 对象。
@@ -70,6 +88,35 @@ let fontSwitchTaskId = 0;
 // });
 // 右键菜单
 const rightMenuRef = ref(null);
+
+// 导入后检查函数
+const importCheckPass = () => {
+  importCheckVisible.value = false;
+  clearInterval(importCheckTimer);
+  localStorage.removeItem("importJustCompleted");
+  if (typeof $message !== "undefined") {
+    $message.success("配置导入成功");
+  }
+};
+
+const importCheckFail = () => {
+  importCheckVisible.value = false;
+  clearInterval(importCheckTimer);
+  localStorage.removeItem("siteData");
+  localStorage.removeItem("importJustCompleted");
+  location.reload();
+};
+
+const startImportCheck = () => {
+  importCheckCountdown.value = 10;
+  importCheckVisible.value = true;
+  importCheckTimer = setInterval(() => {
+    importCheckCountdown.value--;
+    if (importCheckCountdown.value <= 0) {
+      importCheckFail();
+    }
+  }, 1000);
+};
 
 // 判断是否为文章页面
 const isPostPage = computed(() => {
@@ -238,11 +285,16 @@ onMounted(() => {
   window.addEventListener("copy", copyTip);
   // 监听系统颜色
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", changeSiteThemeType);
+  // 检查是否需要显示导入后检查弹窗
+  if (localStorage.getItem("importJustCompleted") === "true") {
+    startImportCheck();
+  }
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("scroll", calculateScroll);
   window.removeEventListener("contextmenu", openRightMenu);
+  clearInterval(importCheckTimer);
 });
 </script>
 
@@ -280,6 +332,101 @@ onBeforeUnmount(() => {
   &.hidden {
     opacity: 0;
     transform: translateY(100px);
+  }
+}
+.import-check-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.import-check-dialog {
+  background-color: #f5f3ff;
+  border: 2px solid #c4b5fd;
+  border-radius: 12px;
+  padding: 24px 32px;
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+.import-check-title {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  color: #7c3aed;
+  margin-bottom: 8px;
+}
+.import-check-countdown {
+  display: block;
+  font-size: 13px;
+  color: #7c3aed;
+  opacity: 0.8;
+  margin-bottom: 16px;
+}
+.import-check-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.import-check-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9375rem;
+  padding: 8px 16px;
+  min-width: 60px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.3s, background-color 0.3s;
+}
+.import-check-no {
+  color: #7c3aed;
+  border: 1px solid #7c3aed;
+  background-color: transparent;
+  &:hover {
+    color: #6d28d9;
+    border-color: #6d28d9;
+  }
+}
+.import-check-yes {
+  color: #fff;
+  background-color: #7c3aed;
+  &:hover {
+    background-color: #6d28d9;
+  }
+}
+html.dark {
+  .import-check-dialog {
+    background-color: #1e1833;
+    border-color: #3b2d6b;
+  }
+  .import-check-title,
+  .import-check-countdown {
+    color: #a78bfa;
+  }
+  .import-check-countdown {
+    opacity: 0.8;
+  }
+  .import-check-no {
+    color: #a78bfa;
+    border-color: #a78bfa;
+    &:hover {
+      color: #c4b5fd;
+      border-color: #c4b5fd;
+    }
+  }
+  .import-check-yes {
+    background-color: #7c3aed;
+    &:hover {
+      background-color: #6d28d9;
+    }
   }
 }
 </style>

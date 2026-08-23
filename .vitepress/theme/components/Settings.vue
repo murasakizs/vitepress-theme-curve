@@ -723,7 +723,7 @@
               </div>
             </Transition>
             <div class="set-item">
-              <span class="set-label">显示开发中的功能（dev）</span>
+              <span class="set-label">开发者选项（dev）</span>
               <div class="set-options">
                 <span
                   :class="['options', { choose: !showDevFeatures }]"
@@ -741,7 +741,7 @@
             </div>
             <Transition name="fade-up">
               <div v-if="showDevFeaturesWarnVisible" class="set-warn" @click="showDevFeatures = false; showDevFeaturesWarnVisible = false">
-                <span class="warn-text">这些功能还处于开发阶段，可能出现未知的问题，你确定要继续吗</span>
+                <span class="warn-text">启用开发者选项可能导致未知的问题，你确定要继续吗</span>
                 <span class="options" @click.stop="confirmShowDevFeatures">确认</span>
               </div>
             </Transition>
@@ -797,7 +797,44 @@
                 </div>
               </Transition>
             </template>
-          <span class="title">恢复默认配置</span>
+          <span class="title">个性化配置数据</span>
+          <div class="set-item">
+            <span class="set-label">导入/导出配置</span>
+            <div class="set-options">
+              <span class="options" @click="handleImportConfig">导入</span>
+              <span class="options" @click="handleExportConfig">导出</span>
+            </div>
+          </div>
+          <input
+            ref="importFileInput"
+            type="file"
+            accept=".dat,.json"
+            style="display: none"
+            @change="handleFileImport"
+          />
+          <Transition name="fade-up">
+            <div v-if="importConfirmVisible" class="set-warn set-warn-purple-import" @click="cancelImportConfirm">
+              <span class="warn-text">你确定要导入配置数据吗</span>
+              <span class="options" @click.stop="confirmImportConfirm">确认</span>
+            </div>
+          </Transition>
+          <Transition name="fade-up">
+            <div v-if="importWarnVisible" class="set-warn set-warn-red">
+              <template v-if="importWarnType === 'high'">
+                <span class="warn-text" v-html="'你导入的配置文件版本过高，无法导入<br>请联系网站管理员拉取更新'"></span>
+                <div class="warn-actions">
+                  <span class="warn-yes" @click="cancelImportWarn">确认</span>
+                </div>
+              </template>
+              <template v-else-if="importWarnType === 'low'">
+                <span class="warn-text">你导入的配置文件版本过低，可能存在兼容性问题，你确定要继续吗</span>
+                <div class="warn-actions">
+                  <span class="warn-no" @click="cancelImportWarn">取消</span>
+                  <span class="warn-yes" @click="confirmImportWarn">确认</span>
+                </div>
+              </template>
+            </div>
+          </Transition>
           <div class="set-item">
             <span class="set-label">恢复默认配置</span>
             <div class="set-options">
@@ -828,6 +865,7 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
+const { theme } = useData();
 const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations } =
   storeToRefs(store);
 
@@ -985,6 +1023,176 @@ const showResetWarning = () => {
   if (typeof $message !== "undefined") {
     $message.warning("即将恢复默认配置，请再次确认");
   }
+};
+
+// 导入/导出配置
+const importFileInput = ref(null);
+const importConfirmVisible = ref(false);
+const importWarnVisible = ref(false);
+const importWarnType = ref(""); // "high" | "low"
+const pendingImportConfig = ref(null);
+
+// 混淆编码
+const obfuscate = (str) => {
+  const shifted = str.split('').map(c => {
+    const code = c.charCodeAt(0);
+    return String.fromCharCode(code + 3);
+  }).join('');
+  return btoa(encodeURIComponent(shifted));
+};
+
+// 混淆解码
+const deobfuscate = (str) => {
+  const decoded = decodeURIComponent(atob(str));
+  return decoded.split('').map(c => {
+    const code = c.charCodeAt(0);
+    return String.fromCharCode(code - 3);
+  }).join('');
+};
+
+const handleExportConfig = () => {
+  try {
+    const siteData = localStorage.getItem("siteData");
+    if (!siteData) {
+      if (typeof $message !== "undefined") {
+        $message.warning("没有可导出的配置数据");
+      }
+      return;
+    }
+    const parsed = JSON.parse(siteData);
+    // 版本号格式：显示V1.6，存储16
+    const versionStr = theme.siteVersion || "V1.0";
+    const versionNum = parseInt(versionStr.replace(/[Vv.]/g, ""), 10) || 10;
+    const exportData = {
+      version: versionNum,
+      timestamp: new Date().toISOString(),
+      config: parsed,
+    };
+    const encoded = obfuscate(JSON.stringify(exportData));
+    const blob = new Blob([encoded], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `site-config-${new Date().toISOString().slice(0, 10)}.dat`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    if (typeof $message !== "undefined") {
+      $message.success("配置已导出");
+    }
+  } catch (e) {
+    if (typeof $message !== "undefined") {
+      $message.error("导出配置失败");
+    }
+  }
+};
+
+const handleImportConfig = () => {
+  importFileInput.value?.click();
+};
+
+const handleFileImport = (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      let data;
+      const content = e.target.result;
+      // 尝试解码混淆格式
+      try {
+        data = JSON.parse(deobfuscate(content));
+      } catch {
+        // 尝试直接解析JSON（兼容旧格式）
+        data = JSON.parse(content);
+      }
+      const importVersion = data.version;
+      // 版本号格式：显示V1.6，存储16
+      const versionStr = theme.siteVersion || "V1.0";
+      const currentVersion = parseInt(versionStr.replace(/[Vv.]/g, ""), 10) || 10;
+      // 检查版本号
+      if (typeof importVersion === "number" && importVersion > currentVersion) {
+        // 版本过高
+        pendingImportConfig.value = data;
+        importWarnType.value = "high";
+        importWarnVisible.value = true;
+        return;
+      }
+      if (typeof importVersion === "number" && importVersion < currentVersion) {
+        // 版本过低
+        pendingImportConfig.value = data;
+        importWarnType.value = "low";
+        importWarnVisible.value = true;
+        return;
+      }
+      // 版本相同，显示紫色确认警告
+      pendingImportConfig.value = data;
+      importConfirmVisible.value = true;
+    } catch (e) {
+      if (typeof $message !== "undefined") {
+        $message.error("导入失败，请检查文件格式是否正确");
+      }
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = "";
+};
+
+const applyImportConfig = (data) => {
+  try {
+    let config = data.config || data;
+    const validKeys = [
+      "themeType", "themeColor", "bannerType", "useRightMenu", "useCustomCursor",
+      "playerShow", "playerVolume", "backgroundBlur", "backgroundType", "fontFamily",
+      "fontSize", "infoPosition", "backgroundUrl", "highContrast", "siteLayout",
+      "messageStyle", "messagePosition", "progressDirection", "messageDuration",
+      "islandMode", "islandUseThemeColor", "islandShowSeconds", "islandShowDate",
+      "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
+      "removeAnimations", "showMoreSettings", "showDevFeatures",
+    ];
+    const filtered = {};
+    for (const key of validKeys) {
+      if (config[key] !== undefined) {
+        filtered[key] = config[key];
+      }
+    }
+    localStorage.setItem("siteData", JSON.stringify(filtered));
+    if (typeof $message !== "undefined") {
+      $message.success("配置已导入，页面将刷新以应用设置", { duration: 3000 });
+    }
+    localStorage.setItem("importJustCompleted", "true");
+    setTimeout(() => {
+      location.reload();
+    }, 3000);
+  } catch (e) {
+    if (typeof $message !== "undefined") {
+      $message.error("导入失败，请检查文件格式是否正确");
+    }
+  }
+};
+
+const confirmImportWarn = () => {
+  importWarnVisible.value = false;
+  importConfirmVisible.value = true;
+};
+
+const cancelImportWarn = () => {
+  importWarnVisible.value = false;
+  pendingImportConfig.value = null;
+};
+
+const confirmImportConfirm = () => {
+  importConfirmVisible.value = false;
+  if (pendingImportConfig.value) {
+    applyImportConfig(pendingImportConfig.value);
+    pendingImportConfig.value = null;
+  }
+};
+
+const cancelImportConfirm = () => {
+  importConfirmVisible.value = false;
+  pendingImportConfig.value = null;
 };
 
 // 设置首页Banner高度
@@ -1418,6 +1626,7 @@ watch(
       removeAnimationsWarnVisible.value = false;
       showMoreSettingsWarnVisible.value = false;
       showDevFeaturesWarnVisible.value = false;
+      importConfirmVisible.value = false;
       if (showMoreSettings.value && !showMoreSettingsConfirmed.value) {
         showMoreSettings.value = false;
       }
@@ -1427,6 +1636,7 @@ watch(
     }
     if (!val) {
       showResetConfirm.value = false;
+      importConfirmVisible.value = false;
       // 关闭设置面板时，如果字体大小被修改过，恢复默认
       if (fontSizeEditing.value) {
         resetFontSize();
@@ -1690,6 +1900,82 @@ watch(
       }
     }
   }
+  .set-warn-red {
+    flex-direction: column;
+    align-items: stretch;
+    background-color: #fef2f2;
+    border-color: #fca5a5;
+    .warn-text {
+      color: #dc2626;
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .warn-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .warn-no {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9375rem;
+      color: #dc2626;
+      border: 1px solid #dc2626;
+      border-radius: 8px;
+      padding: 6px 8px;
+      min-width: 30px;
+      background-color: transparent;
+      transition: color 0.3s, background-color 0.3s;
+      &:hover {
+        color: #b91c1c;
+        border-color: #b91c1c;
+        background-color: transparent;
+        box-shadow: none;
+      }
+    }
+    .warn-yes {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9375rem;
+      color: #fff !important;
+      background-color: #dc2626 !important;
+      border-radius: 8px;
+      padding: 6px 8px;
+      min-width: 30px;
+      transition: color 0.3s, background-color 0.3s;
+      &:hover {
+        background-color: #b91c1c !important;
+      }
+    }
+  }
+  .set-warn-purple-import {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background-color: #f5f3ff;
+    border: 1px solid #c4b5fd;
+    .warn-text {
+      font-size: 14px;
+      color: #7c3aed;
+    }
+    .options {
+      flex-shrink: 0;
+      color: #7c3aed;
+      background-color: transparent;
+      &:hover {
+        color: #6d28d9;
+        background-color: transparent;
+        box-shadow: none;
+      }
+    }
+  }
   .color-input-hidden {
     position: absolute;
     width: 0;
@@ -1751,6 +2037,37 @@ html.theme-gray .set-warn.set-warn-purple {
     }
   }
 }
+html.theme-gray .set-warn.set-warn-red {
+  background-color: #f0f0f0 !important;
+  border-color: #cccccc !important;
+  .warn-text {
+    color: #666666 !important;
+  }
+  .warn-no {
+    color: #666666 !important;
+    border-color: #666666 !important;
+  }
+  .warn-yes {
+    color: #fff !important;
+    background-color: #666666 !important;
+    &:hover {
+      background-color: #555555 !important;
+    }
+  }
+}
+html.theme-gray .set-warn.set-warn-purple-import {
+  background-color: #f0f0f0 !important;
+  border-color: #cccccc !important;
+  .warn-text {
+    color: #666666 !important;
+  }
+  .options {
+    color: #666666 !important;
+    &:hover {
+      color: #555555 !important;
+    }
+  }
+}
 html.dark.theme-gray .set-warn.set-warn-purple {
   background-color: #222222 !important;
   border-color: #444444 !important;
@@ -1767,6 +2084,37 @@ html.dark.theme-gray .set-warn.set-warn-purple {
     background-color: #666666 !important;
     &:hover {
       background-color: #888888 !important;
+    }
+  }
+}
+html.dark.theme-gray .set-warn.set-warn-red {
+  background-color: #222222 !important;
+  border-color: #444444 !important;
+  .warn-text {
+    color: #999999 !important;
+  }
+  .warn-no {
+    color: #999999 !important;
+    border-color: #999999 !important;
+  }
+  .warn-yes {
+    color: #fff !important;
+    background-color: #666666 !important;
+    &:hover {
+      background-color: #888888 !important;
+    }
+  }
+}
+html.dark.theme-gray .set-warn.set-warn-purple-import {
+  background-color: #222222 !important;
+  border-color: #444444 !important;
+  .warn-text {
+    color: #999999 !important;
+  }
+  .options {
+    color: #999999 !important;
+    &:hover {
+      color: #888888 !important;
     }
   }
 }
@@ -1808,6 +2156,43 @@ html.dark .set-list .set-warn.set-warn-purple {
     background-color: #7c3aed !important;
     &:hover {
       background-color: #6d28d9 !important;
+    }
+  }
+}
+html.dark .set-list .set-warn.set-warn-red {
+  background-color: #3b1520;
+  border-color: #5c2030;
+  .warn-text {
+    color: #f87171;
+  }
+  .warn-no {
+    color: #f87171;
+    border-color: #f87171;
+    &:hover {
+      color: #fca5a5;
+      border-color: #fca5a5;
+      background-color: transparent;
+    }
+  }
+  .warn-yes {
+    color: #fff !important;
+    background-color: #dc2626 !important;
+    &:hover {
+      background-color: #b91c1c !important;
+    }
+  }
+}
+html.dark .set-list .set-warn.set-warn-purple-import {
+  background-color: #1e1833;
+  border-color: #3b2d6b;
+  .warn-text {
+    color: #a78bfa;
+  }
+  .options {
+    color: #a78bfa;
+    &:hover {
+      color: #c4b5fd;
+      background-color: transparent;
     }
   }
 }

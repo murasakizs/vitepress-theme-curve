@@ -1,6 +1,8 @@
 // 个人主题配置（覆盖默认配置）
 // 仅定义需要覆盖的字段，未定义的字段使用默认值
 export const themeConfig = {
+  // ===== 站点版本 =====
+  siteVersion: "V1.0",
   // ===== 站点信息 =====
   siteMeta: {
     title: "泠の小站",

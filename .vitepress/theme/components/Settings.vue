@@ -183,9 +183,9 @@
           </div>
         </div>
         <Transition name="fade-up">
-          <div v-if="showMoreSettings && !showMoreSettingsConfirmed" ref="warnRef" class="set-warn">
+          <div v-if="showMoreSettings && !showMoreSettingsConfirmed" ref="warnRef" class="set-warn" @click="showMoreSettings = false">
             <span class="warn-text">更改这些选项可能导致未知的问题，你确定要继续吗</span>
-            <span class="options" @click="confirmShowMoreSettings">确认</span>
+            <span class="options" @click.stop="confirmShowMoreSettings">确认</span>
           </div>
         </Transition>
         <Transition name="fade-up">
@@ -235,7 +235,7 @@
                   </div>
                 </div>
                 <Transition name="fade-up">
-                  <div v-if="fontSizeWarnVisible" class="set-warn">
+                  <div v-if="fontSizeWarnVisible" class="set-warn" @click="fontSizeWarnVisible = false">
                     <span class="warn-text">修改字体大小可能导致未知的问题，你确定要继续吗</span>
                     <span class="options" @click.stop="fontSizeEditing = true; fontSizeWarnVisible = false; store.fontSizePending = true">确认</span>
                   </div>
@@ -268,7 +268,7 @@
               </div>
             </div>
             <Transition name="fade-up">
-              <div v-if="layoutWarnVisible" class="set-warn">
+              <div v-if="layoutWarnVisible" class="set-warn" @click="layoutWarnVisible = false; siteLayoutDisplay = siteLayout">
                 <span class="warn-text">强制更改页面布局可能导致未知的问题，你确定要继续吗</span>
                 <span class="options" @click.stop="handleLayoutWarnConfirm">确认</span>
               </div>
@@ -717,7 +717,7 @@
               </div>
             </div>
             <Transition name="fade-up">
-              <div v-if="showDevFeatures && !showDevFeaturesConfirmed" class="set-warn">
+              <div v-if="showDevFeatures && !showDevFeaturesConfirmed" class="set-warn" @click="showDevFeatures = false">
                 <span class="warn-text">这些功能还处于开发阶段，可能出现未知的问题，你确定要继续吗</span>
                 <span class="options" @click.stop="confirmShowDevFeatures">确认</span>
               </div>
@@ -1710,6 +1710,47 @@ html.dark.theme-gray .set-warn.set-warn-purple {
     background-color: #666666 !important;
     &:hover {
       background-color: #888888 !important;
+    }
+  }
+}
+
+// 深色模式 - 警告区域
+html.dark .set-list .set-warn {
+  background-color: #3b1520;
+  border-color: #5c2030;
+  .warn-text {
+    color: #f87171;
+  }
+  .options {
+    color: #f87171;
+    &:hover {
+      color: #fca5a5;
+    }
+  }
+}
+html.dark .set-list .set-warn.set-warn-purple {
+  background-color: #1e1833;
+  border-color: #3b2d6b;
+  .warn-text {
+    color: #a78bfa;
+  }
+  .warn-countdown {
+    color: #a78bfa;
+  }
+  .warn-no {
+    color: #a78bfa;
+    border-color: #a78bfa;
+    &:hover {
+      color: #c4b5fd;
+      border-color: #c4b5fd;
+      background-color: transparent;
+    }
+  }
+  .warn-yes {
+    color: #fff !important;
+    background-color: #7c3aed !important;
+    &:hover {
+      background-color: #6d28d9 !important;
     }
   }
 }

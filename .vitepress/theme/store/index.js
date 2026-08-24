@@ -58,9 +58,10 @@ export const mainStore = defineStore("main", {
       // 显示更多设置
       showMoreSettings: false,
       showMoreSettingsConfirmed: false,
-      // 显示开发中的功能
-      showDevFeatures: false,
-      showDevFeaturesConfirmed: false,
+      // 频道展开状态
+      betaChannelExpanded: true,
+      devChannelExpanded: false,
+      canaryChannelExpanded: false,
       // 高对比度模式
       highContrast: false,
       // 站点布局
@@ -292,8 +293,9 @@ export const mainStore = defineStore("main", {
         "backgroundUrl",
         "showMoreSettings",
         "showMoreSettingsConfirmed",
-        "showDevFeatures",
-        "showDevFeaturesConfirmed",
+        "betaChannelExpanded",
+        "devChannelExpanded",
+        "canaryChannelExpanded",
         "highContrast",
         "siteLayout",
         "siteLayoutPending",

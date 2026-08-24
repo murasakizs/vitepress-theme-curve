@@ -155,20 +155,6 @@ export default withPwa(
               cacheName: "image-cache",
             },
           },
-          {
-            urlPattern: /^https:\/\/cdn2\.codesign\.qq\.com\/.*/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "iconfont-cache",
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 2,
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
         ],
         // 缓存文件
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,jpeg,gif,svg,woff2,ttf}"],

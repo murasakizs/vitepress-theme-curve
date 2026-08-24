@@ -28,7 +28,7 @@ export const themeConfig = {
       ["link", { rel: "icon", type: "image/png", href: "/images/logo/favicon-32.png" }],
       ["script", {}, "document.documentElement.classList.add('js-enabled');"],
       ["link", { rel: "alternate", type: "application/rss+xml", title: "RSS", href: "/rss.xml" }],
-      ["link", { crossorigin: "anonymous", rel: "stylesheet", href: "https://cdn2.codesign.qq.com/icons/g5ZpEgx3z4VO6j2/latest/iconfont.css" }],
+      ["link", { rel: "stylesheet", href: "/fonts/iconfont/iconfont.css" }],
     ],
   },
 
@@ -96,6 +96,7 @@ export const themeConfig = {
         items: [
           { text: "关于泠酱", link: "/pages/about-me" },
           { text: "关于本站", link: "/pages/about-website" },
+          { text: "友情链接", link: "/pages/friend-link" },
           { text: "TO DO", link: "/pages/todo" },
         ],
       },

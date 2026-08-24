@@ -71,19 +71,25 @@
           <span class="set-label">调整明暗显示外观</span>
           <div class="set-options">
             <span
-              :class="['options', { choose: themeType === 'auto' }]"
+              v-if="scheduledThemeEnabled"
+              class="options choose"
+            >
+              定时切换
+            </span>
+            <span
+              :class="['options', { choose: !scheduledThemeEnabled && themeType === 'auto' }]"
               @click="setThemeType('auto')"
             >
               跟随系统
             </span>
             <span
-              :class="['options', { choose: themeType === 'dark' }]"
+              :class="['options', { choose: !scheduledThemeEnabled && themeType === 'dark' }]"
               @click="setThemeType('dark')"
             >
               深色
             </span>
             <span
-              :class="['options', { choose: themeType === 'light' }]"
+              :class="['options', { choose: !scheduledThemeEnabled && themeType === 'light' }]"
               @click="setThemeType('light')"
             >
               浅色
@@ -786,6 +792,45 @@
                       </span>
                     </div>
                   </div>
+                  <div class="set-item">
+                    <span class="set-label">定时切换明暗显示外观</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !scheduledThemeEnabled }]"
+                        @click="toggleScheduledTheme(false)"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: scheduledThemeEnabled }]"
+                        @click="toggleScheduledTheme(true)"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <div v-if="scheduledThemeEnabled" class="set-item">
+                    <span class="set-label">浅色模式时间</span>
+                    <div class="set-options">
+                      <input
+                        v-model="scheduledLightTime"
+                        type="time"
+                        class="time-input"
+                        @change="onScheduledTimeChange"
+                      />
+                    </div>
+                  </div>
+                  <div v-if="scheduledThemeEnabled" class="set-item">
+                    <span class="set-label">深色模式时间</span>
+                    <div class="set-options">
+                      <input
+                        v-model="scheduledDarkTime"
+                        type="time"
+                        class="time-input"
+                        @change="onScheduledTimeChange"
+                      />
+                    </div>
+                  </div>
                 </div>
               </Transition>
               <div class="set-item">
@@ -873,7 +918,7 @@ import { mainStore } from "@/store";
 
 const store = mainStore();
 const { theme } = useData();
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime } =
   storeToRefs(store);
 
 // 判断是否使用移动端布局
@@ -1154,6 +1199,7 @@ const applyImportConfig = (data) => {
       "islandMode", "islandUseThemeColor", "islandShowSeconds", "islandShowDate",
       "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
       "removeAnimations", "showMoreSettings",
+      "scheduledThemeEnabled", "scheduledLightTime", "scheduledDarkTime",
       "betaChannelExpanded", "devChannelExpanded", "canaryChannelExpanded",
     ];
     const filtered = {};
@@ -1307,6 +1353,30 @@ const setRemoveAnimations = (enabled) => {
   }
 };
 
+// 定时切换明暗显示外观
+const toggleScheduledTheme = (enabled) => {
+  scheduledThemeEnabled.value = enabled;
+  if (enabled) {
+    store.startScheduledTheme();
+    if (typeof $message !== "undefined") {
+      $message.success("显示外观已切换为定时切换");
+    }
+  } else {
+    store.stopScheduledTheme();
+    themeType.value = 'auto';
+    store.updateActualThemeValue();
+    if (typeof $message !== "undefined") {
+      $message.success("显示外观已切换为跟随系统");
+    }
+  }
+};
+
+const onScheduledTimeChange = () => {
+  if (scheduledThemeEnabled.value) {
+    store.startScheduledTheme();
+  }
+};
+
 const applyRemoveAnimations = () => {
   removeAnimationsWarnVisible.value = false;
   if (typeof document !== 'undefined') {
@@ -1319,6 +1389,11 @@ const applyRemoveAnimations = () => {
 
 // 设置显示外观
 const setThemeType = (type) => {
+  // 如果正在使用定时切换，关闭它
+  if (scheduledThemeEnabled.value) {
+    scheduledThemeEnabled.value = false;
+    store.stopScheduledTheme();
+  }
   themeType.value = type;
   const typeNames = { auto: '跟随系统', dark: '深色', light: '浅色' };
   if (typeof $message !== "undefined") {
@@ -1553,6 +1628,10 @@ onMounted(() => {
   window.addEventListener("resize", handleResize);
   // 页面加载时判断布局是否发生变化，如果变化则更新消息样式
   updateMessageStyleByLayout();
+  // 如果定时切换已启用，启动定时器
+  if (scheduledThemeEnabled.value) {
+    store.startScheduledTheme();
+  }
 });
 
 // 根据页面布局更新消息样式
@@ -1990,6 +2069,20 @@ watch(
     background-color: var(--main-card-background);
     margin-left: 8px;
     box-sizing: border-box;
+    &:focus {
+      outline: none;
+      border-color: var(--main-color);
+    }
+  }
+  .time-input {
+    border: 1px solid var(--main-card-border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-family: var(--main-font-family);
+    color: var(--main-font-color);
+    background-color: var(--main-card-background);
+    cursor: pointer;
     &:focus {
       outline: none;
       border-color: var(--main-color);

@@ -243,7 +243,7 @@
               </div>
             </Transition>
             <span class="title">实验性功能</span>
-            <span class="set-desc">以下选项处于测试阶段，可能出现未知的问题</span>
+            <span class="set-desc">以下选项处于实验性阶段，可能出现未知的问题</span>
             <div class="set-item">
               <span class="set-label">页面布局</span>
               <div class="set-options">
@@ -723,45 +723,37 @@
               </div>
             </Transition>
             <div class="set-item">
-              <span class="set-label">开发者选项（dev）</span>
-              <div class="set-options">
-                <span
-                  :class="['options', { choose: !showDevFeatures }]"
-                  @click="setShowDevFeatures(false)"
-                >
-                  关闭
-                </span>
-                <span
-                  :class="['options', { choose: showDevFeatures }]"
-                  @click="setShowDevFeatures(true)"
-                >
-                  开启
-                </span>
-              </div>
-            </div>
-            <Transition name="fade-up">
-              <div v-if="showDevFeaturesWarnVisible" class="set-warn" @click="showDevFeatures = false; showDevFeaturesWarnVisible = false">
-                <span class="warn-text">启用开发者选项可能导致未知的问题，你确定要继续吗</span>
-                <span class="options" @click.stop="confirmShowDevFeatures">确认</span>
-              </div>
-            </Transition>
-            <template v-if="showDevFeatures && showDevFeaturesConfirmed">
-              <div class="set-item">
-                <span class="set-label">Features under development or maintenance</span>
+              <span class="set-label set-label-channel">来自beta频道的新内容</span>
                 <div class="set-options">
                   <span
-                    :class="['options', { choose: featuresExpanded }]"
-                    @click="featuresExpanded = !featuresExpanded"
+                    :class="['options', { choose: betaChannelExpanded }]"
+                    @click="betaChannelExpanded = !betaChannelExpanded"
                   >
-                    {{ featuresExpanded ? '收起' : '展开' }}
+                    {{ betaChannelExpanded ? '收起' : '展开' }}
                   </span>
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="featuresExpanded" class="set-expand-box">
-                  <span class="set-desc">These options are still in the early stages of development, and basic functionality has not yet been implemented; enabling them is not recommended.</span>
+                <div v-if="betaChannelExpanded" class="set-expand-box">
+                  <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
+                </div>
+              </Transition>
+              <div class="set-item">
+                <span class="set-label set-label-channel">来自dev频道的新内容</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: devChannelExpanded }]"
+                    @click="devChannelExpanded = !devChannelExpanded"
+                  >
+                    {{ devChannelExpanded ? '收起' : '展开' }}
+                  </span>
+                </div>
+              </div>
+              <Transition name="fade-up">
+                <div v-if="devChannelExpanded" class="set-expand-box">
+                  <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。</span>
                   <div class="set-item">
-                    <span class="set-label">Background blurry</span>
+                    <span class="set-label">背景模糊</span>
                     <div class="set-options">
                       <span
                         :class="['options', { choose: !backgroundBlur }]"
@@ -778,7 +770,7 @@
                     </div>
                   </div>
                   <div class="set-item">
-                    <span class="set-label">Player</span>
+                    <span class="set-label">播放器</span>
                     <div class="set-options">
                       <span
                         :class="['options', { choose: !playerShow }]"
@@ -796,7 +788,22 @@
                   </div>
                 </div>
               </Transition>
-            </template>
+              <div class="set-item">
+                <span class="set-label set-label-channel">来自canary频道的新内容</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: canaryChannelExpanded }]"
+                    @click="canaryChannelExpanded = !canaryChannelExpanded"
+                  >
+                    {{ canaryChannelExpanded ? '收起' : '展开' }}
+                  </span>
+                </div>
+              </div>
+              <Transition name="fade-up">
+                <div v-if="canaryChannelExpanded" class="set-expand-box">
+                  <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁</span>
+                </div>
+              </Transition>
           <span class="title">个性化配置数据</span>
           <div class="set-item">
             <span class="set-label">导入/导出配置</span>
@@ -866,7 +873,7 @@ import { mainStore } from "@/store";
 
 const store = mainStore();
 const { theme } = useData();
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, showDevFeatures, showDevFeaturesConfirmed, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations } =
   storeToRefs(store);
 
 // 判断是否使用移动端布局
@@ -976,14 +983,11 @@ const themeColorList = [
   { value: 'green', label: '春绿' },
   { value: 'gray', label: '失灰' },
 ];
-// 功能维护展开状态
-const featuresExpanded = ref(false);
 // 字体大小调整状态
 const fontSizeEditing = ref(false);
 const fontSizeWarnVisible = ref(false);
 const removeAnimationsWarnVisible = ref(false);
 const showMoreSettingsWarnVisible = ref(false);
-const showDevFeaturesWarnVisible = ref(false);
 const resetFontSize = () => {
   store.fontSize = 17;
   if (typeof document !== 'undefined') {
@@ -1149,7 +1153,8 @@ const applyImportConfig = (data) => {
       "messageStyle", "messagePosition", "progressDirection", "messageDuration",
       "islandMode", "islandUseThemeColor", "islandShowSeconds", "islandShowDate",
       "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
-      "removeAnimations", "showMoreSettings", "showDevFeatures",
+      "removeAnimations", "showMoreSettings",
+      "betaChannelExpanded", "devChannelExpanded", "canaryChannelExpanded",
     ];
     const filtered = {};
     for (const key of validKeys) {
@@ -1384,29 +1389,6 @@ const confirmShowMoreSettings = () => {
   }
 };
 
-// 设置显示开发中的功能
-const setShowDevFeatures = (show) => {
-  showDevFeatures.value = show;
-  if (!show) {
-    showDevFeaturesConfirmed.value = false;
-    showDevFeaturesWarnVisible.value = false;
-    if (typeof $message !== "undefined") {
-      $message.warning("已隐藏并关闭开发中的功能");
-    }
-  } else {
-    showDevFeaturesWarnVisible.value = true;
-  }
-};
-
-// 确认显示开发中的功能
-const confirmShowDevFeatures = () => {
-  showDevFeaturesConfirmed.value = true;
-  showDevFeaturesWarnVisible.value = false;
-  if (typeof $message !== "undefined") {
-    $message.warning("已显示开发中的功能");
-  }
-};
-
 // 获取消息样式名称
 const getMessageStyleName = (style) => {
   const names = { bar: '传统', card: '卡片', island: '超级岛' };
@@ -1625,13 +1607,9 @@ watch(
       fontSizeWarnVisible.value = false;
       removeAnimationsWarnVisible.value = false;
       showMoreSettingsWarnVisible.value = false;
-      showDevFeaturesWarnVisible.value = false;
       importConfirmVisible.value = false;
       if (showMoreSettings.value && !showMoreSettingsConfirmed.value) {
         showMoreSettings.value = false;
-      }
-      if (showDevFeatures.value && !showDevFeaturesConfirmed.value) {
-        showDevFeatures.value = false;
       }
     }
     if (!val) {
@@ -1724,6 +1702,9 @@ watch(
     color: var(--main-font-color);
     opacity: 0.6;
     margin: -4px 0 12px;
+  }
+  .set-label-channel {
+    color: var(--main-color);
   }
   .set-item {
     display: flex;

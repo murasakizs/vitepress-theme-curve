@@ -1,10 +1,10 @@
 const FONT_STYLESHEET_MAP = {
-  lexend: "https://cdn.jsdmirror.com/gh/CYYYY5/chiyupic@main/fonts/Lexend.css",
+  lexend: "/fonts/lexend/lexend.css",
   vsans: "https://cdn.jsdmirror.com/gh/CYYYY5/chiyupic@main/fonts/vivosans.css",
   hmos: "https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css",
-  xlfont: "https://cdn.jsdmirror.com/gh/CYYYY5/chiyupic@main/fonts/xiaolai.css",
-  misans: "https://cdn.jsdmirror.com/npm/misans@4.1.0/lib/Normal/MiSans-Medium.min.css",
-  firaCode: "https://use.sevencdn.com/css2?family=Fira+Code:wght@300..700&display=swap",
+  xlfont: "/fonts/xlfont/xlfont.css",
+  misans: "/fonts/misans/misans.css",
+  firaCode: "/fonts/firacode/firacode.css",
 };
 
 const FONT_FAMILY_MAP = {

@@ -1500,6 +1500,56 @@ a {
   }
 }
 
+// 图片懒加载骨架屏
+img:not(.no-lazy) {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  &.loaded {
+    opacity: 1;
+  }
+  &.error {
+    opacity: 0.5;
+  }
+}
+
+// fancybox 图片容器骨架屏
+.img-fancybox {
+  position: relative;
+  min-height: 100px;
+  background: linear-gradient(
+    90deg,
+    var(--main-card-border) 25%,
+    var(--main-card-background) 37%,
+    var(--main-card-border) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+  transition: background 0.3s;
+
+  // 图片加载完成后移除骨架屏背景
+  &:has(img.loaded) {
+    background: none;
+    animation: none;
+  }
+
+  .post-img {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    &.loaded {
+      opacity: 1;
+    }
+  }
+
+  .post-img-tip {
+    opacity: 0;
+    transition: opacity 0.3s ease 0.1s;
+  }
+
+  &:has(img.loaded) .post-img-tip {
+    opacity: 0.6;
+  }
+}
+
 //自定义块样式
 .custom-block {
   .custom-block-content {

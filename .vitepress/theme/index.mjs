@@ -4,6 +4,7 @@ import { routeChange } from "@/utils/initTools.mjs";
 import { enhanceAppWithTabs } from "vitepress-plugin-tabs/client";
 import LazyLoader from "@/components/LazyLoader.vue";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+import initImageLazy from "@/utils/initImageLazy.mjs";
 
 // 根组件
 import App from "@/App.vue";
@@ -32,6 +33,8 @@ const Theme = {
     };
     router.onAfterRouteChanged = (to) => {
       routeChange("after", to);
+      // 图片懒加载增强
+      setTimeout(() => initImageLazy(), 100);
     };
   },
 };

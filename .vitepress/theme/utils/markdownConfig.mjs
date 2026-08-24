@@ -67,16 +67,20 @@ const markdownConfig = (md, themeConfig) => {
   md.renderer.rules.table_close = () => {
     return "</table></div>";
   };
-  // 图片
+  // 图片 - 支持 WebP 自动转换（客户端处理）
   md.renderer.rules.image = (tokens, idx) => {
     const token = tokens[idx];
     const src = token.attrs[token.attrIndex("src")][1];
     const alt = token.content;
+
+    // 生成 WebP 路径（将扩展名替换为 .webp）
+    const webpSrc = src.replace(/\.(png|jpe?g|bmp|tiff)$/i, ".webp");
+
     if (!themeConfig.fancybox.enable) {
-      return `<img src="${src}" alt="${alt}" loading="lazy">`;
+      return `<img src="${src}" alt="${alt}" loading="lazy" data-webp="${webpSrc}">`;
     }
     return `<a class="img-fancybox" href="${src}" data-fancybox="gallery" data-caption="${alt}">
-                <img class="post-img" src="${src}" alt="${alt}" loading="lazy" />
+                <img class="post-img" src="${src}" alt="${alt}" loading="lazy" data-webp="${webpSrc}" />
                 <span class="post-img-tip">${alt}</span>
               </a>`;
   };

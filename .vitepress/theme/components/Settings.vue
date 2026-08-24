@@ -802,6 +802,122 @@
               <Transition name="fade-up">
                 <div v-if="canaryChannelExpanded" class="set-expand-box">
                   <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁</span>
+                  <div class="set-item">
+                    <span class="set-label">PWA 缓存增强</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !pwaCacheEnabled }]"
+                        @click="pwaCacheEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: pwaCacheEnabled }]"
+                        @click="pwaCacheEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">开启后将增强 Service Worker 缓存策略，支持离线阅读已访问过的文章。关闭后仅保留基础预缓存。</span>
+                  <div v-if="pwaCacheEnabled" class="set-item">
+                    <span class="set-label">缓存条目上限</span>
+                    <div class="set-options">
+                      <span
+                        v-for="limit in [50, 100, 200, 500, 0]"
+                        :key="limit"
+                        :class="['options', { choose: pwaCacheLimit === limit }]"
+                        @click="pwaCacheLimit = limit"
+                      >
+                        {{ limit === 0 ? '无限' : limit }}
+                      </span>
+                    </div>
+                  </div>
+                  <span v-if="pwaCacheEnabled" class="set-desc">每类缓存的最大条目数，超出后自动清理最早的缓存。选择"无限"则不清理。</span>
+                  <div class="set-item">
+                    <span class="set-label">清除 PWA 缓存</span>
+                    <div class="set-options">
+                      <span
+                        class="options"
+                        @click="clearPwaCache"
+                      >
+                        清除
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">清除运行时缓存（已访问页面、API 数据等），预缓存会在下次加载时自动恢复。</span>
+                  <div class="set-item">
+                    <span class="set-label">阅读进度条</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !readingProgressEnabled }]"
+                        @click="readingProgressEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: readingProgressEnabled }]"
+                        @click="readingProgressEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">在文章页面顶部显示阅读进度条，支持阅读时长统计。</span>
+                  <div class="set-item">
+                    <span class="set-label">图片懒加载</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !imageLazyEnabled }]"
+                        @click="imageLazyEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: imageLazyEnabled }]"
+                        @click="imageLazyEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">开启后图片加载前显示骨架屏，加载完成后渐入显示。</span>
+                  <div class="set-item">
+                    <span class="set-label">WebP 自动转换</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !imageWebpEnabled }]"
+                        @click="imageWebpEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: imageWebpEnabled }]"
+                        @click="imageWebpEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">浏览器支持 WebP 时自动加载 WebP 版本，减小图片体积。</span>
+                  <div class="set-item">
+                    <span class="set-label">图片灯箱</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !imageLightboxEnabled }]"
+                        @click="imageLightboxEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: imageLightboxEnabled }]"
+                        @click="imageLightboxEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">点击图片弹出大图查看，支持缩放、旋转等操作。</span>
                 </div>
               </Transition>
           <span class="title">个性化配置数据</span>
@@ -873,8 +989,29 @@ import { mainStore } from "@/store";
 
 const store = mainStore();
 const { theme } = useData();
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled } =
   storeToRefs(store);
+
+// PWA 缓存增强相关
+const clearPwaCache = async () => {
+  if (typeof $message === "undefined") return;
+  try {
+    // 清除运行时缓存（保留预缓存）
+    const cacheNames = await caches.keys();
+    const runtimeCaches = ["api-cache", "html-cache", "page-cache", "post-cache"];
+    let cleared = 0;
+    for (const name of cacheNames) {
+      if (runtimeCaches.some(rc => name.includes(rc))) {
+        await caches.delete(name);
+        cleared++;
+      }
+    }
+    $message.success(`已清除 ${cleared} 个运行时缓存`, { duration: 2000 });
+  } catch (e) {
+    console.error("Clear PWA cache failed:", e);
+    $message.error("清除缓存失败", { duration: 2000 });
+  }
+};
 
 // 判断是否使用移动端布局
 const isMobileLayout = computed(() => {

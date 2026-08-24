@@ -7,6 +7,12 @@
 
 const IMAGE_SELECTOR = "img:not(.no-lazy), .img-fancybox img";
 
+// 默认配置
+const defaultConfig = {
+  lazyEnabled: true,
+  webpEnabled: true,
+};
+
 // WebP 支持检测（缓存结果）
 let webpSupported = null;
 const checkWebpSupport = () => {
@@ -24,9 +30,9 @@ const checkWebpSupport = () => {
 /**
  * 尝试加载 WebP 版本
  */
-const tryLoadWebp = (img) => {
+const tryLoadWebp = (img, webpEnabled) => {
   const webpSrc = img.dataset.webp;
-  if (!webpSrc || !checkWebpSupport()) return;
+  if (!webpSrc || !webpEnabled || !checkWebpSupport()) return;
 
   // 创建一个临时 Image 对象来预加载 WebP
   const tempImg = new Image();
@@ -45,10 +51,16 @@ const tryLoadWebp = (img) => {
 /**
  * 处理单个图片元素
  */
-const handleImage = (img) => {
+const handleImage = (img, config = defaultConfig) => {
   // 已处理过则跳过
   if (img.dataset.lazyEnhanced) return;
   img.dataset.lazyEnhanced = "true";
+
+  // 懒加载增强关闭时，直接标记为已加载
+  if (!config.lazyEnabled) {
+    img.classList.add("loaded");
+    return;
+  }
 
   // 尝试加载 WebP 版本
   if (img.dataset.webp) {
@@ -70,7 +82,7 @@ const handleImage = (img) => {
     );
 
     // 异步尝试加载 WebP
-    tryLoadWebp(img);
+    tryLoadWebp(img, config.webpEnabled);
     return;
   }
 
@@ -102,36 +114,47 @@ const handleImage = (img) => {
 /**
  * 扫描并处理页面中的所有图片
  */
-const scanImages = (root = document) => {
+const scanImages = (config, root = document) => {
   const images = root.querySelectorAll(IMAGE_SELECTOR);
-  images.forEach(handleImage);
+  images.forEach((img) => handleImage(img, config));
 };
+
+// 存储 observer 实例以便清理
+let currentObserver = null;
 
 /**
  * 初始化图片懒加载增强
- * 使用 MutationObserver 监听新增图片
+ * @param {Object} config - 配置对象
+ * @param {boolean} config.lazyEnabled - 是否启用懒加载
+ * @param {boolean} config.webpEnabled - 是否启用 WebP 自动转换
  */
-const initImageLazy = () => {
+const initImageLazy = (config = defaultConfig) => {
   if (typeof document === "undefined") return;
 
+  // 清理之前的 observer
+  if (currentObserver) {
+    currentObserver.disconnect();
+    currentObserver = null;
+  }
+
   // 首次扫描
-  scanImages();
+  scanImages(config);
 
   // MutationObserver 监听 DOM 变化，自动处理新增图片
-  const observer = new MutationObserver((mutations) => {
+  currentObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (node.nodeType === Node.ELEMENT_NODE) {
           if (node.matches?.(IMAGE_SELECTOR)) {
-            handleImage(node);
+            handleImage(node, config);
           }
-          node.querySelectorAll?.(IMAGE_SELECTOR).forEach(handleImage);
+          node.querySelectorAll?.(IMAGE_SELECTOR).forEach((img) => handleImage(img, config));
         }
       }
     }
   });
 
-  observer.observe(document.body, {
+  currentObserver.observe(document.body, {
     childList: true,
     subtree: true,
   });

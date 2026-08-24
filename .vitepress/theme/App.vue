@@ -3,6 +3,8 @@
   <Background />
   <!-- 加载提示 -->
   <Loading />
+  <!-- 阅读进度条 -->
+  <ReadingProgress />
   <!-- 导航栏 -->
   <Nav />
   <!-- 主内容 -->

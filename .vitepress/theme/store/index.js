@@ -90,6 +90,15 @@ export const mainStore = defineStore("main", {
       customThemeBeforeHighContrast: false,
       // 移除动画
       removeAnimations: false,
+      // PWA 缓存增强
+      pwaCacheEnabled: true,
+      pwaCacheLimit: 100,
+      // 阅读进度条
+      readingProgressEnabled: true,
+      // 图片功能开关
+      imageLazyEnabled: true,
+      imageWebpEnabled: true,
+      imageLightboxEnabled: true,
     };
   },
   getters: {},
@@ -315,6 +324,12 @@ export const mainStore = defineStore("main", {
         "lastCustomSecondaryColor",
         "customThemeBeforeHighContrast",
         "removeAnimations",
+        "pwaCacheEnabled",
+        "pwaCacheLimit",
+        "readingProgressEnabled",
+        "imageLazyEnabled",
+        "imageWebpEnabled",
+        "imageLightboxEnabled",
       ], 
     },
   ],

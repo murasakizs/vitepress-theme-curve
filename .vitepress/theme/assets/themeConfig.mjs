@@ -53,7 +53,18 @@ export const themeConfig = {
           href: "/rss.xml",
         },
       ],
-            // iconfont
+            // iconfont preload
+      [
+        "link",
+        {
+          rel: "preload",
+          href: "/fonts/iconfont/iconfont.woff2",
+          as: "font",
+          type: "font/woff2",
+          crossorigin: "anonymous",
+        },
+      ],
+      // iconfont
       [
         "link",
         {

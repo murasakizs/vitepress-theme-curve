@@ -138,6 +138,7 @@ let progressInterval = null;
 const islandMessages = ref([]);
 const islandMessageTimeouts = ref({});
 const islandWrapperShow = ref(false);
+const islandWrapperHideTimeout = ref(null);
 const progressUpdateKey = ref(0);
 
 // 计算最下面一条消息的类型和key（数组第一条，因为显示是倒序）
@@ -171,8 +172,13 @@ const closeIslandMessage = (key) => {
     delete islandMessageTimeouts.value[key];
     // 如果是最后一条消息，延迟关闭容器以播放动画
     if (islandMessages.value.length === 0) {
-      setTimeout(() => {
-        islandWrapperShow.value = false;
+      // 清除之前的隐藏超时
+      clearTimeout(islandWrapperHideTimeout.value);
+      islandWrapperHideTimeout.value = setTimeout(() => {
+        // 再次检查是否仍有消息（可能在延迟期间有新消息到达）
+        if (islandMessages.value.length === 0) {
+          islandWrapperShow.value = false;
+        }
       }, 300);
     }
   }
@@ -188,6 +194,9 @@ const showMessage = (text, type = "info", options = {}, func = null) => {
 
   // 拓展模式
   if (island && store.islandMode === 'extended') {
+    // 清除待执行的隐藏超时，防止新消息到达时容器被错误隐藏
+    clearTimeout(islandWrapperHideTimeout.value);
+
     const newKey = Date.now();
     islandMessages.value.push({
       key: newKey,
@@ -320,6 +329,7 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(timeInterval);
   clearInterval(progressInterval);
+  clearTimeout(islandWrapperHideTimeout.value);
 });
 </script>
 

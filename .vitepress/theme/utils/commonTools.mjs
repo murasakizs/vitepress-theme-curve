@@ -28,7 +28,6 @@ export const loadScript = (src, option = {}) => {
   // 检查是否已经加载过此脚本
   const existingScript = document.querySelector(`script[src="${src}"]`);
   if (existingScript) {
-    console.log("已有重复脚本");
     if (!reload) {
       callback && callback(null, existingScript);
       return false;
@@ -64,7 +63,6 @@ export const loadCSS = (href, option = {}) => {
   // 检查是否已经加载过此样式表
   const existingLink = document.querySelector(`link[href="${href}"]`);
   if (existingLink) {
-    console.log("已有重复样式");
     if (!reload) {
       callback && callback(null, existingLink);
       return false;
@@ -115,7 +113,7 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
         if (link.getAttribute("target") === "_blank") {
           // 检查链接是否包含排除的类
           if (excludeClass.some((className) => link.classList.contains(className))) {
-            return false;
+            return;
           }
           const linkHref = link.getAttribute("href");
           // 存在链接且非中转页

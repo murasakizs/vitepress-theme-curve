@@ -150,7 +150,6 @@ const changeSiteThemeType = () => {
   };
   // 必要数据
   const htmlElement = document.documentElement;
-  console.log("当前模式：", themeType.value);
   // 清除所有 class
   Object.values(themeClasses).forEach((themeClass) => {
     htmlElement.classList.remove(themeClass);
@@ -223,7 +222,6 @@ watch(
 
 onMounted(() => {
   initializeCursor();
-  console.log(frontmatter.value, page.value, theme.value);
   // 测试频道提示（加载遮罩消失后显示）
   if (store.channelMode >= 2 && store.channelMode <= 4 && typeof $message !== "undefined") {
     const channelName = store.channelMode === 2 ? 'beta' : store.channelMode === 3 ? 'dev' : 'canary';

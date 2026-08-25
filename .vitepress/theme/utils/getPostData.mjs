@@ -117,16 +117,15 @@ export const getAllPosts = async () => {
 export const getAllType = (postData) => {
   const tagData = {};
   // 遍历数据
-  postData.map((item) => {
+  postData.forEach((item) => {
     // 检查是否有 tags 属性
     if (!item.tags || item.tags.length === 0) return;
     // 处理标签
-    if (typeof item.tags === "string") {
-      // 以逗号分隔
-      item.tags = item.tags.split(",");
-    }
+    const tags = typeof item.tags === "string"
+      ? item.tags.split(",").map(t => t.trim()).filter(Boolean)
+      : item.tags;
     // 遍历文章的每个标签
-    item.tags.forEach((tag) => {
+    tags.forEach((tag) => {
       // 初始化标签的统计信息，如果不存在
       if (!tagData[tag]) {
         tagData[tag] = {
@@ -151,15 +150,14 @@ export const getAllType = (postData) => {
 export const getAllCategories = (postData) => {
   const catData = {};
   // 遍历数据
-  postData.map((item) => {
+  postData.forEach((item) => {
     if (!item.categories || item.categories.length === 0) return;
-    // 处理标签
-    if (typeof item.categories === "string") {
-      // 以逗号分隔
-      item.categories = item.categories.split(",");
-    }
-    // 遍历文章的每个标签
-    item.categories.forEach((tag) => {
+    // 处理分类
+    const categories = typeof item.categories === "string"
+      ? item.categories.split(",").map(t => t.trim()).filter(Boolean)
+      : item.categories;
+    // 遍历文章的每个分类
+    categories.forEach((tag) => {
       // 初始化标签的统计信息，如果不存在
       if (!catData[tag]) {
         catData[tag] = {

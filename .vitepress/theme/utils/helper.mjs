@@ -111,22 +111,16 @@ export const daysFromNow = (dateStr) => {
 /**
  * 随机前往一篇文章
  * @param {Object} postData - 文章数据
- * @returns {number} 天数差值
+ * @returns {string} 随机文章的路径
  */
 let lastIndex = -1;
 export const shufflePost = (postData) => {
   let randomIndex;
   do {
-    // 随机生成一个索引值
     randomIndex = Math.floor(Math.random() * postData.length);
   } while (randomIndex === lastIndex && postData.length > 1);
-  // 更新上一次的索引值
   lastIndex = randomIndex;
-  // 随机文章
-  const randomPost = postData[randomIndex];
-  console.log(randomPost);
-  // 跳转到随机文章
-  return randomPost.regularPath;
+  return postData[randomIndex].regularPath;
 };
 
 /**
@@ -177,7 +171,6 @@ export const copyImage = async (imageURL) => {
         [blob.type]: blob,
       }),
     ]);
-    console.log("图片已复制到剪贴板");
     $message.success("图片已复制到剪贴板");
   } catch (error) {
     console.error("复制图片出错：", error);

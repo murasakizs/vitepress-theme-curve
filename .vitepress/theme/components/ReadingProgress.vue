@@ -10,8 +10,6 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRoute } from 'vitepress';
 import { storeToRefs } from 'pinia';
 import { mainStore } from '@/store';
 

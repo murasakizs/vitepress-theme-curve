@@ -16,22 +16,12 @@ export const getHitokoto = async () => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const hitokoto = await response.json();
-    // 源代码如下：
-    // 更改时间：2025.06.11
-    // 变更功能：延迟一言在后2秒再显示，留给用户时间查看slogan
     return hitokoto;
-    // 返回一个新的 Promise，它将在2秒后解析
-    //return new Promise(resolve => {
-    //  setTimeout(() => {
-    //    resolve(hitokoto);
-    //  }, 2000); // 2000 毫秒 = 2 秒
-    //});
   } catch (error) {
     console.error(`获取一言失败 (${useFallbackAPI ? '备用 API' : '主 API'})：`, error);
     if (!useFallbackAPI) {
       // 主 API 失败，切换到备用 API
       useFallbackAPI = true;
-      console.log("切换到备用 API：", fallbackUrl);
       // 递归调用以使用备用 API
       return await getHitokoto();
     }
@@ -143,9 +133,4 @@ export const getWeather = async (key, city) => {
   return await res.json();
 };
 
-// 获取教书先生天气 API
-// https://api.oioweb.cn/doc/weather/GetWeather
-// export const getOtherWeather = async () => {
-//  const res = await fetch("https://api.oioweb.cn/api/weather/GetWeather");
-//  return await res.json();
-// };
+

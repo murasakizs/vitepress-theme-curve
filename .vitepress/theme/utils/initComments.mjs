@@ -7,7 +7,6 @@ const initComments = async (themeConfig) => {
     const commentType = option.type;
     if (!option.enable) return false;
     const server = option[commentType].server;
-    console.log("开始加载", commentType, server);
     switch (commentType) {
       case "artalk":
         // 引入资源

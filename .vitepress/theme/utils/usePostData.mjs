@@ -1,4 +1,5 @@
 import { computed, ref } from "vue";
+import { useData } from "vitepress";
 
 const postData = ref([]);
 const isLoading = ref(false);

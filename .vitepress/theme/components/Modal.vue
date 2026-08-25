@@ -268,7 +268,7 @@ watch(
     right: auto !important;
     width: 100%;
     max-width: 100%;
-    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
     border-radius: 20px 20px 0 0;
     overflow: hidden;
     .modal-drag-handle {
@@ -309,13 +309,14 @@ watch(
       }
     }
     .modal-content {
-      max-height: calc(100vh - 48px - 64px - 40px);
+      max-height: calc(100dvh - 48px - 64px - 40px);
     }
   }
 }
 .modal-wrapper-mobile {
   align-items: flex-end;
   justify-content: center;
+  height: 100dvh;
 }
 .modal-mobile.fade-enter-active {
   animation: slide-up 0.3s ease-out forwards;

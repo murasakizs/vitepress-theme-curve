@@ -14,6 +14,12 @@
       @modal-close="store.changeShowStatus('showSettings')"
     >
       <div class="set-list">
+        <div v-if="channelMode >= 2 && channelMode <= 4" class="set-warn set-warn-channel">
+          <span class="warn-text">当前处于测试频道（{{ channelMode === 2 ? 'beta' : channelMode === 3 ? 'dev' : 'canary' }}分支）</span>
+        </div>
+        <div v-else-if="channelMode === 5" class="set-warn set-warn-channel">
+          <span class="warn-text">当前处于开发模式，提交代码时应退出开发模式</span>
+        </div>
         <span class="title">通用</span>
         <div class="set-item">
           <span class="set-label">首页样式（ Banner 高度 ）</span>
@@ -71,19 +77,25 @@
           <span class="set-label">调整明暗显示外观</span>
           <div class="set-options">
             <span
-              :class="['options', { choose: themeType === 'auto' }]"
+              v-if="scheduledThemeEnabled"
+              class="options choose"
+            >
+              定时切换
+            </span>
+            <span
+              :class="['options', { choose: !scheduledThemeEnabled && themeType === 'auto' }]"
               @click="setThemeType('auto')"
             >
               跟随系统
             </span>
             <span
-              :class="['options', { choose: themeType === 'dark' }]"
+              :class="['options', { choose: !scheduledThemeEnabled && themeType === 'dark' }]"
               @click="setThemeType('dark')"
             >
               深色
             </span>
             <span
-              :class="['options', { choose: themeType === 'light' }]"
+              :class="['options', { choose: !scheduledThemeEnabled && themeType === 'light' }]"
               @click="setThemeType('light')"
             >
               浅色
@@ -414,29 +426,6 @@
                       </div>
                     </div>
                   </template>
-                  <div class="set-item">
-                    <span class="set-label">移除动画（beta）</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !removeAnimations }]"
-                        @click="setRemoveAnimations(false)"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: removeAnimations }]"
-                        @click="removeAnimations = true; removeAnimationsWarnVisible = true"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <Transition name="fade-up">
-                    <div v-if="removeAnimationsWarnVisible" class="set-warn" @click="removeAnimations = false; removeAnimationsWarnVisible = false">
-                      <span class="warn-text">开启此选项将移除所有过渡动画，你确定要继续吗？</span>
-                      <span class="options" @click.stop="applyRemoveAnimations">确认</span>
-                    </div>
-                  </Transition>
                 </template>
               </div>
             </Transition>
@@ -472,7 +461,7 @@
                       :class="['options', { choose: messageStyle === 'island' }]"
                       @click="setMessageStyle('island')"
                     >
-                      超级岛（beta）
+                      超级岛
                     </span>
                   </div>
                 </div>
@@ -630,7 +619,7 @@
               </div>
             </Transition>
             <div class="set-item">
-              <span class="set-label">超级岛（beta）</span>
+              <span class="set-label">超级岛</span>
               <div class="set-options">
                 <span
                   :class="['options', { choose: islandSettingsExpanded }]"
@@ -714,7 +703,7 @@
                 </template>
                 <template v-else>
                   <div class="set-item">
-                    <span class="set-label">需要先将消息类型切换为 超级岛（beta）</span>
+                    <span class="set-label">需要先将消息类型切换为 超级岛</span>
                     <div class="set-options">
                       <span class="options" @click="setMessageStyle('island')">确认</span>
                     </div>
@@ -722,8 +711,10 @@
                 </template>
               </div>
             </Transition>
-            <div class="set-item">
-              <span class="set-label set-label-channel">来自beta频道的新内容</span>
+            <!-- 测试频道（开发环境） -->
+            <template v-if="channelMode >= 2">
+              <div class="set-item">
+                <span class="set-label set-label-channel">来自beta频道的新内容{{ channelMode === 2 ? '（当前频道）' : '' }}</span>
                 <div class="set-options">
                   <span
                     :class="['options', { choose: betaChannelExpanded }]"
@@ -734,12 +725,41 @@
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="betaChannelExpanded" class="set-expand-box">
+                <div v-if="betaChannelExpanded && (channelMode === 2 || channelMode === 5)" class="set-expand-box">
                   <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
+                  <div class="set-item">
+                    <span class="set-label">移除动画</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !removeAnimations }]"
+                        @click="setRemoveAnimations(false)"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: removeAnimations }]"
+                        @click="removeAnimations = true; removeAnimationsWarnVisible = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <Transition name="fade-up">
+                    <div v-if="removeAnimationsWarnVisible" class="set-warn" @click="removeAnimations = false; removeAnimationsWarnVisible = false">
+                      <span class="warn-text">开启此选项将移除所有过渡动画，你确定要继续吗</span>
+                      <span class="options" @click.stop="applyRemoveAnimations">确认</span>
+                    </div>
+                  </Transition>
+                </div>
+                <div v-else-if="betaChannelExpanded && channelMode >= 3 && channelMode <= 4" class="set-expand-box">
+                  <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
+                  <div class="set-item">
+                    <span class="set-label">显示选项需要先切换到beta频道</span>
+                  </div>
                 </div>
               </Transition>
               <div class="set-item">
-                <span class="set-label set-label-channel">来自dev频道的新内容</span>
+                <span class="set-label set-label-channel">来自dev频道的新内容{{ channelMode === 3 ? '（当前频道）' : '' }}</span>
                 <div class="set-options">
                   <span
                     :class="['options', { choose: devChannelExpanded }]"
@@ -750,8 +770,14 @@
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="devChannelExpanded" class="set-expand-box">
-                  <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。</span>
+                <div v-if="devChannelExpanded && (channelMode === 3 || channelMode === 5)" class="set-expand-box">
+                  <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                  <template v-if="devChannelMerged === 2">
+                    <div class="set-item">
+                      <span class="set-label">当前频道内容已全部合并至beta频道，稍后再看看吧</span>
+                    </div>
+                  </template>
+                  <template v-else>
                   <div class="set-item">
                     <span class="set-label">背景模糊</span>
                     <div class="set-options">
@@ -786,10 +812,59 @@
                       </span>
                     </div>
                   </div>
+                  <div class="set-item">
+                    <span class="set-label">定时切换明暗显示外观</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !scheduledThemeEnabled }]"
+                        @click="toggleScheduledTheme(false)"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: scheduledThemeEnabled }]"
+                        @click="toggleScheduledTheme(true)"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <div v-if="scheduledThemeEnabled" class="set-item">
+                    <span class="set-label">浅色模式时间</span>
+                    <div class="set-options">
+                      <input
+                        v-model="scheduledLightTime"
+                        type="time"
+                        class="time-input"
+                        @change="onScheduledTimeChange"
+                      />
+                    </div>
+                  </div>
+                  <div v-if="scheduledThemeEnabled" class="set-item">
+                    <span class="set-label">深色模式时间</span>
+                    <div class="set-options">
+                      <input
+                        v-model="scheduledDarkTime"
+                        type="time"
+                        class="time-input"
+                        @change="onScheduledTimeChange"
+                      />
+                    </div>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">修复了一些已知的问题</span>
+                  </div>
+                  </template>
+                </div>
+                <div v-else-if="devChannelExpanded && (channelMode === 2 || channelMode === 4)" class="set-expand-box">
+                  <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                  <div class="set-item">
+                    <span class="set-label">显示选项需要先切换到dev频道</span>
+                  </div>
                 </div>
               </Transition>
               <div class="set-item">
-                <span class="set-label set-label-channel">来自canary频道的新内容</span>
+                <span class="set-label set-label-channel">来自canary频道的新内容{{ channelMode === 4 ? '（当前频道）' : '' }}</span>
                 <div class="set-options">
                   <span
                     :class="['options', { choose: canaryChannelExpanded }]"
@@ -800,10 +875,104 @@
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="canaryChannelExpanded" class="set-expand-box">
-                  <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁</span>
+                <div v-if="canaryChannelExpanded && (channelMode === 4 || channelMode === 5)" class="set-expand-box">
+                  <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                  <template v-if="canaryChannelMerged === 2">
+                    <div class="set-item">
+                      <span class="set-label">当前频道内容已全部合并至beta频道，稍后再看看吧</span>
+                    </div>
+                  </template>
+                </div>
+                <div v-else-if="canaryChannelExpanded && (channelMode === 2 || channelMode === 3)" class="set-expand-box">
+                  <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                  <div class="set-item">
+                    <span class="set-label">显示选项需要先切换到canary频道</span>
+                  </div>
                 </div>
               </Transition>
+              <div class="set-item">
+                <span class="set-label">查看源码</span>
+                <div class="set-options">
+                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/beta" target="_blank" class="options">beta频道</a>
+                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/dev" target="_blank" class="options">dev频道</a>
+                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/canary" target="_blank" class="options">canary频道</a>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">反馈与建议</span>
+                <div class="set-options">
+                  <a href="mailto:sgexilq.top" target="_blank" class="options">EMail</a>
+                  <a href="https://myat-q.sgexilq.top" target="_blank" class="options">QQ</a>
+                  <a href="https://github.com/murasakizs/vitepress-theme-curve/issues" target="_blank" class="options">Github</a>
+                </div>
+              </div>
+              <div v-if="channelMode >= 2 && channelMode <= 4" class="set-item">
+                <span class="set-label">前往预览测试频道</span>
+                <div class="set-options">
+                  <a href="https://beta.sgexilq.top" target="_blank" :class="['options', { choose: channelMode === 2 }]">beta频道{{ channelMode === 2 ? '（当前频道）' : '' }}</a>
+                  <a href="https://dev.sgexilq.top" target="_blank" :class="['options', { choose: channelMode === 3 }]">dev频道{{ channelMode === 3 ? '（当前频道）' : '' }}</a>
+                  <a href="https://canary.sgexilq.top" target="_blank" :class="['options', { choose: channelMode === 4 }]">canary频道{{ channelMode === 4 ? '（当前频道）' : '' }}</a>
+                </div>
+              </div>
+              <div v-else-if="channelMode === 5" class="set-item">
+                <span class="set-label">预览测试频道</span>
+                <div class="set-options">
+                  <a href="https://beta.sgexilq.top" target="_blank" class="options">beta频道</a>
+                  <a href="https://dev.sgexilq.top" target="_blank" class="options">dev频道</a>
+                  <a href="https://canary.sgexilq.top" target="_blank" class="options">canary频道</a>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">返回正式频道</span>
+                <div class="set-options">
+                  <a href="https://sgexilq.top" target="_blank" class="options">前往</a>
+                </div>
+              </div>
+            </template>
+            <!-- 正式频道（生产环境） -->
+            <template v-else-if="channelMode === 1">
+              <div class="set-item">
+                <span class="set-label">测试频道</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: stableChannelExpanded }]"
+                    @click="stableChannelExpanded = !stableChannelExpanded"
+                  >
+                    {{ stableChannelExpanded ? '收起' : '展开' }}
+                  </span>
+                </div>
+              </div>
+              <Transition name="fade-up">
+                <div v-if="stableChannelExpanded" class="set-expand-box">
+                  <div class="set-item">
+                    <span class="set-label">当前处于正式频道（master/selfuse分支）</span>
+                  </div>
+                  <div class="set-item set-item-channel">
+                    <span class="set-label">beta频道</span>
+                    <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
+                  </div>
+                  <div class="set-item set-item-channel">
+                    <span class="set-label">dev频道</span>
+                    <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                  </div>
+                  <div class="set-item set-item-channel">
+                    <span class="set-label">canary频道</span>
+                    <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                  </div>
+                  <div class="set-item" style="margin-bottom: 4px;">
+                    <span class="set-label">前往预览测试频道</span>
+                    <div class="set-options">
+                      <a href="https://beta.sgexilq.top" target="_blank" class="options">beta频道</a>
+                      <a href="https://dev.sgexilq.top" target="_blank" class="options">dev频道</a>
+                      <a href="https://canary.sgexilq.top" target="_blank" class="options">canary频道</a>
+                    </div>
+                  </div>
+                  <div class="set-item" style="min-height: 36px;">
+                    <span class="set-desc">预览页面由 泠诗尘 提供</span>
+                  </div>
+                </div>
+              </Transition>
+            </template>
           <span class="title">个性化配置数据</span>
           <div class="set-item">
             <span class="set-label">导入/导出配置</span>
@@ -873,7 +1042,7 @@ import { mainStore } from "@/store";
 
 const store = mainStore();
 const { theme } = useData();
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, channelMode, devChannelMerged, canaryChannelMerged, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime } =
   storeToRefs(store);
 
 // 判断是否使用移动端布局
@@ -1154,6 +1323,7 @@ const applyImportConfig = (data) => {
       "islandMode", "islandUseThemeColor", "islandShowSeconds", "islandShowDate",
       "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
       "removeAnimations", "showMoreSettings",
+      "scheduledThemeEnabled", "scheduledLightTime", "scheduledDarkTime",
       "betaChannelExpanded", "devChannelExpanded", "canaryChannelExpanded",
     ];
     const filtered = {};
@@ -1307,6 +1477,30 @@ const setRemoveAnimations = (enabled) => {
   }
 };
 
+// 定时切换明暗显示外观
+const toggleScheduledTheme = (enabled) => {
+  scheduledThemeEnabled.value = enabled;
+  if (enabled) {
+    store.startScheduledTheme();
+    if (typeof $message !== "undefined") {
+      $message.success("显示外观已切换为定时切换");
+    }
+  } else {
+    store.stopScheduledTheme();
+    themeType.value = 'auto';
+    store.updateActualThemeValue();
+    if (typeof $message !== "undefined") {
+      $message.success("显示外观已切换为跟随系统");
+    }
+  }
+};
+
+const onScheduledTimeChange = () => {
+  if (scheduledThemeEnabled.value) {
+    store.startScheduledTheme();
+  }
+};
+
 const applyRemoveAnimations = () => {
   removeAnimationsWarnVisible.value = false;
   if (typeof document !== 'undefined') {
@@ -1319,6 +1513,11 @@ const applyRemoveAnimations = () => {
 
 // 设置显示外观
 const setThemeType = (type) => {
+  // 如果正在使用定时切换，关闭它
+  if (scheduledThemeEnabled.value) {
+    scheduledThemeEnabled.value = false;
+    store.stopScheduledTheme();
+  }
   themeType.value = type;
   const typeNames = { auto: '跟随系统', dark: '深色', light: '浅色' };
   if (typeof $message !== "undefined") {
@@ -1553,6 +1752,20 @@ onMounted(() => {
   window.addEventListener("resize", handleResize);
   // 页面加载时判断布局是否发生变化，如果变化则更新消息样式
   updateMessageStyleByLayout();
+  // 如果定时切换已启用，启动定时器
+  if (scheduledThemeEnabled.value) {
+    store.startScheduledTheme();
+  }
+  // 根据频道模式设置展开状态
+  if (channelMode.value >= 2 && channelMode.value <= 4) {
+    betaChannelExpanded.value = channelMode.value === 2;
+    devChannelExpanded.value = channelMode.value === 3;
+    canaryChannelExpanded.value = channelMode.value === 4;
+  } else if (channelMode.value === 5) {
+    betaChannelExpanded.value = true;
+    devChannelExpanded.value = true;
+    canaryChannelExpanded.value = true;
+  }
 });
 
 // 根据页面布局更新消息样式
@@ -1787,6 +2000,7 @@ watch(
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
+      min-height: 40px;
       &:last-child {
         margin-bottom: 0;
       }
@@ -1805,6 +2019,17 @@ watch(
             }
           }
         }
+      }
+    }
+    .set-item-channel {
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: auto;
+      .set-label {
+        margin-bottom: 4px;
+      }
+      .set-desc {
+        margin-top: 4px;
       }
     }
   }
@@ -1831,6 +2056,14 @@ watch(
         background-color: transparent;
         box-shadow: none;
       }
+    }
+  }
+  .set-warn-channel {
+    background-color: var(--main-color-bg);
+    border-color: var(--main-color);
+    cursor: default;
+    .warn-text {
+      color: var(--main-color);
     }
   }
   .set-warn-purple {
@@ -1995,6 +2228,20 @@ watch(
       border-color: var(--main-color);
     }
   }
+  .time-input {
+    border: 1px solid var(--main-card-border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-family: var(--main-font-family);
+    color: var(--main-font-color);
+    background-color: var(--main-card-background);
+    cursor: pointer;
+    &:focus {
+      outline: none;
+      border-color: var(--main-color);
+    }
+  }
 }
 </style>
 
@@ -2114,6 +2361,13 @@ html.dark .set-list .set-warn {
     }
   }
 }
+html.dark .set-list .set-warn-channel {
+  background-color: var(--main-color-bg);
+  border-color: var(--main-color);
+  .warn-text {
+    color: var(--main-color);
+  }
+}
 html.dark .set-list .set-warn.set-warn-purple {
   background-color: #1e1833;
   border-color: #3b2d6b;
@@ -2215,6 +2469,13 @@ html.dark.high-contrast-max .set-warn {
     color: #000000 !important;
     background: #ffffff !important;
     border-color: #ffffff !important;
+  }
+}
+html.dark.high-contrast-max .set-warn-channel {
+  background-color: var(--main-color-bg) !important;
+  border-color: var(--main-color) !important;
+  .warn-text {
+    color: var(--main-color) !important;
   }
 }
 

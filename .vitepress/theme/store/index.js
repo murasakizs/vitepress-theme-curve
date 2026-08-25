@@ -3,6 +3,23 @@ import cursorInit from '@/utils/cursor.js';
 
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+// 开发用版本号，每次改默认值时 +1，自动清除旧缓存
+const PERSIST_VERSION = 15;
+// 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
+const DEFAULT_CHANNEL_MODE = 2;
+// dev频道合并状态（1 = 未合并，2 = 已合并至beta）
+const DEFAULT_DEV_CHANNEL_MERGED = 0;
+// canary频道合并状态（1 = 未合并，2 = 已合并至beta）
+const DEFAULT_CANARY_CHANNEL_MERGED = 0;
+
+// 模块加载时立即检查版本，确保在 pinia-persistedstate 水合之前清除旧缓存
+if (typeof localStorage !== 'undefined') {
+  const storedVersion = parseInt(localStorage.getItem('siteDataVersion') || '0', 10);
+  if (storedVersion < PERSIST_VERSION) {
+    localStorage.removeItem('siteData');
+    localStorage.setItem('siteDataVersion', String(PERSIST_VERSION));
+  }
+}
 
 export const mainStore = defineStore("main", {
   state: () => {
@@ -59,9 +76,15 @@ export const mainStore = defineStore("main", {
       showMoreSettings: false,
       showMoreSettingsConfirmed: false,
       // 频道展开状态
-      betaChannelExpanded: true,
+      betaChannelExpanded: false,
       devChannelExpanded: false,
       canaryChannelExpanded: false,
+      stableChannelExpanded: false,
+      // 频道合并标记（1 = 未合并，2 = 已合并至beta）
+      devChannelMerged: DEFAULT_DEV_CHANNEL_MERGED,
+      canaryChannelMerged: DEFAULT_CANARY_CHANNEL_MERGED,
+      // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
+      channelMode: DEFAULT_CHANNEL_MODE,
       // 高对比度模式
       highContrast: false,
       // 站点布局
@@ -90,6 +113,11 @@ export const mainStore = defineStore("main", {
       customThemeBeforeHighContrast: false,
       // 移除动画
       removeAnimations: false,
+      // 定时切换明暗显示外观
+      scheduledThemeEnabled: false,
+      scheduledLightTime: "07:00",
+      scheduledDarkTime: "19:00",
+      scheduledThemeTimer: null,
     };
   },
   getters: {},
@@ -270,7 +298,63 @@ export const mainStore = defineStore("main", {
       if (typeof $message !== "undefined") {
         $message.success('自定义主题色已应用', { duration: 3000 });
       }
-    }
+    },
+
+    // 定时切换明暗显示外观
+    startScheduledTheme() {
+      if (typeof window === 'undefined') return;
+      this.stopScheduledTheme();
+
+      const checkAndSwitch = () => {
+        if (!this.scheduledThemeEnabled) return;
+
+        const now = new Date();
+        const currentHours = now.getHours();
+        const currentMinutes = now.getMinutes();
+        const currentTime = `${String(currentHours).padStart(2, '0')}:${String(currentMinutes).padStart(2, '0')}`;
+
+        const lightTime = this.scheduledLightTime;
+        const darkTime = this.scheduledDarkTime;
+
+        let shouldLight = false;
+        let shouldDark = false;
+
+        // 判断当前时间是否在浅色或深色时段
+        if (lightTime <= darkTime) {
+          // 例如 07:00 - 19:00
+          shouldLight = currentTime >= lightTime && currentTime < darkTime;
+          shouldDark = currentTime >= darkTime || currentTime < lightTime;
+        } else {
+          // 跨天情况，例如 22:00 - 06:00
+          shouldLight = currentTime >= lightTime || currentTime < darkTime;
+          shouldDark = currentTime >= darkTime && currentTime < lightTime;
+        }
+
+        // 切换主题（如果壁纸模式则跳过）
+        if (this.backgroundType === "image") return;
+
+        if (shouldLight && this.themeType !== 'light') {
+          this.themeType = 'light';
+          this.updateActualThemeValue();
+        } else if (shouldDark && this.themeType !== 'dark') {
+          this.themeType = 'dark';
+          this.updateActualThemeValue();
+        }
+      };
+
+      // 立即检查一次
+      checkAndSwitch();
+
+      // 每分钟检查一次
+      this.scheduledThemeTimer = setInterval(checkAndSwitch, 60000);
+    },
+
+    stopScheduledTheme() {
+      if (this.scheduledThemeTimer) {
+        clearInterval(this.scheduledThemeTimer);
+        this.scheduledThemeTimer = null;
+      }
+    },
   },
   // 数据持久化
   persist: [
@@ -293,9 +377,9 @@ export const mainStore = defineStore("main", {
         "backgroundUrl",
         "showMoreSettings",
         "showMoreSettingsConfirmed",
-        "betaChannelExpanded",
-        "devChannelExpanded",
-        "canaryChannelExpanded",
+        "channelMode",
+        "devChannelMerged",
+        "canaryChannelMerged",
         "highContrast",
         "siteLayout",
         "siteLayoutPending",
@@ -315,6 +399,9 @@ export const mainStore = defineStore("main", {
         "lastCustomSecondaryColor",
         "customThemeBeforeHighContrast",
         "removeAnimations",
+        "scheduledThemeEnabled",
+        "scheduledLightTime",
+        "scheduledDarkTime",
       ], 
     },
   ],

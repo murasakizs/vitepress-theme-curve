@@ -5,7 +5,7 @@
       <div class="meta">
         <div class="categories">
           <a
-            v-for="(item, index) in postMetaData.categories"
+            v-for="(item, index) in asArray(postMetaData.categories)"
             :key="index"
             :href="`/pages/categories/${item}`"
             class="cat-item"
@@ -16,7 +16,7 @@
         </div>
         <div class="tags">
           <a
-            v-for="(item, index) in postMetaData.tags"
+            v-for="(item, index) in asArray(postMetaData.tags)"
             :key="index"
             :href="`/pages/tags/${item}`"
             class="tag-item"
@@ -37,6 +37,16 @@
         <span class="update meta">
           <i class="iconfont icon-time" />
           {{ formatTimestamp(page?.lastUpdated || postMetaData.lastModified) }}
+        </span>
+        <!-- 字数 -->
+        <span v-if="postMetaData.wordCount" class="meta">
+          <i class="iconfont icon-article" />
+          {{ postMetaData.wordCount.toLocaleString() }} 字
+        </span>
+        <!-- 阅读时间 -->
+        <span v-if="postMetaData.readTime" class="meta">
+          <i class="iconfont icon-time" />
+          约 {{ postMetaData.readTime }} 分钟
         </span>
         <!-- 热度 -->
         <span class="hot meta">
@@ -77,7 +87,7 @@
         <div class="other-meta">
           <div class="all-tags">
             <a
-              v-for="(item, index) in postMetaData.tags"
+              v-for="(item, index) in asArray(postMetaData.tags)"
               :key="index"
               :href="`/pages/tags/${item}`"
               class="tag-item"
@@ -123,6 +133,14 @@ import PasswordProtect from "@/components/PasswordProtect.vue";
 const { page, theme, frontmatter } = useData();
 const { isDesktopAsideVisible } = useDesktopAside();
 const { postData, loadPostData } = usePostData();
+
+// 标签/分类归一化：字符串转数组
+const asArray = (val) => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string") return val.split(",").map(s => s.trim()).filter(Boolean);
+  return [];
+};
 
 // 评论元素
 const commentRef = ref(null);

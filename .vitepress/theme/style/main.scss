@@ -1500,8 +1500,8 @@ a {
   }
 }
 
-// 图片懒加载骨架屏
-img:not(.no-lazy) {
+// 图片懒加载骨架屏（仅限主内容区域）
+.mian-layout img:not(.no-lazy) {
   opacity: 0;
   transition: opacity 0.4s ease;
   &.loaded {
@@ -1512,8 +1512,8 @@ img:not(.no-lazy) {
   }
 }
 
-// fancybox 图片容器骨架屏
-.img-fancybox {
+// fancybox 图片容器骨架屏（仅限主内容区域）
+.mian-layout .img-fancybox {
   position: relative;
   min-height: 100px;
   background: linear-gradient(

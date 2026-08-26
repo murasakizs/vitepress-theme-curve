@@ -128,7 +128,7 @@ export const mainStore = defineStore("main", {
       readingProgressEnabled: true,
       // 图片功能开关
       imageLazyEnabled: true,
-      imageWebpEnabled: true,
+      imageWebpEnabled: false,
       imageLightboxEnabled: true,
       // 定时切换明暗显示外观
       scheduledThemeEnabled: false,

@@ -36,15 +36,33 @@ const tryLoadWebp = (img, webpEnabled) => {
 
   // 创建一个临时 Image 对象来预加载 WebP
   const tempImg = new Image();
+  let settled = false;
+
+  const onSettled = () => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(timer);
+  };
+
   tempImg.onload = () => {
+    onSettled();
     // WebP 加载成功，替换原图
     img.src = webpSrc;
     img.classList.add("loaded");
   };
   tempImg.onerror = () => {
+    onSettled();
     // WebP 不存在，保持原图，标记为已加载
     img.classList.add("loaded");
   };
+
+  // 超时兜底：WebP 文件不存在时不会触发 onerror（某些浏览器），
+  // 用超时避免原图一直卡在 opacity: 0
+  const timer = setTimeout(() => {
+    onSettled();
+    img.classList.add("loaded");
+  }, 3000);
+
   tempImg.src = webpSrc;
 };
 

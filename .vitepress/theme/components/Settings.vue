@@ -1025,7 +1025,7 @@
           </div>
           <Transition name="fade-up">
             <div v-if="showResetConfirm" ref="resetWarnRef" class="set-warn" @click="showResetConfirm = false">
-              <span class="warn-text">即将恢复默认配置，请再次确认</span>
+              <span class="warn-text">即将恢复默认配置，此操作将清空所有本地存储并完全重新拉取资源，请再次确认</span>
               <span class="options" @click.stop="handleResetConfig">确认</span>
             </div>
           </Transition>
@@ -1186,8 +1186,25 @@ const scrollToResetWarn = () => {
   });
 };
 const handleResetConfig = () => {
-  localStorage.removeItem("siteData");
   showResetConfirm.value = false;
+  // 清空 localStorage 和 sessionStorage
+  localStorage.clear();
+  sessionStorage.clear();
+  // 注销 Service Worker 并清除缓存
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (const reg of registrations) {
+        reg.unregister();
+      }
+    });
+  }
+  if ("caches" in window) {
+    caches.keys().then((names) => {
+      for (const name of names) {
+        caches.delete(name);
+      }
+    });
+  }
   location.reload();
 };
 

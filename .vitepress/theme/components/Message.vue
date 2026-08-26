@@ -86,7 +86,17 @@
           </span>
         </div>
         <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
-          <span class="pill-text">sgexilq<span class="pill-domain">.top</span></span>
+          <span class="pill-text">
+            <template v-if="store.channelMode === 5">
+              <span class="pill-prefix info">{{ pillText }}</span>
+            </template>
+            <template v-else-if="pillChannel">
+              <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}</span><span>.sgexilq</span><span class="pill-domain">.top</span>
+            </template>
+            <template v-else>
+              <span>sgexilq</span><span class="pill-domain">.top</span>
+            </template>
+          </span>
         </div>
       </div>
       </Transition>
@@ -133,6 +143,28 @@ const currentSeconds = ref("");
 const currentDate = ref("");
 let timeInterval = null;
 let progressInterval = null;
+
+// 根据频道模式显示不同的药丸文本
+const pillChannel = computed(() => {
+  const mode = store.channelMode;
+  if (mode === 2) return 'beta';
+  if (mode === 3) return 'dev';
+  if (mode === 4) return 'canary';
+  return '';
+});
+const pillChannelClass = computed(() => {
+  const mode = store.channelMode;
+  if (mode === 2) return 'success';
+  if (mode === 3) return 'warning';
+  if (mode === 4) return 'error';
+  return '';
+});
+const pillText = computed(() => {
+  const mode = store.channelMode;
+  if (mode === 5) return '开发模式';
+  const channel = pillChannel.value;
+  return channel ? `${channel}.sgexilq.top` : 'sgexilq.top';
+});
 
 // 拓展模式消息数组
 const islandMessages = ref([]);
@@ -670,6 +702,12 @@ onUnmounted(() => {
       font-weight: 500;
       color: var(--main-font-color);
       white-space: nowrap;
+      .pill-prefix {
+        &.success { color: var(--main-success-color); }
+        &.warning { color: var(--main-warning-color); }
+        &.error { color: var(--main-error-color); }
+        &.info { color: var(--main-info-color); }
+      }
       .pill-domain {
         color: var(--main-color);
       }
@@ -703,6 +741,12 @@ onUnmounted(() => {
       border-color: var(--main-color);
       .pill-text {
         color: #ffffff;
+        .pill-prefix {
+          &.success { color: #ffffff; }
+          &.warning { color: #ffffff; }
+          &.error { color: #ffffff; }
+          &.info { color: #ffffff; }
+        }
         .pill-domain,
         .time-separator,
         .time-seconds {

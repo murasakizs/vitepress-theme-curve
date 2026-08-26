@@ -1,9 +1,16 @@
 import { loadScript, loadCSS } from "./commonTools.mjs";
 
-const initFancybox = (themeConfig) => {
+/**
+ * 初始化图片灯箱
+ * @param {Object} themeConfig - 主题配置
+ * @param {Object} options - 额外选项
+ * @param {boolean} options.lightboxEnabled - 是否启用水印箱
+ */
+const initFancybox = (themeConfig, options = {}) => {
   try {
     const option = themeConfig.fancybox;
-    if (!option.enable) return false;
+    // 检查主题配置或用户设置是否启用
+    if (!option.enable || options.lightboxEnabled === false) return false;
     // 引入css及js
     loadCSS(option.css);
     loadScript(option.js, {

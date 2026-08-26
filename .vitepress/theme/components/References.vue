@@ -20,35 +20,22 @@
 </template>
 
 <script setup>
-import { useData } from 'vitepress';
-
-const { frontmatter } = useData(); // frontmatter 已经在这里声明了
+const { frontmatter } = useData();
 const screenWidth = ref(0);
 // 直接使用 frontmatter 来初始化 references
 const references = ref(frontmatter.value?.references || []); // 不需要重新声明 frontmatter
 
 // 计算属性，用于动态限制标题字数
 const limitedReferences = computed(() => {
-  //2025.06.12更新：在 Next.js 的服务端渲染过程中，应用会在服务器端先进行渲染
-  //而在服务器端的 JavaScript 环境中，并没有浏览器提供的 window 对象。
-  //最简单的解决方法是确保在客户端代码中访问 window
-  //可以通过判断代码是否在浏览器环境中运行来避免在服务器端渲染时执行涉及 window 的代码
-  //使用 typeof window !== 'undefined' 来判断
-  onMounted(() => {
-  // 只有在浏览器环境才会执行这里的代码
-  if (typeof window !== 'undefined') {
-    const screenWidth = window.innerWidth;
-  }
-});
   // 假设你想让标题占据屏幕宽度的某个百分比，例如 70%
   // 这里的 '16' 是一个估算值，代表一个汉字或英文字符的平均像素宽度。
   // 你需要根据你的字体大小和字体类型进行精确调整。
-  const maxChars = Math.floor((screenWidth * 0.7) / 16); // 估算最大字符数
+  const maxChars = Math.floor((screenWidth.value * 0.7) / 16); // 估算最大字符数
 
   return references.value.map(item => {
     let title = item.title;
     if (title.length > maxChars) {
-      title = title.substring(0, maxChars) + '...'; // 截断并添加省略号
+      title = title.substring(0, maxChars) + '...';
     }
     return { ...item, title: title };
   });
@@ -56,8 +43,16 @@ const limitedReferences = computed(() => {
 
 // 在组件挂载时监听窗口大小变化，以便动态调整字数限制
 onMounted(() => {
+  //2025.06.12更新：在 Next.js 的服务端渲染过程中，应用会在服务器端先进行渲染
+  //而在服务器端的 JavaScript 环境中，并没有浏览器提供的 window 对象。
+  //最简单的解决方法是确保在客户端代码中访问 window
+  //可以通过判断代码是否在浏览器环境中运行来避免在服务器端渲染时执行涉及 window 的代码
+  //使用 typeof window !== 'undefined' 来判断
+  if (typeof window !== 'undefined') {
+    screenWidth.value = window.innerWidth;
+  }
   window.addEventListener('resize', updateReferences);
-  updateReferences(); // 首次加载时也更新
+  updateReferences();
 });
 
 // 在组件卸载前移除事件监听器
@@ -73,6 +68,7 @@ const updateReferences = () => {
   // 或者在 VitePress 的生命周期中，当 frontmatter 更新时，手动触发 references.value 的更新
   // 在 VitePress 中，useData() 返回的数据通常是响应式的，所以这里可能不需要手动更新 references.value
   // 如果需要，可以这样：
+  screenWidth.value = window.innerWidth;
   references.value = frontmatter.value?.references || [];
 };
 </script>

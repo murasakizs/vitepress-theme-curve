@@ -106,15 +106,12 @@
 
 <script setup>
 import { mainStore } from "@/store";
+import { useIsMobileLayout } from "@/utils/layout.js";
 
 const store = mainStore();
 
 // 根据页面布局决定默认消息样式
-const isMobileLayout = computed(() => {
-  if (store.siteLayout === "mobile") return true;
-  if (store.siteLayout === "pc") return false;
-  return store.windowWidth <= 768;
-});
+const isMobileLayout = useIsMobileLayout();
 
 const useCardStyle = computed(() => {
   return store.messageStyle === "card";

@@ -139,26 +139,100 @@ export default withPwa(
         clientsClaim: true,
         skipWaiting: true,
         cleanupOutdatedCaches: true,
-        // 资源缓存
+        // 运行时缓存策略
         runtimeCaching: [
+          // API 请求 - 网络优先
           {
-            urlPattern: /(.*?)\.(woff2|woff|ttf|css)/,
-            handler: "CacheFirst",
+            urlPattern: /^\/api\/.*/i,
+            handler: "NetworkFirst",
             options: {
-              cacheName: "file-cache",
+              cacheName: "api-cache",
+              networkTimeoutSeconds: 5,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 5 * 60, // 5 分钟
+              },
             },
           },
+          // 文章页面 - 网络优先，离线回退缓存
           {
-            urlPattern: /(.*?)\.(ico|webp|png|jpe?g|svg|gif|bmp|psd|tiff|tga|eps)/,
+            urlPattern: /\.html$/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-cache",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 天
+              },
+            },
+          },
+          // VitePress 生成的页面路由（cleanUrls 模式）
+          {
+            urlPattern: /^\/[^/]+\/?$/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "page-cache",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 天
+              },
+            },
+          },
+          // 文章详情页路由
+          {
+            urlPattern: /^\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\/?$/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "post-cache",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 天
+              },
+            },
+          },
+          // 字体和样式 - 缓存优先
+          {
+            urlPattern: /\.(woff2|woff|ttf|css)$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "static-assets-cache",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 天
+              },
+            },
+          },
+          // 图片 - 缓存优先
+          {
+            urlPattern: /\.(ico|webp|png|jpe?g|svg|gif|bmp|psd|tiff|tga|eps)$/i,
             handler: "CacheFirst",
             options: {
               cacheName: "image-cache",
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 天
+              },
+            },
+          },
+          // JS 资源 - 缓存优先
+          {
+            urlPattern: /\.js$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "js-cache",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 天
+              },
             },
           },
         ],
-        // 缓存文件
+        // 预缓存构建产物
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,jpeg,gif,svg,woff2,ttf}"],
-        globIgnores: ["**/vp-icons.css"],
+        globIgnores: ["**/vp-icons.css", "**/sitemap.xml", "**/rss.xml"],
         // 排除路径
         navigateFallbackDenylist: [/^\/sitemap.xml$/, /^\/rss.xml$/, /^\/robots.txt$/, /^\/redirect(?:\.html)?(?:\/|$)/],
       },

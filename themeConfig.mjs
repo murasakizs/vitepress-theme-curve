@@ -140,4 +140,10 @@ export const themeConfig = {
   rewardData: { enable: false },
   music: { enable: false }, // TODO: 获取网易云歌单 ID 后启用
   search: { enable: false }, // TODO: 获取 Algolia appId 和 apiKey 后启用
+  // 图片灯箱（点击放大查看）
+  fancybox: {
+    enable: true,
+    js: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js",
+    css: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/fancyapps-ui/5.0.36/fancybox/fancybox.min.css",
+  },
 };

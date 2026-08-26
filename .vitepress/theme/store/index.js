@@ -21,6 +21,31 @@ if (typeof localStorage !== 'undefined') {
   }
 }
 
+// 主题色 class 列表（粉色为默认，不需要 class）
+const THEME_COLOR_CLASSES = ['theme-purple', 'theme-blue', 'theme-red', 'theme-green', 'theme-gray'];
+// 光标颜色映射
+const CURSOR_COLORS = {
+  light: { pink: '#e8558e', purple: '#8000ff', blue: '#4fc3f7', red: '#ef5350', green: '#66bb6a', gray: '#9e9e9e' },
+  dark:  { pink: '#f06292', purple: '#b388ff', blue: '#81d4fa', red: '#ef9a9a', green: '#a5d6a7', gray: '#757575' }
+};
+// 开发用版本号，每次改默认值时 +1，自动清除旧缓存
+const PERSIST_VERSION = 15;
+// 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
+const DEFAULT_CHANNEL_MODE = 4;
+// dev频道合并状态（1 = 未合并，2 = 已合并至beta）
+const DEFAULT_DEV_CHANNEL_MERGED = 0;
+// canary频道合并状态（1 = 未合并，2 = 已合并至beta）
+const DEFAULT_CANARY_CHANNEL_MERGED = 0;
+
+// 模块加载时立即检查版本，确保在 pinia-persistedstate 水合之前清除旧缓存
+if (typeof localStorage !== 'undefined') {
+  const storedVersion = parseInt(localStorage.getItem('siteDataVersion') || '0', 10);
+  if (storedVersion < PERSIST_VERSION) {
+    localStorage.removeItem('siteData');
+    localStorage.setItem('siteDataVersion', String(PERSIST_VERSION));
+  }
+}
+
 export const mainStore = defineStore("main", {
   state: () => {
     return {
@@ -113,6 +138,15 @@ export const mainStore = defineStore("main", {
       customThemeBeforeHighContrast: false,
       // 移除动画
       removeAnimations: false,
+      // PWA 缓存增强
+      pwaCacheEnabled: true,
+      pwaCacheLimit: 100,
+      // 阅读进度条
+      readingProgressEnabled: true,
+      // 图片功能开关
+      imageLazyEnabled: true,
+      imageWebpEnabled: true,
+      imageLightboxEnabled: true,
       // 定时切换明暗显示外观
       scheduledThemeEnabled: false,
       scheduledLightTime: "07:00",
@@ -194,20 +228,15 @@ export const mainStore = defineStore("main", {
       this.themeColor = color;
       const html = document.documentElement;
       // 移除所有主题色 class
-      const themeColors = ['theme-purple', 'theme-blue', 'theme-red', 'theme-green', 'theme-gray'];
-      themeColors.forEach(cls => html.classList.remove(cls));
+      THEME_COLOR_CLASSES.forEach(cls => html.classList.remove(cls));
       // 添加新的主题色 class（粉色为默认，不需要 class）
       if (color !== 'pink') {
         html.classList.add(`theme-${color}`);
       }
 
       // 更新光标颜色（CSS 变量 + SVG）
-      const cursorColors = {
-        light: { pink: '#e8558e', purple: '#8000ff', blue: '#4fc3f7', red: '#ef5350', green: '#66bb6a', gray: '#9e9e9e' },
-        dark:  { pink: '#f06292', purple: '#b388ff', blue: '#81d4fa', red: '#ef9a9a', green: '#a5d6a7', gray: '#757575' }
-      };
       const actualTheme = this.themeValue || 'light';
-      html.style.setProperty('--cursor-bg-color', cursorColors[actualTheme][color] || cursorColors[actualTheme].pink);
+      html.style.setProperty('--cursor-bg-color', CURSOR_COLORS[actualTheme][color] || CURSOR_COLORS[actualTheme].pink);
       if (appCursorInstance) {
         appCursorInstance.setThemeType(this.themeType, color);
       }
@@ -236,14 +265,10 @@ export const mainStore = defineStore("main", {
       this.themeValue = actualTheme;
 
       const root = document.documentElement;
-      const cursorColors = {
-        light: { pink: '#e8558e', purple: '#8000ff', blue: '#4fc3f7', red: '#ef5350', green: '#66bb6a', gray: '#9e9e9e' },
-        dark:  { pink: '#f06292', purple: '#b388ff', blue: '#81d4fa', red: '#ef9a9a', green: '#a5d6a7', gray: '#757575' }
-      };
       if (this.customThemeEnabled) {
         root.style.setProperty('--cursor-bg-color', this.customPrimaryColor);
       } else {
-        root.style.setProperty('--cursor-bg-color', cursorColors[actualTheme][this.themeColor] || cursorColors[actualTheme].pink);
+        root.style.setProperty('--cursor-bg-color', CURSOR_COLORS[actualTheme][this.themeColor] || CURSOR_COLORS[actualTheme].pink);
       }
 
       if (actualTheme === 'dark') {
@@ -282,8 +307,7 @@ export const mainStore = defineStore("main", {
       if (typeof document === 'undefined') return;
       const html = document.documentElement;
       // 移除所有预设主题 class
-      const themeColors = ['theme-purple', 'theme-blue', 'theme-red', 'theme-green', 'theme-gray'];
-      themeColors.forEach(cls => html.classList.remove(cls));
+      THEME_COLOR_CLASSES.forEach(cls => html.classList.remove(cls));
       // 设置 CSS 变量
       html.style.setProperty('--main-color', primary);
       html.style.setProperty('--main-color-bg', primary + '0d');
@@ -399,6 +423,12 @@ export const mainStore = defineStore("main", {
         "lastCustomSecondaryColor",
         "customThemeBeforeHighContrast",
         "removeAnimations",
+        "pwaCacheEnabled",
+        "pwaCacheLimit",
+        "readingProgressEnabled",
+        "imageLazyEnabled",
+        "imageWebpEnabled",
+        "imageLightboxEnabled",
         "scheduledThemeEnabled",
         "scheduledLightTime",
         "scheduledDarkTime",

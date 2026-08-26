@@ -42,9 +42,9 @@
 
 <script setup>
 import { getAdcode, getWeather } from '@/api'
-import { mainStore } from "@/store";
+import { useIsMobileLayout } from "@/utils/layout.js";
 
-const store = mainStore();
+const isMobileLayout = useIsMobileLayout();
 
 // 声明会在请求出错时抛出的事件
 const emit = defineEmits(['fetch-error'])
@@ -52,12 +52,6 @@ const emit = defineEmits(['fetch-error'])
 const weatherData = ref(null)
 const loading     = ref(true)
 const error       = ref(false)
-
-const isMobileLayout = computed(() => {
-  if (store.siteLayout === "mobile") return true;
-  if (store.siteLayout === "pc") return false;
-  return store.windowWidth <= 768;
-})
 
 onMounted(async () => {
   if (isMobileLayout.value) {

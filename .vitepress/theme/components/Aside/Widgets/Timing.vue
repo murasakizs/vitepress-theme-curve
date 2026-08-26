@@ -1,6 +1,5 @@
 <script setup>
 import dayjs from "dayjs";
-import { useData } from "vitepress";
 
 const { theme } = useData();
 

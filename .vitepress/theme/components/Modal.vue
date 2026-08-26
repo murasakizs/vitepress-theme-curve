@@ -40,9 +40,9 @@
 </template>
 
 <script setup>
-import { mainStore } from "@/store";
+import { useIsMobileLayout } from "@/utils/layout.js";
 
-const store = mainStore();
+const isMobileLayout = useIsMobileLayout();
 
 const props = defineProps({
   // 是否显示
@@ -75,13 +75,6 @@ const props = defineProps({
     type: Number,
     default: 80,
   },
-});
-
-// 判断是否使用移动端布局
-const isMobileLayout = computed(() => {
-  if (store.siteLayout === "mobile") return true;
-  if (store.siteLayout === "pc") return false;
-  return store.windowWidth <= 768;
 });
 
 // 发射事件

@@ -28,7 +28,7 @@ export const routeChange = (type, to) => {
   if (typeof window === "undefined") return false;
   // 跳转前
   if (type === "before") {
-    console.log("跳转前", to);
+
     isOnlyAfter = false;
     // const isSame = isSamePage(to);
     // 更改上次路径
@@ -38,11 +38,11 @@ export const routeChange = (type, to) => {
   }
   // 跳转后
   else if (type === "after") {
-    console.log("跳转后", to);
+
     const isSame = isSamePage(to);
     const pathName = new URL(to, window.location.origin).pathname;
     if (isSame && lastPathName === pathName) {
-      console.log("相同页面");
+
       if (!isOnlyAfter) changeLoading();
       return false;
     } else {
@@ -67,7 +67,6 @@ const changeLoading = (option = {}) => {
   // 随机延时结束
   loadingTimer = setTimeout(
     () => {
-      console.log("加载动画延时结束");
       store.loadingStatus = false;
       // 替换链接
       // jumpRedirect(null, true);

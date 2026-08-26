@@ -95,7 +95,6 @@ const formatSearchData = (data) => {
     const searchData = { url, type, title, anchor, content };
     results.push(searchData);
   }
-  console.log(results);
   return results;
 };
 

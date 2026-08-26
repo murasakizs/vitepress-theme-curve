@@ -851,9 +851,6 @@
                       />
                     </div>
                   </div>
-                  <div class="set-item">
-                    <span class="set-label">修复了一些已知的问题</span>
-                  </div>
                   </template>
                 </div>
                 <div v-else-if="devChannelExpanded && (channelMode === 2 || channelMode === 4)" class="set-expand-box">

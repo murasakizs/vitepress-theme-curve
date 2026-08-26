@@ -53,9 +53,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useData } from 'vitepress';
-
 // 获取状态页 URL
 // 通过 useData 获取 theme 配置，假设配置在该处，或者直接使用 env
 // VitePress 注入

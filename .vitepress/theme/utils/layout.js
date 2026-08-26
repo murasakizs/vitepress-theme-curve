@@ -1,15 +1,17 @@
+import { computed } from "vue";
 import { mainStore } from "@/store";
 
 /**
  * 判断当前是否为移动端布局
  * 遵循 store 中 siteLayout 的设置：auto / pc / mobile
+ * auto 模式下基于 store.windowWidth（响应式）判断
  */
 export const useIsMobileLayout = () => {
   const store = mainStore();
   return computed(() => {
     if (store.siteLayout === "mobile") return true;
     if (store.siteLayout === "pc") return false;
-    return typeof window !== "undefined" && window.innerWidth <= 768;
+    return store.windowWidth <= 768;
   });
 };
 

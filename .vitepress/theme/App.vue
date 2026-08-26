@@ -3,6 +3,8 @@
   <Background />
   <!-- 加载提示 -->
   <Loading />
+  <!-- 阅读进度条 -->
+  <ReadingProgress />
   <!-- 导航栏 -->
   <Nav />
   <!-- 主内容 -->
@@ -148,7 +150,6 @@ const changeSiteThemeType = () => {
   };
   // 必要数据
   const htmlElement = document.documentElement;
-  console.log("当前模式：", themeType.value);
   // 清除所有 class
   Object.values(themeClasses).forEach((themeClass) => {
     htmlElement.classList.remove(themeClass);

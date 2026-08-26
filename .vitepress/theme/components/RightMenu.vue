@@ -226,6 +226,9 @@
 import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 import { smoothScrolling, shufflePost, copyText, copyImage, downloadImage } from "@/utils/helper";
+import { useIsMobileLayout } from "@/utils/layout.js";
+
+const isMobileLayout = useIsMobileLayout();
 
 const router = useRouter();
 const store = mainStore();
@@ -249,8 +252,7 @@ const commentCopyData = ref(null);
 const openRightMenu = (e) => {
   // 检测是否可开启
   if (e.ctrlKey || !useRightMenu.value) return true;
-  const isMobileLayout = store.siteLayout === "mobile" || (store.siteLayout !== "pc" && store.windowWidth < 768);
-  if (isMobileLayout) return true;
+  if (isMobileLayout.value) return true;
   e.preventDefault();
   rightMenuShow.value = false;
   // 获取点击类型

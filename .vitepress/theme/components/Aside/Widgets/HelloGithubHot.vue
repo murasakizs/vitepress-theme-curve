@@ -25,8 +25,10 @@
 
 <script setup>
 import { mainStore } from "@/store";
+import { useIsMobileLayout } from "@/utils/layout.js";
 
 const store = mainStore();
+const isMobile = useIsMobileLayout();
 
 // 数据与状态
 // —— 新增：定义 emit ——
@@ -38,12 +40,6 @@ const containerHeight = ref(0);
 const listContainer = ref(null);
 // 从环境变量读取 API 地址
 const API_URL = import.meta.env.VITE_HELLOGITHUB_API_URL;
-
-const isMobile = computed(() => {
-  if (store.siteLayout === "mobile") return true;
-  if (store.siteLayout === "pc") return false;
-  return store.windowWidth <= 768;
-});
 
 // 将 ISO 时间解析成 'YYYY-MM-DD HH:mm:ss'
 const formattedUpdateTime = computed(() => {

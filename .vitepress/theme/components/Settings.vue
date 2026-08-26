@@ -851,9 +851,7 @@
                       />
                     </div>
                   </div>
-                  <div class="set-item">
-                    <span class="set-label">修复了一些已知的问题</span>
-                  </div>
+
                   </template>
                 </div>
                 <div v-else-if="devChannelExpanded && (channelMode === 2 || channelMode === 4)" class="set-expand-box">
@@ -881,6 +879,124 @@
                     <div class="set-item">
                       <span class="set-label">当前频道内容已全部合并至beta频道，稍后再看看吧</span>
                     </div>
+                  </template>
+                  <template v-else>
+                  <div class="set-item">
+                    <span class="set-label">PWA 缓存增强</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !pwaCacheEnabled }]"
+                        @click="pwaCacheEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: pwaCacheEnabled }]"
+                        @click="pwaCacheEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">开启后将增强 Service Worker 缓存策略，支持离线阅读已访问过的文章。关闭后仅保留基础预缓存。</span>
+                  <div v-if="pwaCacheEnabled" class="set-item">
+                    <span class="set-label">缓存条目上限</span>
+                    <div class="set-options">
+                      <span
+                        v-for="limit in [50, 100, 200, 500, 0]"
+                        :key="limit"
+                        :class="['options', { choose: pwaCacheLimit === limit }]"
+                        @click="pwaCacheLimit = limit"
+                      >
+                        {{ limit === 0 ? '无限' : limit }}
+                      </span>
+                    </div>
+                  </div>
+                  <span v-if="pwaCacheEnabled" class="set-desc">每类缓存的最大条目数，超出后自动清理最早的缓存。选择"无限"则不清理。</span>
+                  <div class="set-item">
+                    <span class="set-label">清除 PWA 缓存</span>
+                    <div class="set-options">
+                      <span
+                        class="options"
+                        @click="clearPwaCache"
+                      >
+                        清除
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">清除运行时缓存（已访问页面、API 数据等），预缓存会在下次加载时自动恢复。</span>
+                  <div class="set-item">
+                    <span class="set-label">阅读进度条</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !readingProgressEnabled }]"
+                        @click="readingProgressEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: readingProgressEnabled }]"
+                        @click="readingProgressEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">在文章页面顶部显示阅读进度条，支持阅读时长统计。</span>
+                  <div class="set-item">
+                    <span class="set-label">图片懒加载</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !imageLazyEnabled }]"
+                        @click="imageLazyEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: imageLazyEnabled }]"
+                        @click="imageLazyEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">开启后图片加载前显示骨架屏，加载完成后渐入显示。</span>
+                  <div class="set-item">
+                    <span class="set-label">WebP 自动转换</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !imageWebpEnabled }]"
+                        @click="imageWebpEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: imageWebpEnabled }]"
+                        @click="imageWebpEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">浏览器支持 WebP 时自动加载 WebP 版本，减小图片体积。</span>
+                  <div class="set-item">
+                    <span class="set-label">图片灯箱</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: !imageLightboxEnabled }]"
+                        @click="imageLightboxEnabled = false"
+                      >
+                        关闭
+                      </span>
+                      <span
+                        :class="['options', { choose: imageLightboxEnabled }]"
+                        @click="imageLightboxEnabled = true"
+                      >
+                        开启
+                      </span>
+                    </div>
+                  </div>
+                  <span class="set-desc">点击图片弹出大图查看，支持缩放、旋转等操作。</span>
                   </template>
                 </div>
                 <div v-else-if="canaryChannelExpanded && (channelMode === 2 || channelMode === 3)" class="set-expand-box">
@@ -1039,18 +1155,46 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
+import { useConfigIO } from "@/utils/useConfigIO.mjs";
+import { useIsMobileLayout } from "@/utils/layout.js";
 
 const store = mainStore();
 const { theme } = useData();
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, channelMode, devChannelMerged, canaryChannelMerged, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime } =
+const {
+  importFileInput, importConfirmVisible, importWarnVisible, importWarnType,
+  handleExportConfig, handleImportConfig, handleFileImport,
+  confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
+} = useConfigIO(theme.siteVersion || "V1.0");
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled } =
   storeToRefs(store);
 
+// PWA 缓存增强相关
+const pwaCacheClearing = ref(false);
+const clearPwaCache = async () => {
+  if (typeof $message === "undefined" || pwaCacheClearing.value) return;
+  pwaCacheClearing.value = true;
+  try {
+    // 清除运行时缓存（保留预缓存）
+    const cacheNames = await caches.keys();
+    const runtimeCaches = ["api-cache", "html-cache", "page-cache", "post-cache"];
+    let cleared = 0;
+    for (const name of cacheNames) {
+      if (runtimeCaches.some(rc => name.includes(rc))) {
+        await caches.delete(name);
+        cleared++;
+      }
+    }
+    $message.success(`已清除 ${cleared} 个运行时缓存`, { duration: 2000 });
+  } catch (e) {
+    console.error("Clear PWA cache failed:", e);
+    $message.error("清除缓存失败", { duration: 2000 });
+  } finally {
+    pwaCacheClearing.value = false;
+  }
+};
+
 // 判断是否使用移动端布局
-const isMobileLayout = computed(() => {
-  if (store.siteLayout === "mobile") return true;
-  if (store.siteLayout === "pc") return false;
-  return store.windowWidth <= 768;
-});
+const isMobileLayout = useIsMobileLayout();
 
 // 警告区域自动滚动
 const warnRef = ref(null);
@@ -1213,178 +1357,6 @@ const showResetWarning = () => {
   if (typeof $message !== "undefined") {
     $message.warning("即将恢复默认配置，请再次确认");
   }
-};
-
-// 导入/导出配置
-const importFileInput = ref(null);
-const importConfirmVisible = ref(false);
-const importWarnVisible = ref(false);
-const importWarnType = ref(""); // "high" | "low"
-const pendingImportConfig = ref(null);
-
-// 混淆编码
-const obfuscate = (str) => {
-  const shifted = str.split('').map(c => {
-    const code = c.charCodeAt(0);
-    return String.fromCharCode(code + 3);
-  }).join('');
-  return btoa(encodeURIComponent(shifted));
-};
-
-// 混淆解码
-const deobfuscate = (str) => {
-  const decoded = decodeURIComponent(atob(str));
-  return decoded.split('').map(c => {
-    const code = c.charCodeAt(0);
-    return String.fromCharCode(code - 3);
-  }).join('');
-};
-
-const handleExportConfig = () => {
-  try {
-    const siteData = localStorage.getItem("siteData");
-    if (!siteData) {
-      if (typeof $message !== "undefined") {
-        $message.warning("没有可导出的配置数据");
-      }
-      return;
-    }
-    const parsed = JSON.parse(siteData);
-    // 版本号格式：显示V1.6，存储16
-    const versionStr = theme.siteVersion || "V1.0";
-    const versionNum = parseInt(versionStr.replace(/[Vv.]/g, ""), 10) || 10;
-    const exportData = {
-      version: versionNum,
-      timestamp: new Date().toISOString(),
-      config: parsed,
-    };
-    const encoded = obfuscate(JSON.stringify(exportData));
-    const blob = new Blob([encoded], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `site-config-${new Date().toISOString().slice(0, 10)}.dat`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    if (typeof $message !== "undefined") {
-      $message.success("配置已导出");
-    }
-  } catch (e) {
-    if (typeof $message !== "undefined") {
-      $message.error("导出配置失败");
-    }
-  }
-};
-
-const handleImportConfig = () => {
-  importFileInput.value?.click();
-};
-
-const handleFileImport = (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      let data;
-      const content = e.target.result;
-      // 尝试解码混淆格式
-      try {
-        data = JSON.parse(deobfuscate(content));
-      } catch {
-        // 尝试直接解析JSON（兼容旧格式）
-        data = JSON.parse(content);
-      }
-      const importVersion = data.version;
-      // 版本号格式：显示V1.6，存储16
-      const versionStr = theme.siteVersion || "V1.0";
-      const currentVersion = parseInt(versionStr.replace(/[Vv.]/g, ""), 10) || 10;
-      // 检查版本号
-      if (typeof importVersion === "number" && importVersion > currentVersion) {
-        // 版本过高
-        pendingImportConfig.value = data;
-        importWarnType.value = "high";
-        importWarnVisible.value = true;
-        return;
-      }
-      if (typeof importVersion === "number" && importVersion < currentVersion) {
-        // 版本过低
-        pendingImportConfig.value = data;
-        importWarnType.value = "low";
-        importWarnVisible.value = true;
-        return;
-      }
-      // 版本相同，显示紫色确认警告
-      pendingImportConfig.value = data;
-      importConfirmVisible.value = true;
-    } catch (e) {
-      if (typeof $message !== "undefined") {
-        $message.error("导入失败，请检查文件格式是否正确");
-      }
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = "";
-};
-
-const applyImportConfig = (data) => {
-  try {
-    let config = data.config || data;
-    const validKeys = [
-      "themeType", "themeColor", "bannerType", "useRightMenu", "useCustomCursor",
-      "playerShow", "playerVolume", "backgroundBlur", "backgroundType", "fontFamily",
-      "fontSize", "infoPosition", "backgroundUrl", "highContrast", "siteLayout",
-      "messageStyle", "messagePosition", "progressDirection", "messageDuration",
-      "islandMode", "islandUseThemeColor", "islandShowSeconds", "islandShowDate",
-      "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
-      "removeAnimations", "showMoreSettings",
-      "scheduledThemeEnabled", "scheduledLightTime", "scheduledDarkTime",
-      "betaChannelExpanded", "devChannelExpanded", "canaryChannelExpanded",
-    ];
-    const filtered = {};
-    for (const key of validKeys) {
-      if (config[key] !== undefined) {
-        filtered[key] = config[key];
-      }
-    }
-    localStorage.setItem("siteData", JSON.stringify(filtered));
-    if (typeof $message !== "undefined") {
-      $message.success("配置已导入，页面将刷新以应用设置", { duration: 3000 });
-    }
-    localStorage.setItem("importJustCompleted", "true");
-    setTimeout(() => {
-      location.reload();
-    }, 3000);
-  } catch (e) {
-    if (typeof $message !== "undefined") {
-      $message.error("导入失败，请检查文件格式是否正确");
-    }
-  }
-};
-
-const confirmImportWarn = () => {
-  importWarnVisible.value = false;
-  importConfirmVisible.value = true;
-};
-
-const cancelImportWarn = () => {
-  importWarnVisible.value = false;
-  pendingImportConfig.value = null;
-};
-
-const confirmImportConfirm = () => {
-  importConfirmVisible.value = false;
-  if (pendingImportConfig.value) {
-    applyImportConfig(pendingImportConfig.value);
-    pendingImportConfig.value = null;
-  }
-};
-
-const cancelImportConfirm = () => {
-  importConfirmVisible.value = false;
-  pendingImportConfig.value = null;
 };
 
 // 设置首页Banner高度

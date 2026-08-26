@@ -69,9 +69,7 @@ async function initPlayer() {
 
   // 尝试自动播放
   if (props.autoplay) {
-    video.value.play().catch(() => {
-      console.log('⚠️ 自动播放被浏览器阻止，需要用户交互')
-    })
+    video.value.play().catch(() => {})
   }
 }
 

@@ -14,12 +14,132 @@
       @modal-close="store.changeShowStatus('showSettings')"
     >
       <div class="set-list">
-        <div v-if="channelMode >= 2 && channelMode <= 4" class="set-warn set-warn-channel">
+        <div v-if="channelMode >= 2 && channelMode <= 4 && store.devMode !== 2" class="set-warn set-warn-channel">
           <span class="warn-text">当前处于测试频道（{{ channelMode === 2 ? 'beta' : channelMode === 3 ? 'dev' : 'canary' }}分支）</span>
         </div>
-        <div v-else-if="channelMode === 5" class="set-warn set-warn-channel">
+        <div v-if="store.devMode === 2" class="set-warn set-warn-dev">
           <span class="warn-text">当前处于开发模式，提交代码时应退出开发模式</span>
         </div>
+        <!-- 开发模式选项 -->
+        <template v-if="store.devMode === 2">
+          <div class="set-item">
+            <span class="set-label set-label-channel">development mode options</span>
+            <div class="set-options">
+              <span
+                :class="['options', { choose: devModeOptionsExpanded }]"
+                @click="devModeOptionsExpanded = !devModeOptionsExpanded"
+              >
+                {{ devModeOptionsExpanded ? 'collapse' : 'expand' }}
+              </span>
+            </div>
+          </div>
+          <Transition name="fade-up">
+            <div v-if="devModeOptionsExpanded" class="set-expand-box">
+              <div class="set-item">
+                <span class="set-label">channel mode</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: channelMode === 1 }]"
+                    @click="switchChannelMode(1)"
+                  >
+                    release
+                  </span>
+                  <span
+                    :class="['options', { choose: channelMode === 2 }]"
+                    @click="switchChannelMode(2)"
+                  >
+                    beta
+                  </span>
+                  <span
+                    :class="['options', { choose: channelMode === 3 }]"
+                    @click="switchChannelMode(3)"
+                  >
+                    dev
+                  </span>
+                  <span
+                    :class="['options', { choose: channelMode === 4 }]"
+                    @click="switchChannelMode(4)"
+                  >
+                    canary
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">show all test channel options</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: !showAllGroups }]"
+                    @click="showAllGroups = false"
+                  >
+                    off
+                  </span>
+                  <span
+                    :class="['options', { choose: showAllGroups }]"
+                    @click="showAllGroups = true"
+                  >
+                    on
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">dev no content</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: devChannelMerged !== 2 }]"
+                    @click="devChannelMerged = 0"
+                  >
+                    off
+                  </span>
+                  <span
+                    :class="['options', { choose: devChannelMerged === 2 }]"
+                    @click="devChannelMerged = 2"
+                  >
+                    on
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">canary no content</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: canaryChannelMerged !== 2 }]"
+                    @click="canaryChannelMerged = 0"
+                  >
+                    off
+                  </span>
+                  <span
+                    :class="['options', { choose: canaryChannelMerged === 2 }]"
+                    @click="canaryChannelMerged = 2"
+                  >
+                    on
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">clear all data</span>
+                <div class="set-options">
+                  <span
+                    class="options"
+                    @click="localStorage.clear(); location.reload();"
+                  >
+                    ok
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">close development mode</span>
+                <div class="set-options">
+                  <span
+                    class="options"
+                    @click="store.devMode = 1"
+                  >
+                    confirm
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </template>
         <span class="title">通用</span>
         <div class="set-item">
           <span class="set-label">首页样式（ Banner 高度 ）</span>
@@ -725,7 +845,7 @@
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="betaChannelExpanded && (channelMode === 2 || channelMode === 5)" class="set-expand-box">
+                <div v-if="betaChannelExpanded && (channelMode === 2 || showAllGroups)" class="set-expand-box">
                   <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
                   <div class="set-item">
                     <span class="set-label">移除动画</span>
@@ -751,7 +871,7 @@
                     </div>
                   </Transition>
                 </div>
-                <div v-else-if="betaChannelExpanded && channelMode >= 3 && channelMode <= 4" class="set-expand-box">
+                <div v-else-if="betaChannelExpanded && channelMode >= 3 && channelMode <= 4 && !showAllGroups" class="set-expand-box">
                   <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
                   <div class="set-item">
                     <span class="set-label">显示选项需要先切换到beta频道</span>
@@ -770,7 +890,7 @@
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="devChannelExpanded && (channelMode === 3 || channelMode === 5)" class="set-expand-box">
+                <div v-if="devChannelExpanded && (channelMode === 3 || showAllGroups)" class="set-expand-box">
                   <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
                   <template v-if="devChannelMerged === 2">
                     <div class="set-item">
@@ -854,7 +974,7 @@
 
                   </template>
                 </div>
-                <div v-else-if="devChannelExpanded && (channelMode === 2 || channelMode === 4)" class="set-expand-box">
+                <div v-else-if="devChannelExpanded && (channelMode === 2 || channelMode === 4) && !showAllGroups" class="set-expand-box">
                   <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
                   <div class="set-item">
                     <span class="set-label">显示选项需要先切换到dev频道</span>
@@ -873,7 +993,7 @@
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="canaryChannelExpanded && (channelMode === 4 || channelMode === 5)" class="set-expand-box">
+                <div v-if="canaryChannelExpanded && (channelMode === 4 || showAllGroups)" class="set-expand-box">
                   <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
                   <template v-if="canaryChannelMerged === 2">
                     <div class="set-item">
@@ -999,7 +1119,7 @@
                   <span class="set-desc">点击图片弹出大图查看，支持缩放、旋转等操作。</span>
                   </template>
                 </div>
-                <div v-else-if="canaryChannelExpanded && (channelMode === 2 || channelMode === 3)" class="set-expand-box">
+                <div v-else-if="canaryChannelExpanded && (channelMode === 2 || channelMode === 3) && !showAllGroups" class="set-expand-box">
                   <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
                   <div class="set-item">
                     <span class="set-label">显示选项需要先切换到canary频道</span>
@@ -1030,7 +1150,7 @@
                   <a href="https://canary.sgexilq.top" target="_blank" :class="['options', { choose: channelMode === 4 }]">canary频道{{ channelMode === 4 ? '（当前频道）' : '' }}</a>
                 </div>
               </div>
-              <div v-else-if="channelMode === 5" class="set-item">
+              <div v-else-if="effectiveChannelMode === 5" class="set-item">
                 <span class="set-label">预览测试频道</span>
                 <div class="set-options">
                   <a href="https://beta.sgexilq.top" target="_blank" class="options">beta频道</a>
@@ -1168,6 +1288,15 @@ const {
 const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled } =
   storeToRefs(store);
 
+// 有效频道模式（响应式）
+const effectiveChannelMode = computed(() => store.effectiveChannelMode);
+
+// 切换频道模式并清除旧缓存
+const switchChannelMode = (mode) => {
+  localStorage.setItem('siteData', JSON.stringify({ channelMode: mode }));
+  location.reload();
+};
+
 // PWA 缓存增强相关
 const pwaCacheClearing = ref(false);
 const clearPwaCache = async () => {
@@ -1288,6 +1417,10 @@ const moreFontsExpanded = ref(false);
 const islandSettingsExpanded = ref(false);
 // 主题颜色设置展开状态
 const themeColorExpanded = ref(false);
+// 开发模式选项展开状态
+const devModeOptionsExpanded = ref(false);
+// 显示全部分组（开发模式下展示所有频道分组内容）
+const showAllGroups = ref(false);
 const themeColorList = [
   { value: 'pink', label: '泠粉' },
   { value: 'purple', label: '幻紫' },
@@ -1745,15 +1878,35 @@ onMounted(() => {
   if (scheduledThemeEnabled.value) {
     store.startScheduledTheme();
   }
+  // 初始化时强制关闭不属于当前频道的功能选项
+  const mode = channelMode.value;
+  if (mode !== 2 && mode !== 5) {
+    removeAnimations.value = false;
+  }
+  if (mode !== 3 && mode !== 5) {
+    backgroundBlur.value = false;
+    playerShow.value = false;
+    if (scheduledThemeEnabled.value) {
+      scheduledThemeEnabled.value = false;
+      store.stopScheduledTheme();
+    }
+  }
+  if (mode !== 4 && mode !== 5) {
+    pwaCacheEnabled.value = false;
+    readingProgressEnabled.value = false;
+    imageLazyEnabled.value = false;
+    imageWebpEnabled.value = false;
+    imageLightboxEnabled.value = false;
+  }
   // 根据频道模式设置展开状态
-  if (channelMode.value >= 2 && channelMode.value <= 4) {
-    betaChannelExpanded.value = channelMode.value === 2;
-    devChannelExpanded.value = channelMode.value === 3;
-    canaryChannelExpanded.value = channelMode.value === 4;
-  } else if (channelMode.value === 5) {
+  if (showAllGroups.value) {
     betaChannelExpanded.value = true;
     devChannelExpanded.value = true;
     canaryChannelExpanded.value = true;
+  } else if (channelMode.value >= 2 && channelMode.value <= 4) {
+    betaChannelExpanded.value = channelMode.value === 2;
+    devChannelExpanded.value = channelMode.value === 3;
+    canaryChannelExpanded.value = channelMode.value === 4;
   }
 });
 
@@ -1804,6 +1957,8 @@ watch(
       moreFontsExpanded.value = false;
       islandSettingsExpanded.value = false;
       themeColorExpanded.value = false;
+      devModeOptionsExpanded.value = false;
+      showAllGroups.value = false;
       layoutWarnVisible.value = false;
       fontSizeEditing.value = false;
       fontSizeWarnVisible.value = false;
@@ -2053,6 +2208,13 @@ watch(
     cursor: default;
     .warn-text {
       color: var(--main-color);
+    }
+  }
+  .set-warn-dev {
+    background-color: #fef2f2;
+    border-color: #fca5a5;
+    .warn-text {
+      color: #dc2626;
     }
   }
   .set-warn-purple {
@@ -2357,6 +2519,13 @@ html.dark .set-list .set-warn-channel {
     color: var(--main-color);
   }
 }
+html.dark .set-list .set-warn-dev {
+  background-color: #2d1215;
+  border-color: #7f1d1d;
+  .warn-text {
+    color: #fca5a5;
+  }
+}
 html.dark .set-list .set-warn.set-warn-purple {
   background-color: #1e1833;
   border-color: #3b2d6b;
@@ -2465,6 +2634,13 @@ html.dark.high-contrast-max .set-warn-channel {
   border-color: var(--main-color) !important;
   .warn-text {
     color: var(--main-color) !important;
+  }
+}
+html.dark.high-contrast-max .set-warn-dev {
+  background-color: #2d1215 !important;
+  border-color: #7f1d1d !important;
+  .warn-text {
+    color: #fca5a5 !important;
   }
 }
 

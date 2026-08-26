@@ -87,8 +87,8 @@
         </div>
         <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
           <span class="pill-text">
-            <template v-if="store.channelMode === 5">
-              <span class="pill-prefix info">{{ pillText }}</span>
+            <template v-if="effectiveChannelMode === 5">
+              <span class="pill-prefix error">{{ pillText }}</span>
             </template>
             <template v-else-if="pillChannel">
               <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}</span><span>.sgexilq</span><span class="pill-domain">.top</span>
@@ -109,6 +109,9 @@ import { mainStore } from "@/store";
 import { useIsMobileLayout } from "@/utils/layout.js";
 
 const store = mainStore();
+
+// 有效频道模式（响应式）
+const effectiveChannelMode = computed(() => store.effectiveChannelMode);
 
 // 根据页面布局决定默认消息样式
 const isMobileLayout = useIsMobileLayout();
@@ -143,21 +146,21 @@ let progressInterval = null;
 
 // 根据频道模式显示不同的药丸文本
 const pillChannel = computed(() => {
-  const mode = store.channelMode;
+  const mode = effectiveChannelMode.value;
   if (mode === 2) return 'beta';
   if (mode === 3) return 'dev';
   if (mode === 4) return 'canary';
   return '';
 });
 const pillChannelClass = computed(() => {
-  const mode = store.channelMode;
-  if (mode === 2) return 'success';
+  const mode = effectiveChannelMode.value;
+  if (mode === 2) return 'info';
   if (mode === 3) return 'warning';
-  if (mode === 4) return 'error';
+  if (mode === 4) return 'warning';
   return '';
 });
 const pillText = computed(() => {
-  const mode = store.channelMode;
+  const mode = effectiveChannelMode.value;
   if (mode === 5) return '开发模式';
   const channel = pillChannel.value;
   return channel ? `${channel}.sgexilq.top` : 'sgexilq.top';

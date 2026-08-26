@@ -4,9 +4,11 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 18;
+const PERSIST_VERSION = 2;
 // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
-const DEFAULT_CHANNEL_MODE = 5;
+const DEFAULT_CHANNEL_MODE = 3;
+// 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
+const DEFAULT_DEV_MODE = 2;
 // dev频道合并状态（1 = 未合并，2 = 已合并至beta）
 const DEFAULT_DEV_CHANNEL_MERGED = 0;
 // canary频道合并状态（1 = 未合并，2 = 已合并至beta）
@@ -15,7 +17,7 @@ const DEFAULT_CANARY_CHANNEL_MERGED = 0;
 // 模块加载时立即检查版本，确保在 pinia-persistedstate 水合之前清除旧缓存
 if (typeof localStorage !== 'undefined') {
   const storedVersion = parseInt(localStorage.getItem('siteDataVersion') || '0', 10);
-  if (storedVersion < PERSIST_VERSION) {
+  if (storedVersion !== PERSIST_VERSION) {
     localStorage.removeItem('siteData');
     localStorage.setItem('siteDataVersion', String(PERSIST_VERSION));
   }
@@ -93,6 +95,8 @@ export const mainStore = defineStore("main", {
       canaryChannelMerged: DEFAULT_CANARY_CHANNEL_MERGED,
       // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
       channelMode: DEFAULT_CHANNEL_MODE,
+      // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
+      devMode: DEFAULT_DEV_MODE,
       // 高对比度模式
       highContrast: false,
       // 站点布局
@@ -137,7 +141,12 @@ export const mainStore = defineStore("main", {
       scheduledThemeTimer: null,
     };
   },
-  getters: {},
+  getters: {
+    // 有效频道模式：devMode 开启时强制返回5（开发模式），否则返回实际 channelMode
+    effectiveChannelMode(state) {
+      return state.devMode === 2 ? 5 : state.channelMode;
+    },
+  },
   actions: {
     // 切换应用状态
     changeShowStatus(value, blur = true) {
@@ -385,6 +394,7 @@ export const mainStore = defineStore("main", {
         "showMoreSettings",
         "showMoreSettingsConfirmed",
         "channelMode",
+        "devMode",
         "devChannelMerged",
         "canaryChannelMerged",
         "highContrast",

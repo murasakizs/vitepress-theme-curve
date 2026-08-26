@@ -18,7 +18,7 @@
       </div>
       <div class="post-content">
         <div v-if="!simple && item?.categories" class="post-category">
-          <span v-for="cat in item?.categories" :key="cat" class="cat-name">
+          <span v-for="cat in asArray(item?.categories)" :key="cat" class="cat-name">
             <i class="iconfont icon-folder" />
             {{ cat }}
           </span>
@@ -35,16 +35,24 @@
         <div v-if="!simple" class="post-meta">
           <div v-if="item?.tags" class="post-tags">
             <a
-              v-for="tags in item?.tags"
-              :key="tags"
+              v-for="tag in asArray(item?.tags)"
+              :key="tag"
               class="tags-name"
-              :href="`/pages/tags/${tags}`"
+              :href="`/pages/tags/${tag}`"
             >
               <i class="iconfont icon-hashtag" />
-              {{ tags }}
+              {{ tag }}
             </a>
           </div>
           <span class="post-time">{{ formatTimestamp(item?.date) }}</span>
+          <span v-if="item?.wordCount" class="post-stat">
+            <i class="iconfont icon-article" />
+            {{ item.wordCount.toLocaleString() }} 字
+          </span>
+          <span v-if="item?.readTime" class="post-stat">
+            <i class="iconfont icon-time" />
+            {{ item.readTime }} 分钟
+          </span>
         </div>
       </div>
     </div>
@@ -72,6 +80,14 @@ const props = defineProps({
 });
 
 const { theme: themeConfig } = useData()
+
+// 标签/分类归一化：字符串转数组
+const asArray = (val) => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string") return val.split(",").map(s => s.trim()).filter(Boolean);
+  return [];
+};
 
 // 计算布局类型
 const layoutType = computed(() => 
@@ -270,6 +286,18 @@ const toPost = (event, path) => {
           opacity: 0.6;
           font-size: 13px;
           white-space: nowrap;
+        }
+        .post-stat {
+          display: flex;
+          align-items: center;
+          opacity: 0.6;
+          font-size: 13px;
+          white-space: nowrap;
+          margin-left: 12px;
+          .iconfont {
+            margin-right: 4px;
+            font-size: 12px;
+          }
         }
       }
     }

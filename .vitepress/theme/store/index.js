@@ -6,9 +6,9 @@ const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|i
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
 const PERSIST_VERSION = 2;
 // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
-const DEFAULT_CHANNEL_MODE = 3;
+const DEFAULT_CHANNEL_MODE = 1;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
-const DEFAULT_DEV_MODE = 2;
+const DEFAULT_DEV_MODE = 1;
 // dev频道合并状态（1 = 未合并，2 = 已合并至beta）
 const DEFAULT_DEV_CHANNEL_MERGED = 0;
 // canary频道合并状态（1 = 未合并，2 = 已合并至beta）
@@ -18,7 +18,14 @@ const DEFAULT_CANARY_CHANNEL_MERGED = 0;
 if (typeof localStorage !== 'undefined') {
   const storedVersion = parseInt(localStorage.getItem('siteDataVersion') || '0', 10);
   if (storedVersion !== PERSIST_VERSION) {
+    const old = JSON.parse(localStorage.getItem('siteData') || '{}');
+    const keep = {
+      channelMode: old.channelMode,
+      siteVersion: old.siteVersion,
+      siteVersionDate: old.siteVersionDate,
+    };
     localStorage.removeItem('siteData');
+    localStorage.setItem('siteData', JSON.stringify(keep));
     localStorage.setItem('siteDataVersion', String(PERSIST_VERSION));
   }
 }
@@ -97,6 +104,8 @@ export const mainStore = defineStore("main", {
       channelMode: DEFAULT_CHANNEL_MODE,
       // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
       devMode: DEFAULT_DEV_MODE,
+      // 开发模式选项展开状态
+      devModeOptionsExpanded: DEFAULT_DEV_MODE === 2,
       // 高对比度模式
       highContrast: false,
       // 站点布局
@@ -139,6 +148,9 @@ export const mainStore = defineStore("main", {
       scheduledLightTime: "07:00",
       scheduledDarkTime: "19:00",
       scheduledThemeTimer: null,
+      // 站点版本信息（运行时覆盖，用于关于本站页面）
+      siteVersion: "V1.2",
+      siteVersionDate: "2026.8.27",
     };
   },
   getters: {
@@ -395,6 +407,7 @@ export const mainStore = defineStore("main", {
         "showMoreSettingsConfirmed",
         "channelMode",
         "devMode",
+        "devModeOptionsExpanded",
         "devChannelMerged",
         "canaryChannelMerged",
         "highContrast",
@@ -425,6 +438,8 @@ export const mainStore = defineStore("main", {
         "scheduledThemeEnabled",
         "scheduledLightTime",
         "scheduledDarkTime",
+        "siteVersion",
+        "siteVersionDate",
       ], 
     },
   ],

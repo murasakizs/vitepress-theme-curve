@@ -17,7 +17,7 @@
         <div v-if="channelMode >= 2 && channelMode <= 4 && store.devMode !== 2" class="set-warn set-warn-channel">
           <span class="warn-text">当前处于测试频道（{{ channelMode === 2 ? 'beta' : channelMode === 3 ? 'dev' : 'canary' }}分支）</span>
         </div>
-        <div v-if="store.devMode === 2" class="set-warn set-warn-dev">
+        <div v-if="store.devMode === 2" class="set-warn">
           <span class="warn-text">当前处于开发模式，提交代码时应退出开发模式</span>
         </div>
         <!-- 开发模式选项 -->
@@ -86,13 +86,13 @@
                 <div class="set-options">
                   <span
                     :class="['options', { choose: devChannelMerged !== 2 }]"
-                    @click="devChannelMerged = 0"
+                    @click="devChannelMerged = 0; saveStoreDefaults({ DEFAULT_DEV_CHANNEL_MERGED: 0, bumpVersion: true })"
                   >
                     off
                   </span>
                   <span
                     :class="['options', { choose: devChannelMerged === 2 }]"
-                    @click="devChannelMerged = 2"
+                    @click="devChannelMerged = 2; saveStoreDefaults({ DEFAULT_DEV_CHANNEL_MERGED: 2, bumpVersion: true })"
                   >
                     on
                   </span>
@@ -103,13 +103,13 @@
                 <div class="set-options">
                   <span
                     :class="['options', { choose: canaryChannelMerged !== 2 }]"
-                    @click="canaryChannelMerged = 0"
+                    @click="canaryChannelMerged = 0; saveStoreDefaults({ DEFAULT_CANARY_CHANNEL_MERGED: 0, bumpVersion: true })"
                   >
                     off
                   </span>
                   <span
                     :class="['options', { choose: canaryChannelMerged === 2 }]"
-                    @click="canaryChannelMerged = 2"
+                    @click="canaryChannelMerged = 2; saveStoreDefaults({ DEFAULT_CANARY_CHANNEL_MERGED: 2, bumpVersion: true })"
                   >
                     on
                   </span>
@@ -120,7 +120,7 @@
                 <div class="set-options">
                   <span
                     class="options"
-                    @click="localStorage.clear(); location.reload();"
+                    @click.stop="handleClearDataKeepChannel"
                   >
                     ok
                   </span>
@@ -131,12 +131,52 @@
                 <div class="set-options">
                   <span
                     class="options"
-                    @click="store.devMode = 1"
+                    @click="closeDevModeConfirmVisible = true"
                   >
                     confirm
                   </span>
                 </div>
               </div>
+              <Transition name="fade-up">
+                <div v-if="closeDevModeConfirmVisible" class="set-warn" style="flex-direction: column; align-items: stretch" @click="closeDevModeConfirmVisible = false">
+                  <template v-if="channelMode === 1">
+                    <div style="display: flex; align-items: center; justify-content: space-between">
+                      <span class="warn-text">when submitting to the release channel, the defined version needs to be updated</span>
+                      <span class="options" @click.stop="confirmCloseDevMode">confirm</span>
+                    </div>
+                    <div class="set-item" style="margin-top: 14px">
+                      <span class="set-label">site version</span>
+                      <div class="set-options">
+                        <input
+                          v-model="siteVersion"
+                          type="text"
+                          style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 30px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                          placeholder="V1.1"
+                          @click.stop
+                        />
+                      </div>
+                    </div>
+                    <div class="set-item">
+                      <span class="set-label">site version date</span>
+                      <div class="set-options">
+                        <input
+                          v-model="siteVersionDate"
+                          type="text"
+                          style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 30px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                          placeholder="2026.8.24"
+                          @click.stop
+                        />
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div style="display: flex; align-items: center; justify-content: space-between">
+                      <span class="warn-text">are you sure you want to turn off development mode</span>
+                      <span class="options" @click.stop="saveStoreDefaults({ DEFAULT_DEV_MODE: 1, bumpVersion: true }); store.devMode = 1; closeDevModeConfirmVisible = false">confirm</span>
+                    </div>
+                  </template>
+                </div>
+              </Transition>
             </div>
           </Transition>
         </template>
@@ -1285,7 +1325,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
 
 // 有效频道模式（响应式）
@@ -1293,8 +1333,10 @@ const effectiveChannelMode = computed(() => store.effectiveChannelMode);
 
 // 切换频道模式并清除旧缓存
 const switchChannelMode = (mode) => {
-  localStorage.setItem('siteData', JSON.stringify({ channelMode: mode }));
-  location.reload();
+  saveStoreDefaults({ DEFAULT_CHANNEL_MODE: mode, bumpVersion: true });
+  const prev = JSON.parse(localStorage.getItem('siteData') || '{}');
+  localStorage.setItem('siteData', JSON.stringify({ ...prev, channelMode: mode }));
+  window.location.reload();
 };
 
 // PWA 缓存增强相关
@@ -1417,10 +1459,11 @@ const moreFontsExpanded = ref(false);
 const islandSettingsExpanded = ref(false);
 // 主题颜色设置展开状态
 const themeColorExpanded = ref(false);
-// 开发模式选项展开状态
-const devModeOptionsExpanded = ref(false);
+// 开发模式选项展开状态（已移至 store 持久化）
 // 显示全部分组（开发模式下展示所有频道分组内容）
 const showAllGroups = ref(false);
+// 关闭开发模式确认提示
+const closeDevModeConfirmVisible = ref(false);
 const themeColorList = [
   { value: 'pink', label: '泠粉' },
   { value: 'purple', label: '幻紫' },
@@ -1454,6 +1497,57 @@ const confirmFontSizeEdit = () => {
 };
 // 恢复默认配置
 
+// 写入 store/index.js 默认值
+const saveStoreDefaults = async (data) => {
+  try {
+    const res = await fetch("/api/theme-config", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!json.ok) console.error("Save failed:", json.error);
+  } catch (e) {
+    console.error("Failed to save store defaults:", e);
+  }
+};
+
+// 关闭开发模式（保存版本到 store/index.js）
+const confirmCloseDevMode = async () => {
+  await saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 1, bumpVersion: true });
+  store.devMode = 1;
+  closeDevModeConfirmVisible.value = false;
+};
+
+// 清除数据但保留当前频道和开发模式选项
+const handleClearDataKeepChannel = async () => {
+  const mode = channelMode.value;
+  const dev = store.devMode;
+  const devExpanded = devModeOptionsExpanded.value;
+  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value };
+  const savedVersion = localStorage.getItem('siteDataVersion');
+  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value });
+  localStorage.clear();
+  sessionStorage.clear();
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (const reg of registrations) {
+        reg.unregister();
+      }
+    });
+  }
+  if ("caches" in window) {
+    caches.keys().then((names) => {
+      for (const name of names) {
+        caches.delete(name);
+      }
+    });
+  }
+  localStorage.setItem("siteData", JSON.stringify(savedData));
+  if (savedVersion) localStorage.setItem("siteDataVersion", savedVersion);
+  window.location.reload();
+};
+
 // 恢复默认配置
 const showResetConfirm = ref(false);
 const resetWarnRef = ref(null);
@@ -1462,8 +1556,14 @@ const scrollToResetWarn = () => {
     resetWarnRef.value?.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 };
-const handleResetConfig = () => {
+const handleResetConfig = async () => {
   showResetConfirm.value = false;
+  const mode = channelMode.value;
+  const dev = store.devMode;
+  const devExpanded = devModeOptionsExpanded.value;
+  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value };
+  const savedVersion = localStorage.getItem('siteDataVersion');
+  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value });
   // 清空 localStorage 和 sessionStorage
   localStorage.clear();
   sessionStorage.clear();
@@ -1482,7 +1582,9 @@ const handleResetConfig = () => {
       }
     });
   }
-  location.reload();
+  localStorage.setItem("siteData", JSON.stringify(savedData));
+  if (savedVersion) localStorage.setItem("siteDataVersion", savedVersion);
+  window.location.reload();
 };
 
 // 显示恢复默认配置警告
@@ -1957,8 +2059,8 @@ watch(
       moreFontsExpanded.value = false;
       islandSettingsExpanded.value = false;
       themeColorExpanded.value = false;
-      devModeOptionsExpanded.value = false;
       showAllGroups.value = false;
+      closeDevModeConfirmVisible.value = false;
       layoutWarnVisible.value = false;
       fontSizeEditing.value = false;
       fontSizeWarnVisible.value = false;
@@ -2208,13 +2310,6 @@ watch(
     cursor: default;
     .warn-text {
       color: var(--main-color);
-    }
-  }
-  .set-warn-dev {
-    background-color: #fef2f2;
-    border-color: #fca5a5;
-    .warn-text {
-      color: #dc2626;
     }
   }
   .set-warn-purple {
@@ -2519,13 +2614,6 @@ html.dark .set-list .set-warn-channel {
     color: var(--main-color);
   }
 }
-html.dark .set-list .set-warn-dev {
-  background-color: #2d1215;
-  border-color: #7f1d1d;
-  .warn-text {
-    color: #fca5a5;
-  }
-}
 html.dark .set-list .set-warn.set-warn-purple {
   background-color: #1e1833;
   border-color: #3b2d6b;
@@ -2634,13 +2722,6 @@ html.dark.high-contrast-max .set-warn-channel {
   border-color: var(--main-color) !important;
   .warn-text {
     color: var(--main-color) !important;
-  }
-}
-html.dark.high-contrast-max .set-warn-dev {
-  background-color: #2d1215 !important;
-  border-color: #7f1d1d !important;
-  .warn-text {
-    color: #fca5a5 !important;
   }
 }
 

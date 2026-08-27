@@ -9,6 +9,9 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import path from "path";
 import fs from "fs-extra";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // 获取全局数据
 const postData = await getAllPosts();
@@ -102,6 +105,42 @@ export default withPwa(
           include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
           dts: ".vitepress/components.d.ts",
         }),
+        {
+          name: "theme-config-api",
+          configureServer(server) {
+            server.middlewares.use("/api/theme-config", (req, res) => {
+              if (req.method !== "POST") {
+                res.statusCode = 405;
+                res.end("Method Not Allowed");
+                return;
+              }
+              let body = "";
+              req.on("data", (chunk) => { body += chunk; });
+              req.on("end", () => {
+                try {
+                  const data = JSON.parse(body);
+                  const storePath = path.resolve(__dirname, "./theme/store/index.js");
+                  let content = fs.readFileSync(storePath, "utf-8");
+                  if (data.siteVersion != null) content = content.replace(/(siteVersion:\s*")[^"]*(")/, `$1${data.siteVersion}$2`);
+                  if (data.siteVersionDate != null) content = content.replace(/(siteVersionDate:\s*")[^"]*(")/, `$1${data.siteVersionDate}$2`);
+                  if (data.DEFAULT_CHANNEL_MODE != null) content = content.replace(/(DEFAULT_CHANNEL_MODE\s*=\s*)\d+/, `$1${data.DEFAULT_CHANNEL_MODE}`);
+                  if (data.DEFAULT_DEV_MODE != null) content = content.replace(/(DEFAULT_DEV_MODE\s*=\s*)\d+/, `$1${data.DEFAULT_DEV_MODE}`);
+                  if (data.DEFAULT_DEV_CHANNEL_MERGED != null) content = content.replace(/(DEFAULT_DEV_CHANNEL_MERGED\s*=\s*)\d+/, `$1${data.DEFAULT_DEV_CHANNEL_MERGED}`);
+                  if (data.DEFAULT_CANARY_CHANNEL_MERGED != null) content = content.replace(/(DEFAULT_CANARY_CHANNEL_MERGED\s*=\s*)\d+/, `$1${data.DEFAULT_CANARY_CHANNEL_MERGED}`);
+                  if (data.bumpVersion) {
+                    content = content.replace(/(PERSIST_VERSION\s*=\s*)(\d+)/, (_, prefix, num) => `${prefix}${parseInt(num) + 1}`);
+                  }
+                  fs.writeFileSync(storePath, content, "utf-8");
+                  res.setHeader("Content-Type", "application/json");
+                  res.end(JSON.stringify({ ok: true }));
+                } catch (e) {
+                  res.statusCode = 500;
+                  res.end(JSON.stringify({ ok: false, error: e.message }));
+                }
+              });
+            });
+          },
+        },
       ],
       resolve: {
         // 配置路径别名

@@ -4,7 +4,7 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 2;
+const PERSIST_VERSION = 18;
 // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
 const DEFAULT_CHANNEL_MODE = 3;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
@@ -196,7 +196,7 @@ export const mainStore = defineStore("main", {
       // 禁止壁纸模式切换
       if (this.backgroundType === "image") {
         if (typeof $message !== "undefined") { 
-          $message.warning("无法在壁纸模式下切换明暗模式");
+          $message.error("无法在壁纸模式下切换明暗模式");
         }
         return false;
       }

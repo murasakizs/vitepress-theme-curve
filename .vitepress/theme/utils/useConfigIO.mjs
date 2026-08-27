@@ -51,7 +51,7 @@ export const useConfigIO = (siteVersion = "V1.0") => {
       const siteData = localStorage.getItem("siteData");
       if (!siteData) {
         if (typeof $message !== "undefined") {
-          $message.warning("没有可导出的配置数据");
+          $message.error("没有可导出的配置数据");
         }
         return;
       }

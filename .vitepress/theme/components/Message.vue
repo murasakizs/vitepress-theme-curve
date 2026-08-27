@@ -27,6 +27,7 @@
           </span>
           <span v-if="messageHtml" class="text" v-html="messageContent"></span>
           <span v-else class="text">{{ messageContent || "默认消息内容" }}</span>
+          <span v-if="messageIsland && islandChannelText" :class="['island-channel', islandChannelClass]">{{ islandChannelText }}</span>
           <span v-if="messageClose" class="close">
             <i class="iconfont icon-close"></i>
           </span>
@@ -164,6 +165,26 @@ const pillText = computed(() => {
   if (mode === 5) return '开发模式';
   const channel = pillChannel.value;
   return channel ? `${channel}.sgexilq.top` : 'sgexilq.top';
+});
+
+// 灵动模式消息末尾的频道文本
+const islandChannelText = computed(() => {
+  const mode = effectiveChannelMode.value;
+  if (mode === 5) return '开发模式';
+  if (mode === 2) return 'beta频道';
+  if (mode === 3) return 'dev频道';
+  if (mode === 4) return 'canary频道';
+  return '';
+});
+
+// 灵动模式频道文本颜色类
+const islandChannelClass = computed(() => {
+  const mode = effectiveChannelMode.value;
+  if (mode === 5) return 'channel-devmode';
+  if (mode === 2) return 'channel-beta';
+  if (mode === 3) return 'channel-dev';
+  if (mode === 4) return 'channel-canary';
+  return '';
 });
 
 // 拓展模式消息数组
@@ -608,6 +629,18 @@ onUnmounted(() => {
       .message-content .text {
         color: #ffffff;
       }
+      .message-content .island-channel {
+        &.channel-beta {
+          color: rgba(144, 147, 153, 0.8);
+        }
+        &.channel-dev,
+        &.channel-canary {
+          color: rgba(230, 162, 60, 0.8);
+        }
+        &.channel-devmode {
+          color: rgba(245, 108, 108, 0.8);
+        }
+      }
       .message-content .close .iconfont {
         color: #ffffff;
       }
@@ -631,9 +664,25 @@ onUnmounted(() => {
       white-space: nowrap;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 10px;
       .text {
         color: var(--main-font-color);
+      }
+      .island-channel {
+        font-size: 14px;
+        margin-left: -6px;
+        &.channel-beta {
+          color: var(--main-info-color);
+        }
+        &.channel-dev,
+        &.channel-canary {
+          color: var(--main-warning-color);
+        }
+        &.channel-devmode {
+          color: var(--main-error-color);
+          font-weight: bold;
+        }
       }
       .close .iconfont {
         color: var(--main-font-color);

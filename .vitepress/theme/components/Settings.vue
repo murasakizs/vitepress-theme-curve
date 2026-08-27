@@ -82,6 +82,23 @@
                 </div>
               </div>
               <div class="set-item">
+                <span class="set-label">expand all settings groups</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: !expandAllGroups }]"
+                    @click="handleCollapseAllGroups"
+                  >
+                    off
+                  </span>
+                  <span
+                    :class="['options', { choose: expandAllGroups }]"
+                    @click="handleExpandAllGroups"
+                  >
+                    on
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
                 <span class="set-label">dev no content</span>
                 <div class="set-options">
                   <span
@@ -367,7 +384,7 @@
               <div class="set-options">
                 <span
                   :class="['options', { choose: moreFontsExpanded }]"
-                  @click="moreFontsExpanded = !moreFontsExpanded"
+                  @click="handleMoreFontsClick"
                 >
                   {{ moreFontsExpanded ? '收起' : '展开' }}
                 </span>
@@ -413,6 +430,39 @@
                   </div>
                 </Transition>
               </div>
+            </Transition>
+            <!-- 开发模式入口 -->
+            <Transition name="fade-up">
+              <template v-if="devModeEntryVisible">
+                <div v-if="devModeEntrySuccess" class="set-warn">
+                  <span class="warn-text">success</span>
+                  <span class="options" @click="devModeEntryClose">ok</span>
+                </div>
+                <div v-else-if="devModeEntryError" class="set-warn">
+                  <span class="warn-text">error</span>
+                  <span class="options" @click="devModeEntryClose">ok</span>
+                </div>
+                <div v-else-if="devModeEntryStep === 0" class="set-item">
+                  <span class="set-label" style="color: var(--main-error-color)">confirm entry into development mode</span>
+                  <div class="set-options">
+                    <span class="options" @click="devModeEntryClose">no</span>
+                    <span class="options devmode-yes-btn" @click="devModeEntryStep = 1">yes</span>
+                  </div>
+                </div>
+                <div v-else-if="devModeEntryStep === 1" class="set-item">
+                  <span class="set-label" style="color: var(--main-error-color)">verification required</span>
+                  <div class="set-options">
+                    <input
+                      v-model="devModeEntryInput"
+                      class="devmode-entry-input"
+                      type="text"
+                      placeholder="verification code"
+                      @keyup.enter="devModeEntryVerify"
+                    />
+                    <span class="options devmode-yes-btn" @click="devModeEntryVerify">continue</span>
+                  </div>
+                </div>
+              </template>
             </Transition>
             <span class="title">实验性功能</span>
             <span class="set-desc">以下选项处于实验性阶段，可能出现未知的问题</span>
@@ -1455,8 +1505,41 @@ const handleLayoutOk = () => {
 // 消息设置展开状态
 const messageSettingsExpanded = ref(false);
 const moreFontsExpanded = ref(false);
+// 开发模式入口
+const devModeEntryClickCount = ref(0);
+const devModeEntryVisible = ref(false);
+const devModeEntryStep = ref(0);
+const devModeEntryInput = ref('');
+const devModeEntryError = ref(false);
+const devModeEntrySuccess = ref(false);
 // 超级岛设置展开状态
 const islandSettingsExpanded = ref(false);
+// 展开所有设置分组
+const expandAllGroups = ref(false);
+const handleExpandAllGroups = () => {
+  expandAllGroups.value = true;
+  showMoreSettings.value = true;
+  showMoreSettingsConfirmed.value = true;
+  moreFontsExpanded.value = true;
+  messageSettingsExpanded.value = true;
+  islandSettingsExpanded.value = true;
+  betaChannelExpanded.value = true;
+  devChannelExpanded.value = true;
+  canaryChannelExpanded.value = true;
+};
+const handleCollapseAllGroups = () => {
+  expandAllGroups.value = false;
+  showMoreSettings.value = false;
+  showMoreSettingsConfirmed.value = false;
+  moreFontsExpanded.value = false;
+  messageSettingsExpanded.value = false;
+  islandSettingsExpanded.value = false;
+  // 频道展开状态恢复为默认：当前频道展开，其他关闭
+  const mode = channelMode.value;
+  betaChannelExpanded.value = mode === 2;
+  devChannelExpanded.value = mode === 3;
+  canaryChannelExpanded.value = mode === 4;
+};
 // 主题颜色设置展开状态
 const themeColorExpanded = ref(false);
 // 开发模式选项展开状态（已移至 store 持久化）
@@ -1477,6 +1560,55 @@ const fontSizeEditing = ref(false);
 const fontSizeWarnVisible = ref(false);
 const removeAnimationsWarnVisible = ref(false);
 const showMoreSettingsWarnVisible = ref(false);
+
+// 开发模式入口方法
+const handleMoreFontsClick = () => {
+  moreFontsExpanded.value = !moreFontsExpanded.value;
+  devModeEntryClickCount.value++;
+
+  // 10秒内按12下展示开发模式入口
+  if (devModeEntryClickCount.value >= 12 && store.devMode !== 2) {
+    devModeEntryVisible.value = true;
+    devModeEntryStep.value = 0;
+    devModeEntryError.value = false;
+    devModeEntrySuccess.value = false;
+    devModeEntryInput.value = '';
+  }
+
+  // 10秒内没有继续点击则重置计数
+  setTimeout(() => {
+    if (devModeEntryClickCount.value < 12) {
+      devModeEntryClickCount.value = 0;
+    }
+  }, 10000);
+};
+
+const devModeEntryVerify = () => {
+  if (devModeEntryInput.value === 'devyes') {
+    devModeEntrySuccess.value = true;
+    devModeEntryError.value = false;
+  } else {
+    devModeEntryError.value = true;
+    devModeEntryInput.value = '';
+  }
+};
+
+const devModeEntryClose = () => {
+  if (devModeEntrySuccess.value) {
+    store.devMode = 2;
+    saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 2, bumpVersion: true });
+    if (typeof $message !== "undefined") {
+      $message.success("开发模式已启用");
+    }
+  }
+  devModeEntryVisible.value = false;
+  devModeEntryClickCount.value = 0;
+  devModeEntryStep.value = 0;
+  devModeEntryInput.value = '';
+  devModeEntryError.value = false;
+  devModeEntrySuccess.value = false;
+};
+
 const resetFontSize = () => {
   store.fontSize = 17;
   if (typeof document !== 'undefined') {
@@ -1517,10 +1649,16 @@ const confirmCloseDevMode = async () => {
   await saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 1, bumpVersion: true });
   store.devMode = 1;
   closeDevModeConfirmVisible.value = false;
+  if (typeof $message !== "undefined") {
+    $message.warning("已关闭开发模式");
+  }
 };
 
 // 清除数据但保留当前频道和开发模式选项
 const handleClearDataKeepChannel = async () => {
+  if (typeof $message !== "undefined") {
+    $message.warning("数据已清除，页面即将刷新");
+  }
   const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
@@ -1558,6 +1696,9 @@ const scrollToResetWarn = () => {
 };
 const handleResetConfig = async () => {
   showResetConfirm.value = false;
+  if (typeof $message !== "undefined") {
+    $message.warning("配置已恢复默认，页面即将刷新");
+  }
   const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
@@ -2302,6 +2443,27 @@ watch(
         background-color: transparent;
         box-shadow: none;
       }
+    }
+  }
+  .devmode-entry-input {
+    padding: 6px 10px;
+    border: 1px solid var(--main-card-border);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    background-color: var(--main-card-background);
+    color: var(--main-font-color);
+    outline: none;
+    min-width: 140px;
+    margin: 4px 8px;
+    &:focus {
+      border-color: var(--main-color);
+    }
+  }
+  .devmode-yes-btn {
+    background-color: var(--main-error-color) !important;
+    color: #fff !important;
+    &:hover {
+      background-color: color-mix(in srgb, var(--main-error-color) 80%, #000) !important;
     }
   }
   .set-warn-channel {

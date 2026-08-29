@@ -133,4 +133,10 @@ export const getWeather = async (key, city) => {
   return await res.json();
 };
 
+// 获取 wttr.in 天气信息（无需 API Key）
+export const getWeatherWttr = async (city) => {
+  const res = await fetch(`https://wttr.in/${encodeURIComponent(city)}?format=j1`);
+  return await res.json();
+};
+
 

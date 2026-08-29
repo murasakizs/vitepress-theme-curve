@@ -41,10 +41,12 @@
 </template>
 
 <script setup>
-import { getAdcode, getWeather } from '@/api'
+import { getAdcode, getWeather, getWeatherWttr } from '@/api'
 import { useIsMobileLayout } from "@/utils/layout.js";
+import { mainStore } from '@/store';
 
 const isMobileLayout = useIsMobileLayout();
+const store = mainStore();
 
 // 声明会在请求出错时抛出的事件
 const emit = defineEmits(['fetch-error'])
@@ -53,19 +55,52 @@ const weatherData = ref(null)
 const loading     = ref(true)
 const error       = ref(false)
 
+// 高德 API 的中文城市名 -> 英文（wttr.in 需要英文城市名）
+const AMAP_CITY_MAP = {
+  '北京': 'Beijing', '上海': 'Shanghai', '广州': 'Guangzhou', '深圳': 'Shenzhen',
+  '杭州': 'Hangzhou', '成都': 'Chengdu', '武汉': 'Wuhan', '南京': 'Nanjing',
+  '重庆': 'Chongqing', '西安': "Xi'an", '苏州': 'Suzhou', '天津': 'Tianjin',
+  '郑州': 'Zhengzhou', '长沙': 'Changsha', '东莞': 'Dongguan', '沈阳': 'Shenyang',
+  '青岛': 'Qingdao', '合肥': 'Hefei', '佛山': 'Foshan', '宁波': 'Ningbo',
+  '昆明': 'Kunming', '大连': 'Dalian', '厦门': 'Xiamen', '哈尔滨': 'Harbin',
+  '济南': 'Jinan', '福州': 'Fuzhou', '无锡': 'Wuxi', '长春': 'Changchun',
+  '石家庄': 'Shijiazhuang', '常州': 'Changzhou', '南宁': 'Nanning', '贵阳': 'Guiyang',
+  '南昌': 'Nanchang', '太原': 'Taiyuan', '乌鲁木齐': 'Urumqi', '兰州': 'Lanzhou',
+  '海口': 'Haikou', '呼和浩特': 'Hohhot', '银川': 'Yinchuan', '西宁': 'Xining',
+  '拉萨': 'Lhasa', '香港': 'Hong Kong', '澳门': 'Macao', '台北': 'Taipei',
+};
+
 onMounted(async () => {
   if (isMobileLayout.value) {
     loading.value = false
     return
   }
   try {
-    const { adcode }        = await getAdcode(import.meta.env.VITE_WEATHER_KEY)
-    const { lives }         = await getWeather(import.meta.env.VITE_WEATHER_KEY, adcode)
-    weatherData.value       = lives[0]
+    if (store.weatherProvider === 'wttr') {
+      // wttr.in：先通过高德 API 获取城市名，再查询 wttr.in
+      const adcodeData = await getAdcode(import.meta.env.VITE_WEATHER_KEY)
+      const cityName = adcodeData.city || '北京'
+      const englishCity = AMAP_CITY_MAP[cityName] || cityName
+      const data = await getWeatherWttr(englishCity)
+      const current = data?.current_condition?.[0]
+      if (current) {
+        weatherData.value = {
+          city: data?.nearest_area?.[0]?.areaName?.[0]?.value || cityName,
+          temperature: current.temp_C,
+          humidity: current.humidity,
+          winddirection: current.winddir16Point,
+          windpower: current.windspeedKmph + ' km/h',
+        }
+      }
+    } else {
+      // 高德 API（默认）
+      const { adcode }  = await getAdcode(import.meta.env.VITE_WEATHER_KEY)
+      const { lives }   = await getWeather(import.meta.env.VITE_WEATHER_KEY, adcode)
+      weatherData.value = lives?.[0]
+    }
   } catch (e) {
     console.error('获取天气失败：', e)
     error.value = true
-    // 向父组件抛出“fetch-error”事件
     emit('fetch-error', e)
   } finally {
     loading.value = false
@@ -103,6 +138,3 @@ onMounted(async () => {
   }
 }
 </style>
-
-
-

@@ -4,11 +4,11 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 2;
+const PERSIST_VERSION = 1;
 // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
 const DEFAULT_CHANNEL_MODE = 3;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
-const DEFAULT_DEV_MODE = 2;
+const DEFAULT_DEV_MODE = 1;
 // dev频道合并状态（1 = 未合并，2 = 已合并至beta）
 const DEFAULT_DEV_CHANNEL_MERGED = 0;
 // canary频道合并状态（1 = 未合并，2 = 已合并至beta）
@@ -143,6 +143,8 @@ export const mainStore = defineStore("main", {
       imageLazyEnabled: true,
       imageWebpEnabled: false,
       imageLightboxEnabled: true,
+      // 天气数据提供方（amap = 高德，wttr = wttr.in）
+      weatherProvider: "wttr",
       // 定时切换明暗显示外观
       scheduledThemeEnabled: false,
       scheduledLightTime: "07:00",
@@ -435,6 +437,7 @@ export const mainStore = defineStore("main", {
         "imageLazyEnabled",
         "imageWebpEnabled",
         "imageLightboxEnabled",
+        "weatherProvider",
         "scheduledThemeEnabled",
         "scheduledLightTime",
         "scheduledDarkTime",

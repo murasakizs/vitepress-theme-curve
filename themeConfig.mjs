@@ -115,7 +115,7 @@ export const themeConfig = {
   comment: {
     enable: true,
     type: "artalk",
-    artalk: { site: "泠の小站", server: "" }, // TODO: 填入 Artalk 服务端地址
+    artalk: { site: "泠の小站", server: "https://myartalkapi.sgexilq.top" },
   },
 
   // ===== 侧边栏 =====

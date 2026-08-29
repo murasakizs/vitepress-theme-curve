@@ -96,7 +96,7 @@ export const themeConfig = {
         items: [
           { text: "关于泠酱", link: "/pages/about-me" },
           { text: "关于本站", link: "/pages/about-website" },
-          { text: "友情链接", link: "/pages/friend-link" },
+          { text: "友情链接", link: "/pages/link" },
           { text: "TO DO", link: "/pages/todo" },
         ],
       },

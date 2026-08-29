@@ -4,11 +4,11 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 18;
+const PERSIST_VERSION = 2;
 // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
 const DEFAULT_CHANNEL_MODE = 3;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
-const DEFAULT_DEV_MODE = 1;
+const DEFAULT_DEV_MODE = 2;
 // dev频道合并状态（1 = 未合并，2 = 已合并至beta）
 const DEFAULT_DEV_CHANNEL_MERGED = 0;
 // canary频道合并状态（1 = 未合并，2 = 已合并至beta）

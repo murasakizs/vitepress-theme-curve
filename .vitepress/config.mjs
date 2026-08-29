@@ -127,7 +127,9 @@ export default withPwa(
                   if (data.DEFAULT_DEV_MODE != null) content = content.replace(/(DEFAULT_DEV_MODE\s*=\s*)\d+/, `$1${data.DEFAULT_DEV_MODE}`);
                   if (data.DEFAULT_DEV_CHANNEL_MERGED != null) content = content.replace(/(DEFAULT_DEV_CHANNEL_MERGED\s*=\s*)\d+/, `$1${data.DEFAULT_DEV_CHANNEL_MERGED}`);
                   if (data.DEFAULT_CANARY_CHANNEL_MERGED != null) content = content.replace(/(DEFAULT_CANARY_CHANNEL_MERGED\s*=\s*)\d+/, `$1${data.DEFAULT_CANARY_CHANNEL_MERGED}`);
-                  if (data.bumpVersion) {
+                  if (data.resetVersion) {
+                    content = content.replace(/(PERSIST_VERSION\s*=\s*)\d+/, `$1${data.resetVersion}`);
+                  } else if (data.bumpVersion) {
                     content = content.replace(/(PERSIST_VERSION\s*=\s*)(\d+)/, (_, prefix, num) => `${prefix}${parseInt(num) + 1}`);
                   }
                   fs.writeFileSync(storePath, content, "utf-8");

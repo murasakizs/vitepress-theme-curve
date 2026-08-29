@@ -189,7 +189,7 @@
                   <template v-else>
                     <div style="display: flex; align-items: center; justify-content: space-between">
                       <span class="warn-text">are you sure you want to turn off development mode</span>
-                      <span class="options" @click.stop="saveStoreDefaults({ DEFAULT_DEV_MODE: 1, bumpVersion: true }); store.devMode = 1; closeDevModeConfirmVisible = false">confirm</span>
+                      <span class="options" @click.stop="saveStoreDefaults({ DEFAULT_DEV_MODE: 1, resetVersion: 1 }); store.devMode = 1; closeDevModeConfirmVisible = false">confirm</span>
                     </div>
                   </template>
                 </div>
@@ -434,9 +434,9 @@
             <!-- 开发模式入口 -->
             <Transition name="fade-up">
               <template v-if="devModeEntryVisible">
-                <div v-if="devModeEntrySuccess" class="set-warn">
+                <div v-if="devModeEntrySuccess" class="set-warn" @click="devModeEntryClose" style="cursor: pointer">
                   <span class="warn-text">success</span>
-                  <span class="options" @click="devModeEntryClose">ok</span>
+                  <span class="options">ok</span>
                 </div>
                 <div v-else-if="devModeEntryError" class="set-warn">
                   <span class="warn-text">error</span>
@@ -1646,7 +1646,7 @@ const saveStoreDefaults = async (data) => {
 
 // 关闭开发模式（保存版本到 store/index.js）
 const confirmCloseDevMode = async () => {
-  await saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 1, bumpVersion: true });
+  await saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 1, resetVersion: 1 });
   store.devMode = 1;
   closeDevModeConfirmVisible.value = false;
   if (typeof $message !== "undefined") {

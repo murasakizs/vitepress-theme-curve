@@ -143,8 +143,18 @@ export const mainStore = defineStore("main", {
       imageLazyEnabled: true,
       imageWebpEnabled: false,
       imageLightboxEnabled: true,
-      // 天气数据提供方（amap = 高德，wttr = wttr.in）
-      weatherProvider: "wttr",
+      // 天气小组件开关
+      weatherWidgetEnabled: true,
+      // 天气小组件折叠状态
+      weatherSectionExpanded: false,
+      // 天气数据源（amap = 高德，wttr = wttr.in，openmeteo = Open-Meteo）
+      weatherProvider: "amap",
+      // 天气定位方式（satellite = 卫星定位，ip = IP定位，manual = 手动输入）
+      weatherLocationMode: "ip",
+      // 手动输入的城市名
+      weatherManualCity: "",
+      // 天气刷新触发器（手动输入确认时 +1）
+      weatherRefreshTrigger: 0,
       // 定时切换明暗显示外观
       scheduledThemeEnabled: false,
       scheduledLightTime: "07:00",
@@ -438,6 +448,9 @@ export const mainStore = defineStore("main", {
         "imageWebpEnabled",
         "imageLightboxEnabled",
         "weatherProvider",
+        "weatherLocationMode",
+        "weatherManualCity",
+        "weatherWidgetEnabled",
         "scheduledThemeEnabled",
         "scheduledLightTime",
         "scheduledDarkTime",

@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { getAdcode, getWeather, getWeatherWttr } from '@/api'
+import { getAdcode, getWeather, getWeatherWttr, getWeatherOpenMeteo, getCityByCoords } from '@/api'
 import { useIsMobileLayout } from "@/utils/layout.js";
 import { mainStore } from '@/store';
 
@@ -70,22 +70,96 @@ const AMAP_CITY_MAP = {
   '拉萨': 'Lhasa', '香港': 'Hong Kong', '澳门': 'Macao', '台北': 'Taipei',
 };
 
-onMounted(async () => {
-  if (isMobileLayout.value) {
-    loading.value = false
-    return
+// 根据定位方式获取城市信息 { city, lat, lon }
+const getCityInfo = async () => {
+  const mode = store.weatherLocationMode;
+
+  if (mode === 'manual') {
+    return { city: store.weatherManualCity || '北京', lat: null, lon: null };
   }
+
+  if (mode === 'satellite') {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve({ city: '北京', lat: null, lon: null });
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          resolve({ city: null, lat: pos.coords.latitude, lon: pos.coords.longitude });
+        },
+        () => {
+          resolve(null); // 回退到 IP
+        },
+        { timeout: 5000 }
+      );
+    }).then(async (result) => {
+      if (result === null) {
+        const { city } = await getAdcode(import.meta.env.VITE_WEATHER_KEY);
+        return { city: city || '北京', lat: null, lon: null };
+      }
+      // 卫星定位成功，尝试获取城市名
+      if (result.lat != null) {
+        try {
+          const cityName = await getCityByCoords(result.lat, result.lon);
+          return { city: cityName || '北京', lat: result.lat, lon: result.lon };
+        } catch {
+          return { city: '北京', lat: result.lat, lon: result.lon };
+        }
+      }
+      return result;
+    });
+  }
+
+  // 默认 IP 定位
+  const { city } = await getAdcode(import.meta.env.VITE_WEATHER_KEY);
+  return { city: city || '北京', lat: null, lon: null };
+};
+
+// 中文城市名转英文
+const toEnglishCity = (name) => AMAP_CITY_MAP[name] || name;
+
+// 获取天气数据的核心逻辑
+const fetchWeather = async (showMsg = false) => {
+  loading.value = true;
+  error.value = false;
   try {
-    if (store.weatherProvider === 'wttr') {
-      // wttr.in：先通过高德 API 获取城市名，再查询 wttr.in
-      const adcodeData = await getAdcode(import.meta.env.VITE_WEATHER_KEY)
-      const cityName = adcodeData.city || '北京'
-      const englishCity = AMAP_CITY_MAP[cityName] || cityName
-      const data = await getWeatherWttr(englishCity)
+    const { city, lat, lon } = await getCityInfo();
+    const provider = store.weatherProvider;
+
+    if (provider === 'openmeteo') {
+      // Open-Meteo：优先使用坐标，没有坐标时通过城市名查询
+      let queryLat = lat, queryLon = lon;
+      if (queryLat == null) {
+        // 用 geocoding API 将城市名转坐标
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
+        const geoData = await geoRes.json();
+        queryLat = geoData?.results?.[0]?.latitude;
+        queryLon = geoData?.results?.[0]?.longitude;
+      }
+      if (queryLat != null && queryLon != null) {
+        const data = await getWeatherOpenMeteo(queryLat, queryLon);
+        const c = data?.current;
+        if (c) {
+          // WMO 天气代码转描述
+          const WMO_DESC = { 0: '晴', 1: '大部晴', 2: '多云', 3: '阴', 45: '雾', 48: '雾凇', 51: '小毛毛雨', 53: '毛毛雨', 55: '大毛毛雨', 61: '小雨', 63: '中雨', 65: '大雨', 71: '小雪', 73: '中雪', 75: '大雪', 80: '小阵雨', 81: '阵雨', 82: '大阵雨', 85: '小阵雪', 86: '大阵雪', 95: '雷暴', 96: '雷暴+小冰雹', 99: '雷暴+大冰雹' };
+          weatherData.value = {
+            city: city,
+            temperature: c.temperature_2m,
+            humidity: c.relative_humidity_2m,
+            winddirection: c.wind_direction_10m + '°',
+            windpower: c.wind_speed_10m + ' km/h',
+          }
+        }
+      }
+    } else if (provider === 'wttr') {
+      // wttr.in
+      const englishCity = toEnglishCity(city);
+      const data = await getWeatherWttr(englishCity);
       const current = data?.current_condition?.[0]
       if (current) {
         weatherData.value = {
-          city: data?.nearest_area?.[0]?.areaName?.[0]?.value || cityName,
+          city: data?.nearest_area?.[0]?.areaName?.[0]?.value || city,
           temperature: current.temp_C,
           humidity: current.humidity,
           winddirection: current.winddir16Point,
@@ -93,18 +167,74 @@ onMounted(async () => {
         }
       }
     } else {
-      // 高德 API（默认）
-      const { adcode }  = await getAdcode(import.meta.env.VITE_WEATHER_KEY)
-      const { lives }   = await getWeather(import.meta.env.VITE_WEATHER_KEY, adcode)
-      weatherData.value = lives?.[0]
+      // 高德 API，超时或失败时回退到 wttr.in
+      try {
+        const queryCity = store.weatherLocationMode === 'manual' ? city : (
+          await Promise.race([
+            getAdcode(import.meta.env.VITE_WEATHER_KEY),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+          ])
+        ).adcode;
+        const { lives } = await Promise.race([
+          getWeather(import.meta.env.VITE_WEATHER_KEY, queryCity),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+        ]);
+        weatherData.value = lives?.[0];
+      } catch {
+        // 高德超时或失败，回退 wttr.in
+        const data = await getWeatherWttr(toEnglishCity(city));
+        const current = data?.current_condition?.[0];
+        if (current) {
+          weatherData.value = {
+            city: data?.nearest_area?.[0]?.areaName?.[0]?.value || city,
+            temperature: current.temp_C,
+            humidity: current.humidity,
+            winddirection: current.winddir16Point,
+            windpower: current.windspeedKmph + ' km/h',
+          }
+        }
+      }
+    }
+    if (showMsg && typeof $message !== 'undefined') {
+      $message.success('天气数据已刷新');
     }
   } catch (e) {
     console.error('获取天气失败：', e)
     error.value = true
     emit('fetch-error', e)
+    if (showMsg && typeof $message !== 'undefined') {
+      $message.error('天气数据刷新失败');
+    }
   } finally {
     loading.value = false
   }
+};
+
+// 监听天气配置变化，立即刷新
+watch(
+  () => store.weatherProvider,
+  () => fetchWeather(true),
+);
+watch(
+  () => store.weatherLocationMode,
+  (mode) => { if (mode !== 'manual') fetchWeather(true); },
+);
+watch(
+  () => store.weatherRefreshTrigger,
+  () => fetchWeather(true),
+);
+
+// 监听全局刷新事件（设置弹窗可能在组件未挂载时触发）
+const onWeatherRefresh = () => fetchWeather(true);
+onMounted(() => window.addEventListener('weather-refresh', onWeatherRefresh));
+onBeforeUnmount(() => window.removeEventListener('weather-refresh', onWeatherRefresh));
+
+onMounted(async () => {
+  if (isMobileLayout.value) {
+    loading.value = false
+    return
+  }
+  await fetchWeather();
 })
 </script>
 

@@ -139,4 +139,21 @@ export const getWeatherWttr = async (city) => {
   return await res.json();
 };
 
+// 获取 Open-Meteo 天气信息（无需 API Key，需要经纬度）
+export const getWeatherOpenMeteo = async (lat, lon) => {
+  const res = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code`,
+  );
+  return await res.json();
+};
+
+// 根据经纬度获取城市名（Open-Meteo 逆地理编码）
+export const getCityByCoords = async (lat, lon) => {
+  const res = await fetch(
+    `https://geocoding-api.open-meteo.com/v1/search?name=&latitude=${lat}&longitude=${lon}&count=1&language=zh`,
+  );
+  const data = await res.json();
+  return data?.results?.[0]?.name || null;
+};
+
 

@@ -1062,22 +1062,101 @@
                     </div>
                   </div>
                   <div class="set-item">
-                    <span class="set-label">天气数据提供方</span>
+                    <span class="set-label">天气小组件</span>
                     <div class="set-options">
                       <span
-                        :class="['options', { choose: weatherProvider === 'amap' }]"
-                        @click="weatherProvider = 'amap'"
+                        :class="['options', { choose: weatherSectionExpanded }]"
+                        @click="weatherSectionExpanded = !weatherSectionExpanded"
                       >
-                        高德
-                      </span>
-                      <span
-                        :class="['options', { choose: weatherProvider === 'wttr' }]"
-                        @click="weatherProvider = 'wttr'"
-                      >
-                        wttr.in
+                        {{ weatherSectionExpanded ? '收起' : '展开' }}
                       </span>
                     </div>
                   </div>
+                  <Transition name="fade-up">
+                    <div v-if="weatherSectionExpanded" class="set-expand-box">
+                      <div class="set-item">
+                        <span class="set-label">天气小组件</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !weatherWidgetEnabled }]"
+                            @click="weatherWidgetEnabled = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherWidgetEnabled }]"
+                            @click="weatherWidgetEnabled = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">定位方式</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: weatherLocationMode === 'satellite' }]"
+                            @click="switchLocationMode('satellite', '自动')"
+                          >
+                            自动
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherLocationMode === 'ip' }]"
+                            @click="switchLocationMode('ip', 'IP地址')"
+                          >
+                            IP地址
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherLocationMode === 'manual' }]"
+                            @click="switchLocationMode('manual', '自定义')"
+                          >
+                            自定义
+                          </span>
+                        </div>
+                      </div>
+                      <div v-if="weatherLocationMode === 'manual'" class="set-item">
+                        <span class="set-label">城市名称</span>
+                        <div class="set-options">
+                          <input
+                            v-model="weatherManualCity"
+                            type="text"
+                            style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 80px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                            placeholder="例如：苏州"
+                            @keyup.enter="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
+                          />
+                          <span
+                            class="options"
+                            @click="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
+                          >
+                            确认
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">天气数据源</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: weatherProvider === 'amap' }]"
+                            @click="switchWeatherProvider('amap')"
+                          >
+                            高德
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherProvider === 'wttr' }]"
+                            @click="switchWeatherProvider('wttr')"
+                          >
+                            wttr.in
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherProvider === 'openmeteo' }]"
+                            @click="switchWeatherProvider('openmeteo')"
+                          >
+                            Open-Meteo
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
 
                   </template>
                 </div>
@@ -1392,7 +1471,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
 
 // 有效频道模式（响应式）
@@ -1658,6 +1737,24 @@ const saveStoreDefaults = async (data) => {
     if (!json.ok) console.error("Save failed:", json.error);
   } catch (e) {
     console.error("Failed to save store defaults:", e);
+  }
+};
+
+// 切换天气定位方式
+const switchLocationMode = (mode, label) => {
+  weatherLocationMode.value = mode;
+  window.dispatchEvent(new Event('weather-refresh'));
+  if (typeof $message !== 'undefined') {
+    $message.success(`天气定位方式已切换为 ${label}`);
+  }
+};
+
+// 切换天气数据提供商
+const switchWeatherProvider = (provider) => {
+  weatherProvider.value = provider;
+  window.dispatchEvent(new Event('weather-refresh'));
+  if (typeof $message !== 'undefined') {
+    $message.success('已切换天气数据源');
   }
 };
 

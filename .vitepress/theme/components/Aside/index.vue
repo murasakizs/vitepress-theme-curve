@@ -4,7 +4,7 @@
     <div class="sticky">
       <Toc v-if="theme.aside.toc.enable && showToc" class="weidgets" />
   <Weather
-    v-if="theme.aside.weather.enable && showWeather"
+    v-if="theme.aside.weather.enable && store.weatherWidgetEnabled"
     class="weidgets"
     @fetch-error="onWeatherError"
   />
@@ -22,7 +22,9 @@
 </template>
 
 <script setup>
+import { mainStore } from "@/store";
 const { theme } = useData();
+const store = mainStore();
 const props = defineProps({
   // 显示目录
   showToc: {
@@ -31,14 +33,12 @@ const props = defineProps({
   },
 });
 
-// 已有：天气组件的显示开关
-const showWeather = ref(true)
 // 新增：热榜组件的显示开关
 const showHot = ref(true)
-// 一旦收到子组件的 fetch-error 事件，就把 showWeather 置为 false
+// 天气组件获取失败时关闭小组件
 function onWeatherError(err) {
   console.error('天气组件获取失败：', err)
-  showWeather.value = false
+  store.weatherWidgetEnabled = false
 }
 
 function onHotError(err) {

@@ -1779,22 +1779,38 @@ const handleClearDataKeepChannel = async () => {
   const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value };
   const savedVersion = localStorage.getItem('siteDataVersion');
   saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value });
+
+  // 清除 localStorage 和 sessionStorage
   localStorage.clear();
   sessionStorage.clear();
+
+  // 注销所有 Service Worker
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      for (const reg of registrations) {
-        reg.unregister();
-      }
-    });
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const reg of registrations) {
+      await reg.unregister();
+    }
   }
+
+  // 清除所有 Cache API 缓存
   if ("caches" in window) {
-    caches.keys().then((names) => {
-      for (const name of names) {
-        caches.delete(name);
-      }
-    });
+    const names = await caches.keys();
+    for (const name of names) {
+      await caches.delete(name);
+    }
   }
+
+  // 清除所有 IndexedDB
+  if ("indexedDB" in window) {
+    const databases = await indexedDB.databases();
+    for (const db of databases) {
+      if (db.name) {
+        indexedDB.deleteDatabase(db.name);
+      }
+    }
+  }
+
+  // 恢复保留的数据
   localStorage.setItem("siteData", JSON.stringify(savedData));
   if (savedVersion) localStorage.setItem("siteDataVersion", savedVersion);
   window.location.reload();
@@ -1822,20 +1838,28 @@ const handleResetConfig = async () => {
   // 清空 localStorage 和 sessionStorage
   localStorage.clear();
   sessionStorage.clear();
-  // 注销 Service Worker 并清除缓存
+  // 注销所有 Service Worker
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      for (const reg of registrations) {
-        reg.unregister();
-      }
-    });
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const reg of registrations) {
+      await reg.unregister();
+    }
   }
+  // 清除所有 Cache API 缓存
   if ("caches" in window) {
-    caches.keys().then((names) => {
-      for (const name of names) {
-        caches.delete(name);
+    const names = await caches.keys();
+    for (const name of names) {
+      await caches.delete(name);
+    }
+  }
+  // 清除所有 IndexedDB
+  if ("indexedDB" in window) {
+    const databases = await indexedDB.databases();
+    for (const db of databases) {
+      if (db.name) {
+        indexedDB.deleteDatabase(db.name);
       }
-    });
+    }
   }
   localStorage.setItem("siteData", JSON.stringify(savedData));
   if (savedVersion) localStorage.setItem("siteDataVersion", savedVersion);

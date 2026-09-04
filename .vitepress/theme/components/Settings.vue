@@ -1006,22 +1006,71 @@
                     </div>
                   </div>
                   <div class="set-item">
-                    <span class="set-label">播放器</span>
+                    <span class="set-label">音乐播放器</span>
                     <div class="set-options">
                       <span
-                        :class="['options', { choose: !playerShow }]"
-                        @click="playerShow = false"
+                        :class="['options', { choose: musicPlayerExpanded }]"
+                        @click="musicPlayerExpanded = !musicPlayerExpanded"
                       >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: playerShow }]"
-                        @click="playerShow = true"
-                      >
-                        开启
+                        {{ musicPlayerExpanded ? '收起' : '展开' }}
                       </span>
                     </div>
                   </div>
+                  <Transition name="fade-up">
+                    <div v-if="musicPlayerExpanded" class="set-expand-box">
+                      <div class="set-item">
+                        <span class="set-label">音乐播放器</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !playerShow }]"
+                            @click="playerShow = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: playerShow }]"
+                            @click="playerShow = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">进入站点自动播放音乐</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !playerAutoPlay }]"
+                            @click="playerAutoPlay = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: playerAutoPlay }]"
+                            @click="playerAutoPlay = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">随机顺序播放</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !playerShuffle }]"
+                            @click="playerShuffle = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: playerShuffle }]"
+                            @click="playerShuffle = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
                   <div class="set-item">
                     <span class="set-label">定时切换明暗显示外观</span>
                     <div class="set-options">
@@ -1471,7 +1520,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerShuffle, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
 
 // 有效频道模式（响应式）
@@ -1610,6 +1659,8 @@ const devModeEntryError = ref(false);
 const devModeEntrySuccess = ref(false);
 // 超级岛设置展开状态
 const islandSettingsExpanded = ref(false);
+// 音乐播放器设置展开状态
+const musicPlayerExpanded = ref(false);
 // 展开所有设置分组
 const expandAllGroups = ref(false);
 const handleExpandAllGroups = () => {
@@ -2338,6 +2389,7 @@ watch(
       moreFontsExpanded.value = false;
       islandSettingsExpanded.value = false;
       themeColorExpanded.value = false;
+      musicPlayerExpanded.value = false;
       showAllGroups.value = false;
       closeDevModeConfirmVisible.value = false;
       layoutWarnVisible.value = false;

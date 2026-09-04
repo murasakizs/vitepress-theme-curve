@@ -47,7 +47,7 @@ import "aplayer/dist/APlayer.min.css";
 const store = mainStore();
 const { theme } = useData();
 const { enable, url, id, server, type } = theme.value.music;
-const { playerShow, playerVolume, playState, playerData } = storeToRefs(store);
+const { playerShow, playerAutoPlay, playerShuffle, playerVolume, playState, playerData } = storeToRefs(store);
 
 // APlayer
 const player = ref(null);
@@ -144,6 +144,27 @@ const getMusicListData = async () => {
   }
 };
 
+// 安全播放：兼容 APlayer 不返回 Promise 的情况
+const safePlay = () => {
+  if (!player.value) return;
+  const result = player.value.play();
+  if (result && typeof result.catch === "function") {
+    result.catch(() => {});
+  }
+};
+
+// 用户交互后备：浏览器阻止自动播放时，等待用户首次交互后播放
+const tryAutoPlayOnInteraction = () => {
+  if (!playerAutoPlay.value || hasPlayed.value) return;
+  const handler = () => {
+    safePlay();
+    document.removeEventListener("click", handler);
+    document.removeEventListener("keydown", handler);
+  };
+  document.addEventListener("click", handler, { once: true });
+  document.addEventListener("keydown", handler, { once: true });
+};
+
 // 初始化播放器
 const initAPlayer = async (list) => {
   try {
@@ -156,12 +177,15 @@ const initAPlayer = async (list) => {
       volume: playerVolume.value,
       lrcType: 3,
       listFolded: true,
-      order: "list",
+      order: playerShuffle.value ? "random" : "list",
       audio: playlistData,
     });
     console.info("🎵 播放器挂载完成", player.value);
     player.value?.on("canplay", () => {
       getMusicData();
+      if (playerAutoPlay.value && !hasPlayed.value) {
+        safePlay();
+      }
     });
     player.value?.on("play", () => {
       if (!hasPlayed.value) {
@@ -175,7 +199,9 @@ const initAPlayer = async (list) => {
       playState.value = false;
     });
     getMusicData();
-    startRotate();
+    if (!playerAutoPlay.value) {
+      startRotate();
+    }
     window.$player = player.value;
   } catch (error) {
     console.error("初始化播放器出错：", error);
@@ -229,6 +255,28 @@ watch(
   },
 );
 
+// 监听自动播放开关，播放器就绪时立即播放
+watch(
+  () => playerAutoPlay.value,
+  (val) => {
+    if (val && player.value && !hasPlayed.value) {
+      nextTick(() => {
+        safePlay();
+      });
+    }
+  },
+);
+
+// 监听随机播放开关，动态切换播放顺序
+watch(
+  () => playerShuffle.value,
+  (val) => {
+    if (player.value) {
+      player.value.option.order = val ? "random" : "list";
+    }
+  },
+);
+
 // 监听播放器音量变化
 watch(
   () => playerVolume.value,
@@ -239,6 +287,9 @@ watch(
 
 onMounted(() => {
   if (playerShow.value) getMusicListData();
+  if (playerAutoPlay.value) {
+    tryAutoPlayOnInteraction();
+  }
 });
 
 onBeforeUnmount(() => {

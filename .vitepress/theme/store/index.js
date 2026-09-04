@@ -64,6 +64,8 @@ export const mainStore = defineStore("main", {
       // 播放器数据
       playState: false,
       playerShow: true,
+      playerAutoPlay: false,
+      playerShuffle: false,
       playerVolume: 0.7,
       playerData: {
         name: "未知曲目",
@@ -407,6 +409,8 @@ export const mainStore = defineStore("main", {
         "useRightMenu",
         "useCustomCursor",
         "playerShow",
+        "playerAutoPlay",
+        "playerShuffle",
         "playerVolume",
         "backgroundBlur",
         "backgroundType",

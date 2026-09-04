@@ -63,7 +63,7 @@ export const mainStore = defineStore("main", {
       showSettings: false,
       // 播放器数据
       playState: false,
-      playerShow: false,
+      playerShow: true,
       playerVolume: 0.7,
       playerData: {
         name: "未知曲目",

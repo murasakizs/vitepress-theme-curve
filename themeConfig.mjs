@@ -138,7 +138,13 @@ export const themeConfig = {
 
   // ===== 功能开关 =====
   rewardData: { enable: false },
-  music: { enable: false }, // TODO: 获取网易云歌单 ID 后启用
+  music: {
+    enable: true,
+    url: "https://metingapi.sgexilq.top/api/meting",
+    id: "18348521365",
+    server: "netease",
+    type: "playlist",
+  },
   search: { enable: false }, // TODO: 获取 Algolia appId 和 apiKey 后启用
   // 图片灯箱（点击放大查看）
   fancybox: {

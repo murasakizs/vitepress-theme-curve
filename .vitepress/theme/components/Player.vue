@@ -287,6 +287,19 @@ watch(
   },
 );
 
+// 监听播放状态，直接控制封面旋转动画
+watch(
+  () => playState.value,
+  (playing) => {
+    nextTick(() => {
+      const pic = playerDom.value?.querySelector(".aplayer-pic");
+      if (pic) {
+        pic.style.setProperty("animation-play-state", playing ? "running" : "paused", "important");
+      }
+    });
+  },
+);
+
 onMounted(() => {
   if (playerShow.value) getMusicListData();
   if (playerAutoPlay.value) {

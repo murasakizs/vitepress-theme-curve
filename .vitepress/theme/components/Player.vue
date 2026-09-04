@@ -49,7 +49,7 @@ import "aplayer/dist/APlayer.min.css";
 const store = mainStore();
 const { theme } = useData();
 const { enable, url, id, server, type } = theme.value.music;
-const { playerShow, playerAutoPlay, playerShuffle, playerVolume, playState, playerData } = storeToRefs(store);
+const { playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, playerVolume, playState, playerData } = storeToRefs(store);
 
 // APlayer
 const player = ref(null);
@@ -130,7 +130,11 @@ const getMusicListData = async () => {
   if (!enable) return false;
 
   try {
-    const musicList = await getMusicList(url, id, server, type);
+    // 根据歌单来源决定使用哪个 ID
+    const activeId = playerMusicSource.value === "custom" && playerCustomIds.value
+      ? playerCustomIds.value.split(",").map((s) => s.trim()).filter(Boolean)
+      : id;
+    const musicList = await getMusicList(url, activeId, server, type);
     const apiOrigin = new URL(url).origin;
     const fullList = musicList.map((song) => ({
       ...song,
@@ -179,9 +183,14 @@ const initAPlayer = async (list) => {
       volume: playerVolume.value,
       lrcType: 3,
       listFolded: true,
-      order: playerShuffle.value ? "random" : "list",
+      order: playerPlayMode.value === "shuffle" ? "random" : "list",
+      loop: playerPlayMode.value === "single" ? "one" : "all",
       audio: playlistData,
     });
+    // 同步单曲循环到底层 audio 元素
+    if (playerPlayMode.value === "single" && player.value.audio) {
+      player.value.audio.loop = true;
+    }
     console.info("🎵 播放器挂载完成", player.value);
     player.value?.on("canplay", () => {
       getMusicData();
@@ -269,12 +278,19 @@ watch(
   },
 );
 
-// 监听随机播放开关，动态切换播放顺序
+// 监听播放模式变化，动态切换
 watch(
-  () => playerShuffle.value,
+  () => playerPlayMode.value,
   (val) => {
-    if (player.value) {
-      player.value.option.order = val ? "random" : "list";
+    if (!player.value) return;
+    // 播放顺序
+    player.value.options.order = val === "shuffle" ? "random" : "list";
+    // 循环模式
+    const loopMode = val === "single" ? "one" : "all";
+    player.value.options.loop = loopMode;
+    // 同步到底层 audio 元素
+    if (player.value.audio) {
+      player.value.audio.loop = loopMode === "one";
     }
   },
 );
@@ -284,6 +300,40 @@ watch(
   () => playerVolume.value,
   (val) => {
     player.value?.volume(val, true);
+  },
+);
+
+// 监听歌单来源或自定义 ID 变化，防抖后清空并重新加载歌单
+let musicSourceTimer = null;
+watch(
+  () => playerMusicSource.value,
+  () => {
+    if (!playerShow.value) return;
+    clearTimeout(musicSourceTimer);
+    musicSourceTimer = setTimeout(() => {
+      if (playerMusicSource.value === "custom" && !playerCustomIds.value) return;
+      player.value?.destroy();
+      allSongs.value = [];
+      hasPlayed.value = false;
+      playState.value = false;
+      getMusicListData();
+    }, 300);
+  },
+);
+
+// 监听自定义 ID 确认变化
+watch(
+  () => playerCustomIds.value,
+  (val) => {
+    if (!playerShow.value || playerMusicSource.value !== "custom" || !val) return;
+    clearTimeout(musicSourceTimer);
+    musicSourceTimer = setTimeout(() => {
+      player.value?.destroy();
+      allSongs.value = [];
+      hasPlayed.value = false;
+      playState.value = false;
+      getMusicListData();
+    }, 300);
   },
 );
 

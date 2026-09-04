@@ -1053,22 +1053,60 @@
                         </div>
                       </div>
                       <div class="set-item">
-                        <span class="set-label">随机顺序播放</span>
+                        <span class="set-label">播放模式</span>
                         <div class="set-options">
                           <span
-                            :class="['options', { choose: !playerShuffle }]"
-                            @click="playerShuffle = false"
+                            :class="['options', { choose: playerPlayMode === 'list' }]"
+                            @click="playerPlayMode = 'list'"
                           >
-                            关闭
+                            顺序
                           </span>
                           <span
-                            :class="['options', { choose: playerShuffle }]"
-                            @click="playerShuffle = true"
+                            :class="['options', { choose: playerPlayMode === 'shuffle' }]"
+                            @click="playerPlayMode = 'shuffle'"
                           >
-                            开启
+                            随机
+                          </span>
+                          <span
+                            :class="['options', { choose: playerPlayMode === 'single' }]"
+                            @click="playerPlayMode = 'single'"
+                          >
+                            单曲循环
                           </span>
                         </div>
                       </div>
+                      <div class="set-item">
+                        <span class="set-label">歌单来源</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: playerMusicSource === 'preset' }]"
+                            @click="playerMusicSource = 'preset'"
+                          >
+                            泠の预设
+                          </span>
+                          <span
+                            :class="['options', { choose: playerMusicSource === 'custom' }]"
+                            @click="playerMusicSource = 'custom'"
+                          >
+                            自定义
+                          </span>
+                        </div>
+                      </div>
+                      <Transition name="fade-up">
+                        <div v-if="playerMusicSource === 'custom'" class="set-item">
+                          <span class="set-label">自定义歌单ID（网易云音乐）</span>
+                          <div class="set-options">
+                            <input
+                              v-model="playerCustomIdsInput"
+                              type="text"
+                              style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 120px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                              placeholder="多个ID用逗号分隔"
+                              @keyup.enter="confirmCustomIds"
+                            />
+                            <span class="options" @click="confirmCustomIds">确定</span>
+                          </div>
+                        </div>
+                      </Transition>
                     </div>
                   </Transition>
                   <div class="set-item">
@@ -1520,7 +1558,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerShuffle, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
 
 // 有效频道模式（响应式）
@@ -1661,6 +1699,14 @@ const devModeEntrySuccess = ref(false);
 const islandSettingsExpanded = ref(false);
 // 音乐播放器设置展开状态
 const musicPlayerExpanded = ref(false);
+// 自定义歌单 ID 临时输入值
+const playerCustomIdsInput = ref(playerCustomIds.value);
+const confirmCustomIds = () => {
+  playerCustomIds.value = playerCustomIdsInput.value;
+  if (typeof $message !== "undefined") {
+    $message.success("歌单 ID 已更新");
+  }
+};
 // 展开所有设置分组
 const expandAllGroups = ref(false);
 const handleExpandAllGroups = () => {
@@ -2390,6 +2436,7 @@ watch(
       islandSettingsExpanded.value = false;
       themeColorExpanded.value = false;
       musicPlayerExpanded.value = false;
+      playerCustomIdsInput.value = playerCustomIds.value;
       showAllGroups.value = false;
       closeDevModeConfirmVisible.value = false;
       layoutWarnVisible.value = false;

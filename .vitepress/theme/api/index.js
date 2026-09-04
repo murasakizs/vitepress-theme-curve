@@ -75,15 +75,25 @@ export const getSiteInfo = async (url) => {
  * @returns {Promise<Object>} - 音乐详情
  */
 export const getMusicList = async (url, id, server = "netease", type = "playlist") => {
-  const result = await fetch(`${url}?server=${server}&type=${type}&id=${id}`);
-  const list = await result.json();
-  return list.map((song) => {
-    const { pic, ...data } = song;
-    return {
-      ...data,
-      cover: pic,
-    };
-  });
+  const ids = Array.isArray(id) ? id : [id];
+  const results = await Promise.all(
+    ids.map((pid) =>
+      fetch(`${url}?server=${server}&type=${type}&id=${pid}`).then((r) => r.json())
+    )
+  );
+  const merged = results.flat();
+  // 按 id 去重
+  const seen = new Set();
+  return merged
+    .filter((song) => {
+      if (seen.has(song.id)) return false;
+      seen.add(song.id);
+      return true;
+    })
+    .map((song) => {
+      const { pic, ...data } = song;
+      return { ...data, cover: pic };
+    });
 };
 
 /**

@@ -2,23 +2,25 @@
 <template>
   <div v-if="playerShow" class="player-wrapper">
     <!-- 播放列表面板 -->
-    <div v-show="!isFolded" class="playlist-panel">
-      <div class="playlist-header">播放列表</div>
-      <ul class="playlist-list">
-        <li
-          v-for="(song, idx) in allSongs"
-          :key="song.id"
-          :class="['playlist-item', { active: currentIdx === idx }]"
-          @click="playSong(idx)"
-        >
-          <img class="playlist-cover" :src="song.cover" :alt="song.name" />
-          <div class="playlist-info">
-            <span class="playlist-name">{{ song.name }}</span>
-            <span class="playlist-artist">{{ song.artist }}</span>
-          </div>
-        </li>
-      </ul>
-    </div>
+    <Transition name="playlist">
+      <div v-if="!isFolded" class="playlist-panel">
+        <div class="playlist-header">播放列表</div>
+        <ul class="playlist-list">
+          <li
+            v-for="(song, idx) in allSongs"
+            :key="song.id"
+            :class="['playlist-item', { active: currentIdx === idx }]"
+            @click="playSong(idx)"
+          >
+            <img class="playlist-cover" :src="song.cover" :alt="song.name" />
+            <div class="playlist-info">
+              <span class="playlist-name">{{ song.name }}</span>
+              <span class="playlist-artist">{{ song.artist }}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </Transition>
     <!-- 控制栏 -->
     <div :class="['player', { playing: playState, folded: isFolded, 'suppress-hover': suppressHover, [`rotate-${rotatePhase}`]: rotatePhase }]">
       <div class="player-capsule" @click="toggleFold">
@@ -322,6 +324,15 @@ onBeforeUnmount(() => {
     border-color: var(--main-accent);
   }
   margin-bottom: 12px;
+}
+.playlist-enter-active,
+.playlist-leave-active {
+  transition: all 0.3s ease;
+}
+.playlist-enter-from,
+.playlist-leave-to {
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
 }
 .playlist-header {
   padding: 12px 16px 8px;

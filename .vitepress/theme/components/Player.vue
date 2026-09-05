@@ -3,22 +3,38 @@
   <div v-if="playerShow" class="player-wrapper">
     <!-- 播放列表面板 -->
     <Transition name="playlist">
-      <div v-if="!isFolded" class="playlist-panel">
-        <div class="playlist-header">播放列表</div>
-        <ul class="playlist-list">
-          <li
-            v-for="(song, idx) in allSongs"
-            :key="song.id"
-            :class="['playlist-item', { active: currentIdx === idx }]"
-            @click="playSong(idx)"
-          >
-            <img class="playlist-cover" :src="song.cover" :alt="song.name" />
-            <div class="playlist-info">
-              <span class="playlist-name">{{ song.name }}</span>
-              <span class="playlist-artist">{{ song.artist }}</span>
-            </div>
-          </li>
-        </ul>
+      <div v-if="!isFolded" class="expanded-panel">
+        <div class="playlist-header">
+          <span :class="{ active: panelTab === 'list' }" @click="panelTab = 'list'">播放列表</span>
+          <span :class="{ active: panelTab === 'lrc' }" @click="panelTab = 'lrc'">歌词</span>
+        </div>
+        <div v-show="panelTab === 'list'" class="playlist-list-wrap">
+          <ul class="playlist-list">
+            <li
+              v-for="(song, idx) in allSongs"
+              :key="song.id"
+              :class="['playlist-item', { active: currentIdx === idx }]"
+              @click="playSong(idx)"
+            >
+              <img class="playlist-cover" :src="song.cover" :alt="song.name" />
+              <div class="playlist-info">
+                <span class="playlist-name">{{ song.name }}</span>
+                <span class="playlist-artist">{{ song.artist }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div v-show="panelTab === 'lrc'" class="lyrics-panel" ref="lyricsPanelRef">
+          <div v-if="currentLyrics.length" class="lyrics-scroll" ref="lyricsScrollRef">
+            <div
+              v-for="(line, idx) in currentLyrics"
+              :key="idx"
+              :class="['lyric-line', { active: idx === activeLyricIndex }]"
+              :ref="el => { if (idx === activeLyricIndex) activeLyricEl = el }"
+            >{{ line.text }}</div>
+          </div>
+          <div v-else class="lyrics-empty">暂无歌词</div>
+        </div>
       </div>
     </Transition>
     <!-- 控制栏 -->
@@ -59,6 +75,12 @@ const rotateTimer = ref(null);
 const hasPlayed = ref(false);
 const allSongs = ref([]);
 const currentIdx = ref(0);
+const panelTab = ref("list");
+const lyricsPanelRef = ref(null);
+const lyricsScrollRef = ref(null);
+const currentLyrics = ref([]);
+const activeLyricIndex = ref(-1);
+const activeLyricEl = ref(null);
 
 // 随机轮播
 const rotatePhase = ref("");
@@ -144,6 +166,7 @@ const getMusicListData = async () => {
     }));
     allSongs.value = fullList;
     initAPlayer(fullList?.length ? fullList : []);
+    loadCurrentLyrics();
   } catch (error) {
     store.playerShow = false;
     initAPlayer([]);
@@ -256,11 +279,100 @@ const initMediaSession = (title, artist) => {
   }
 };
 
+// 解析 LRC 歌词
+const parseLrc = (text) => {
+  if (!text) return [];
+  const lines = text.split("\n");
+  const result = [];
+  const timeMap = new Map();
+  const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?\]/g;
+  for (const line of lines) {
+    const matches = [...line.matchAll(timeExp)];
+    if (matches.length > 0) {
+      const content = line.replace(timeExp, "").trim();
+      if (content) {
+        for (const match of matches) {
+          let time = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+          time += match[3] ? parseInt(match[3], 10) / (match[3].length === 3 ? 1000 : 100) : 0;
+          if (!timeMap.has(time)) timeMap.set(time, []);
+          timeMap.get(time).push(content);
+        }
+      }
+    }
+  }
+  for (const [time, textLines] of timeMap.entries()) {
+    result.push({ time, text: textLines.join("\n") });
+  }
+  result.sort((a, b) => a.time - b.time);
+  return result;
+};
+
+// 加载当前歌曲歌词
+const loadCurrentLyrics = async () => {
+  currentLyrics.value = [];
+  activeLyricIndex.value = -1;
+  const song = allSongs.value[currentIdx.value];
+  if (!song?.lrc) return;
+  try {
+    const res = await fetch(song.lrc);
+    if (res.ok) {
+      const text = await res.text();
+      currentLyrics.value = parseLrc(text);
+    }
+  } catch (e) {
+    console.warn("Failed to load lyrics", e);
+  }
+};
+
+// 同步歌词高亮
+let lrcTimer = null;
+const syncLyrics = () => {
+  if (!player.value?.audio || !currentLyrics.value.length) return;
+  const ct = player.value.audio.currentTime;
+  let idx = -1;
+  for (let i = 0; i < currentLyrics.value.length; i++) {
+    if (ct >= currentLyrics.value[i].time) idx = i;
+    else break;
+  }
+  if (idx !== activeLyricIndex.value) {
+    activeLyricIndex.value = idx;
+    // 滚动到当前歌词
+    nextTick(() => {
+      if (activeLyricEl.value && lyricsScrollRef.value) {
+        const container = lyricsScrollRef.value;
+        const el = activeLyricEl.value;
+        const offset = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+        container.scrollTo({ top: offset, behavior: "smooth" });
+      }
+    });
+  }
+};
+
+// 切换歌曲时加载歌词
+watch(currentIdx, () => {
+  loadCurrentLyrics();
+});
+
+// 播放状态变化时启停歌词同步
+watch(
+  () => playState.value,
+  (playing) => {
+    if (lrcTimer) { clearInterval(lrcTimer); lrcTimer = null; }
+    if (playing) {
+      syncLyrics();
+      lrcTimer = setInterval(syncLyrics, 300);
+    }
+  },
+);
+
 // 监听播放器开启状态
 watch(
   () => playerShow.value,
   (val) => {
     if (!val) return false;
+    if (lrcTimer) { clearInterval(lrcTimer); lrcTimer = null; }
+    currentLyrics.value = [];
+    activeLyricIndex.value = -1;
     player.value?.destroy();
     getMusicListData();
   },
@@ -359,6 +471,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   stopRotate();
+  if (lrcTimer) { clearInterval(lrcTimer); lrcTimer = null; }
   player.value?.destroy();
 });
 </script>
@@ -375,7 +488,7 @@ onBeforeUnmount(() => {
 }
 
 // 播放列表面板
-.playlist-panel {
+.expanded-panel {
   width: 400px;
   max-height: 400px;
   border-radius: 25px;
@@ -383,6 +496,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--main-card-border);
   box-shadow: 0 6px 16px -4px var(--main-dark-shadow);
   transition: border-color 0.3s;
+  overflow: hidden;
   &:hover {
     border-color: var(--main-accent);
   }
@@ -398,21 +512,70 @@ onBeforeUnmount(() => {
   transform: translateY(10px) scale(0.95);
 }
 .playlist-header {
+  display: flex;
+  gap: 16px;
   padding: 12px 16px 8px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--main-color);
+  color: var(--main-font-second-color);
+  span {
+    cursor: pointer;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    &.active {
+      color: var(--main-color);
+      border-bottom-color: var(--main-color);
+    }
+  }
+}
+.playlist-list-wrap {
+  overflow-y: auto;
+  max-height: 340px;
 }
 .playlist-list {
   list-style: none;
   margin: 0;
   padding: 4px 4px 8px;
-  overflow-y: auto;
-  max-height: 340px;
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
   }
+}
+.lyrics-panel {
+  padding: 8px 16px 12px;
+  max-height: 340px;
+  overflow: hidden;
+}
+.lyrics-scroll {
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+.lyric-line {
+  padding: 6px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--main-font-second-color);
+  text-align: center;
+  transition: color 0.3s, font-size 0.3s, font-weight 0.3s;
+  white-space: pre-wrap;
+  word-break: break-word;
+  &.active {
+    color: var(--main-color);
+    font-weight: 600;
+    font-size: 14px;
+  }
+}
+.lyrics-empty {
+  text-align: center;
+  font-size: 13px;
+  color: var(--main-font-second-color);
+  opacity: 0.6;
+  padding: 24px 0;
 }
 .playlist-item {
   display: flex;

@@ -25,6 +25,7 @@ const VALID_CONFIG_KEYS = [
   "fontSize", "infoPosition", "backgroundUrl", "highContrast", "siteLayout",
   "messageStyle", "messagePosition", "progressDirection", "messageDuration",
   "islandMode", "islandUseThemeColor", "islandShowSeconds", "islandShowDate",
+  "islandPlayerSupport", "islandStyle",
   "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
   "removeAnimations", "showMoreSettings",
   "scheduledThemeEnabled", "scheduledLightTime", "scheduledDarkTime",

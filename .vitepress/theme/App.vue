@@ -28,8 +28,10 @@
   <Teleport to="body">
     <!-- 左侧菜单 -->
     <div :class="['left-menu', { hidden: footerIsShow }]">
-            <!-- 全局播放器 -->
-      <Player />
+            <!-- 全局播放器（拓展模式下隐藏但保留挂载） -->
+      <div v-show="store.islandStyle !== 'extended'">
+        <Player />
+      </div>
       <!-- 全局设置 -->
       <Settings />
     </div>
@@ -38,6 +40,8 @@
   <RightMenu ref="rightMenuRef" />
   <!-- 全局消息 -->
   <Message />
+  <!-- 底部固定药丸 -->
+  <BottomPills />
   <!-- 导入后检查弹窗 -->
   <Teleport to="body">
     <div v-if="importCheckVisible" class="import-check-overlay">

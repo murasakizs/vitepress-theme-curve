@@ -72,7 +72,15 @@ export const mainStore = defineStore("main", {
       playerData: {
         name: "未知曲目",
         artist: "未知艺术家",
+        cover: "",
+        lrc: "",
       },
+      playerLyric: "",
+      playerFolded: true,
+      playerPanelTab: "list",
+      // 超级岛播放器联动
+      islandPlayerSupport: false,
+      islandStyle: "extended",
       // 移动端菜单显示
       mobileMenuShow: false,
       // 使用自定义右键菜单
@@ -416,6 +424,8 @@ export const mainStore = defineStore("main", {
         "playerMusicSource",
         "playerCustomIds",
         "playerVolume",
+        "islandPlayerSupport",
+        "islandStyle",
         "backgroundBlur",
         "backgroundType",
         "fontFamily",

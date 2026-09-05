@@ -1036,6 +1036,23 @@
                         </div>
                       </div>
                       <div class="set-item">
+                        <span class="set-label">样式</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: islandStyle === 'standard' }]"
+                            @click="islandStyle = 'standard'"
+                          >
+                            标准
+                          </span>
+                          <span
+                            :class="['options', { choose: islandStyle === 'extended' }]"
+                            @click="islandStyle = 'extended'"
+                          >
+                            拓展
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
                         <span class="set-label">进入站点自动播放音乐</span>
                         <div class="set-options">
                           <span
@@ -1107,6 +1124,23 @@
                           </div>
                         </div>
                       </Transition>
+                      <div class="set-item">
+                        <span class="set-label">超级岛支持</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !islandPlayerSupport }]"
+                            @click="islandPlayerSupport = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: islandPlayerSupport }]"
+                            @click="islandPlayerSupport = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </Transition>
                   <div class="set-item">
@@ -1558,7 +1592,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
 
 // 有效频道模式（响应式）

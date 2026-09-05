@@ -70,21 +70,31 @@
           <span class="pill-text">{{ { success: '成功 Success', warning: '警告 Warning', error: '错误 Error', info: '信息 Info' }[bottomMessageType] }}</span>
         </div>
         <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
-          <span class="pill-text" v-if="store.islandShowDate">
-            <span class="time-date">{{ currentDate }}</span>&nbsp;
-            <span v-if="store.islandShowSeconds">
+          <template v-if="store.islandPlayerSupport && store.playState && store.playerShow">
+            <span class="pill-text pill-music">
+              <img v-if="store.playerData?.cover" :src="store.playerData.cover" :class="['pill-music-cover', { spinning: store.playState }]" alt="" />
+              <span class="pill-music-info">
+                <span class="pill-music-name">{{ store.playerData?.name || '未知曲目' }}</span>
+              </span>
+            </span>
+          </template>
+          <template v-else>
+            <span class="pill-text" v-if="store.islandShowDate">
+              <span class="time-date">{{ currentDate }}</span>&nbsp;
+              <span v-if="store.islandShowSeconds">
+                <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
+              </span>
+              <span v-else>
+                <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
+              </span>
+            </span>
+            <span class="pill-text" v-else-if="store.islandShowSeconds">
               <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
             </span>
-            <span v-else>
+            <span class="pill-text" v-else>
               <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
             </span>
-          </span>
-          <span class="pill-text" v-else-if="store.islandShowSeconds">
-            <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
-          </span>
-          <span class="pill-text" v-else>
-            <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
-          </span>
+          </template>
         </div>
         <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
           <span class="pill-text">
@@ -768,6 +778,38 @@ onUnmounted(() => {
     .pill-progress {
       width: 20px;
       height: 20px;
+    }
+    .pill-music {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pill-music-cover {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      &.spinning {
+        animation: pill-cover-rotate 8s linear infinite;
+      }
+    }
+    @keyframes pill-cover-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .pill-music-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .pill-music-name {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
     }
     @media (max-width: 768px) {
       padding: 8px 12px;

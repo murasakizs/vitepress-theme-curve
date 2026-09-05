@@ -65,7 +65,7 @@ import "aplayer/dist/APlayer.min.css";
 const store = mainStore();
 const { theme } = useData();
 const { enable, url, id, server, type } = theme.value.music;
-const { playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, playerVolume, playState, playerData } = storeToRefs(store);
+const { playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, playerVolume, playState, playerData, playerLyric, playerFolded, playerPanelTab } = storeToRefs(store);
 
 // APlayer
 const player = ref(null);
@@ -75,7 +75,7 @@ const rotateTimer = ref(null);
 const hasPlayed = ref(false);
 const allSongs = ref([]);
 const currentIdx = ref(0);
-const panelTab = ref("list");
+const panelTab = playerPanelTab;
 const lyricsPanelRef = ref(null);
 const lyricsScrollRef = ref(null);
 const currentLyrics = ref([]);
@@ -124,7 +124,7 @@ const stopRotate = () => {
   }
 };
 
-const isFolded = ref(true);
+const isFolded = playerFolded;
 
 const toggleFold = () => {
   isFolded.value = !isFolded.value;
@@ -204,7 +204,6 @@ const initAPlayer = async (list) => {
     player.value = new APlayer({
       container: playerDom.value,
       volume: playerVolume.value,
-      lrcType: 3,
       listFolded: true,
       order: playerPlayMode.value === "shuffle" ? "random" : "list",
       loop: playerPlayMode.value === "single" ? "one" : "all",
@@ -217,6 +216,14 @@ const initAPlayer = async (list) => {
     console.info("🎵 播放器挂载完成", player.value);
     player.value?.on("canplay", () => {
       getMusicData();
+      // 绑定原生 audio 的 timeupdate 事件驱动歌词同步
+      const audioEl = playerDom.value?.querySelector("audio") || player.value?.audio;
+      if (audioEl && !audioEl._lrcBound) {
+        audioEl._lrcBound = true;
+        audioEl.addEventListener("timeupdate", () => {
+          syncLyricsFromTime(audioEl.currentTime);
+        });
+      }
       if (playerAutoPlay.value && !hasPlayed.value) {
         safePlay();
       }
@@ -250,9 +257,14 @@ const getMusicData = () => {
     const songInfo = playerDom.value.querySelector(".aplayer-info");
     const songName = songInfo.querySelector(".aplayer-title").innerText;
     const songArtist = songInfo.querySelector(".aplayer-author").innerText.replace(" - ", "");
+    const audio = player.value?.list?.audios?.[player.value.list.index];
+    const songCover = allSongs.value[currentIdx.value]?.cover || "";
+    const songLrc = allSongs.value[currentIdx.value]?.lrc || "";
     playerData.value = {
       name: songName || "未知曲目",
       artist: songArtist || "未知艺术家",
+      cover: songCover || audio?.cover || audio?.pic || "",
+      lrc: songLrc,
     };
     initMediaSession(playerData.value?.name, playerData.value?.artist);
   } catch (error) {
@@ -324,11 +336,9 @@ const loadCurrentLyrics = async () => {
   }
 };
 
-// 同步歌词高亮
-let lrcTimer = null;
-const syncLyrics = () => {
-  if (!player.value?.audio || !currentLyrics.value.length) return;
-  const ct = player.value.audio.currentTime;
+// 同步歌词高亮（由 initAPlayer 中的 timeupdate 事件驱动）
+const syncLyricsFromTime = (ct) => {
+  if (!currentLyrics.value.length) return;
   let idx = -1;
   for (let i = 0; i < currentLyrics.value.length; i++) {
     if (ct >= currentLyrics.value[i].time) idx = i;
@@ -336,7 +346,7 @@ const syncLyrics = () => {
   }
   if (idx !== activeLyricIndex.value) {
     activeLyricIndex.value = idx;
-    // 滚动到当前歌词
+    playerLyric.value = idx >= 0 ? currentLyrics.value[idx].text : "";
     nextTick(() => {
       if (activeLyricEl.value && lyricsScrollRef.value) {
         const container = lyricsScrollRef.value;
@@ -353,24 +363,11 @@ watch(currentIdx, () => {
   loadCurrentLyrics();
 });
 
-// 播放状态变化时启停歌词同步
-watch(
-  () => playState.value,
-  (playing) => {
-    if (lrcTimer) { clearInterval(lrcTimer); lrcTimer = null; }
-    if (playing) {
-      syncLyrics();
-      lrcTimer = setInterval(syncLyrics, 300);
-    }
-  },
-);
-
 // 监听播放器开启状态
 watch(
   () => playerShow.value,
   (val) => {
     if (!val) return false;
-    if (lrcTimer) { clearInterval(lrcTimer); lrcTimer = null; }
     currentLyrics.value = [];
     activeLyricIndex.value = -1;
     player.value?.destroy();
@@ -471,7 +468,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   stopRotate();
-  if (lrcTimer) { clearInterval(lrcTimer); lrcTimer = null; }
   player.value?.destroy();
 });
 </script>

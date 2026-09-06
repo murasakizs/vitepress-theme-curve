@@ -113,7 +113,7 @@ const pillLyricWidth = computed(() => {
   if (!hasPlayedOnce.value) return 0;
   if (pillLyrics.value.length) {
     const maxLen = Math.max(...pillLyrics.value.map(l => l.text.length));
-    const capped = Math.min(maxLen, 20);
+    const capped = Math.min(maxLen, 26);
     return capped * 14 + 32;
   }
   return 0;

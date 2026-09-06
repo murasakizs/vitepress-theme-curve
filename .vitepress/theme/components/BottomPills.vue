@@ -63,7 +63,7 @@
       </div>
       <!-- 第一层（最底）：封面 + 歌词 药丸 -->
       <div class="pill-layer pill-layer-lyric">
-        <div :class="['pill-lyric', { 'island-theme-color': store.islandUseThemeColor }]" :style="pillLyricWidth ? { width: pillLyricWidth + 'px' } : null" @click="store.playerFolded = !store.playerFolded">
+        <div :class="['pill-lyric', { 'island-theme-color': store.islandUseThemeColor }]" :style="{ width: pillLyricWidth + 'px' }" @click="store.playerFolded = !store.playerFolded">
           <div :class="['pill-lyric-cover-wrap', { 'cover-fading': showOldCover }]">
             <div v-if="showOldCover && prevCover" class="cover-old-wrap">
               <img :src="prevCover" :class="['pill-lyric-cover', { spinning: store.playState }]" alt="" />
@@ -108,15 +108,15 @@ const pillLyricIdx = ref(-1);
 const hasPlayedOnce = ref(false);
 const prevCover = ref('');
 
-// 胶囊宽度：未播放时不设宽度（自适应"Player"），播放后跟随最长歌词
+// 胶囊宽度：未播放时基于"Player"文本，播放后取最长歌词并固定
 const pillLyricWidth = computed(() => {
-  if (!hasPlayedOnce.value) return 0;
+  if (!hasPlayedOnce.value) return 'Player'.length * 14 + 32;
   if (pillLyrics.value.length) {
     const maxLen = Math.max(...pillLyrics.value.map(l => l.text.length));
-    const capped = Math.min(maxLen, 26);
+    const capped = Math.min(maxLen, 30);
     return capped * 14 + 32;
   }
-  return 0;
+  return 'Player'.length * 14 + 32;
 });
 
 // 从全局播放器同步

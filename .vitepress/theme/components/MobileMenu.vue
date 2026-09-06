@@ -9,7 +9,22 @@
           <div v-show="store.mobileMenuShow" class="menu-content s-card">
             <!-- 顶部控制栏 -->
             <div class="menu-top-control">
-              <!-- 个性化配置 -->
+              <!-- 网址 -->
+              <span class="site-url">
+                <template v-if="pillChannel">
+                  <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}.</span><span>sgexilq</span><span class="pill-domain">.top</span>
+                </template>
+                <template v-else>
+                  <span>sgexilq</span><span class="pill-domain">.top</span>
+                </template>
+              </span>
+              <!-- 关闭按钮 -->
+              <div class="close-control" @click="store.changeShowStatus('mobileMenuShow')">
+                <i class="iconfont icon-close"></i>
+              </div>
+            </div>
+            <!-- 个性化配置 -->
+            <div class="menu-top-control">
               <div
                 class="settings-btn"
                 title="个性化配置"
@@ -17,10 +32,6 @@
               >
                 <i class="iconfont icon-style"></i>
                 <span class="capsule-text">个性化配置</span>
-              </div>
-              <!-- 关闭按钮 -->
-              <div class="close-control" @click="store.changeShowStatus('mobileMenuShow')">
-                <i class="iconfont icon-close"></i>
               </div>
             </div>
             <!-- 菜单 -->
@@ -73,6 +84,23 @@ const { theme } = useData();
 // 菜单数据
 const { nav, tagsData } = theme.value;
 
+// 网址显示（与超级岛第三个药丸一致）
+const effectiveChannelMode = computed(() => store.effectiveChannelMode);
+const pillChannel = computed(() => {
+  const mode = effectiveChannelMode.value;
+  if (mode === 2) return 'beta';
+  if (mode === 3) return 'dev';
+  if (mode === 4) return 'canary';
+  return '';
+});
+const pillChannelClass = computed(() => {
+  const mode = effectiveChannelMode.value;
+  if (mode === 2) return 'info';
+  if (mode === 3) return 'warning';
+  if (mode === 4) return 'warning';
+  return '';
+});
+
 // 页面跳转
 const pageJump = (url) => {
   if (!url) return false;
@@ -123,13 +151,26 @@ const openSettings = () => {
       margin-bottom: 10px;
       margin-right: -5px;
     }
+    .site-url {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--main-font-color);
+      .pill-prefix {
+        &.info { color: #3498db; }
+        &.warning { color: #e67e22; }
+        &.error { color: #e74c3c; }
+      }
+      .pill-domain {
+        color: var(--main-color);
+      }
+    }
     .settings-btn {
       display: flex;
       flex-direction: row;
       align-items: center;
       height: 42px;
       padding: 0 16px 0 10px;
-      border-radius: 25px;
+      border-radius: 12px;
       background-color: var(--main-color);
       transition: opacity 0.3s;
       cursor: pointer;

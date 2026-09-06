@@ -233,6 +233,7 @@ let audioListeners = [];
 
 // 页面滚动时自动折叠播放器面板，滚动到底部时收起胶囊
 let scrollHandler = null;
+let modalScrollHandler = null;
 let lastScrollY = 0;
 onMounted(() => {
   scrollHandler = () => {
@@ -247,9 +248,26 @@ onMounted(() => {
     lastScrollY = st;
   };
   window.addEventListener("scroll", scrollHandler, { passive: true });
+
+  // 监听移动端弹窗内部滚动
+  let lastModalScrollTop = 0;
+  modalScrollHandler = (e) => {
+    const el = e.target;
+    if (!el || !el.classList || !el.classList.contains('modal-content')) return;
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 50;
+    if (!store.playerFolded) store.playerFolded = true;
+    if (atBottom) {
+      pillStackHidden.value = true;
+    } else if (el.scrollTop < lastModalScrollTop) {
+      pillStackHidden.value = false;
+    }
+    lastModalScrollTop = el.scrollTop;
+  };
+  document.addEventListener('scroll', modalScrollHandler, { passive: true, capture: true });
 });
 onBeforeUnmount(() => {
   if (scrollHandler) window.removeEventListener("scroll", scrollHandler);
+  if (modalScrollHandler) document.removeEventListener("scroll", modalScrollHandler, { capture: true });
 });
 const attachAudioListeners = () => {
   const audio = window.$player?.audio;

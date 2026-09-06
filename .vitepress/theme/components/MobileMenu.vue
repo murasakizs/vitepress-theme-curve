@@ -7,9 +7,21 @@
         <div class="menu-mask" @click="store.changeShowStatus('mobileMenuShow')" />
         <Transition name="toLeft" mode="out-in">
           <div v-show="store.mobileMenuShow" class="menu-content s-card">
-            <!-- 关闭按钮 -->
-            <div class="close-control" @click="store.changeShowStatus('mobileMenuShow')">
-              <i class="iconfont icon-close"></i>
+            <!-- 顶部控制栏 -->
+            <div class="menu-top-control">
+              <!-- 个性化配置 -->
+              <div
+                class="settings-btn"
+                title="个性化配置"
+                @click="openSettings"
+              >
+                <i class="iconfont icon-style"></i>
+                <span class="capsule-text">个性化配置</span>
+              </div>
+              <!-- 关闭按钮 -->
+              <div class="close-control" @click="store.changeShowStatus('mobileMenuShow')">
+                <i class="iconfont icon-close"></i>
+              </div>
             </div>
             <!-- 菜单 -->
             <div class="menu-list">
@@ -67,6 +79,14 @@ const pageJump = (url) => {
   store.changeShowStatus("mobileMenuShow");
   router.go(url);
 };
+
+// 关闭侧栏后弹出个性化配置
+const openSettings = () => {
+  store.changeShowStatus("mobileMenuShow");
+  setTimeout(() => {
+    store.changeShowStatus("showSettings");
+  }, 300);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -96,10 +116,41 @@ const pageJump = (url) => {
     border-radius: 12px 0 0 12px;
     padding: 20px;
     overflow: auto;
+    .menu-top-control {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      margin-right: -5px;
+    }
+    .settings-btn {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      height: 42px;
+      padding: 0 16px 0 10px;
+      border-radius: 25px;
+      background-color: var(--main-color);
+      transition: opacity 0.3s;
+      cursor: pointer;
+      .iconfont {
+        font-size: 22px;
+        color: var(--main-card-background);
+      }
+      .capsule-text {
+        margin-left: 10px;
+        font-size: 14px;
+        line-height: 1;
+        color: var(--main-card-background);
+      }
+      &:hover {
+        opacity: 0.8;
+      }
+      &:active {
+        transform: scale(0.95);
+      }
+    }
     .close-control {
-      position: absolute;
-      top: 10px;
-      right: 20px;
       display: flex;
       align-items: center;
       justify-content: center;

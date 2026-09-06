@@ -1,10 +1,6 @@
 <!-- 全局设置 -->
 <template>
   <div class="settings">
-    <div class="set-btn s-card" @click="store.changeShowStatus('showSettings')">
-      <i class="iconfont icon-style"></i>
-      <span class="set-text">个性化配置</span>
-    </div>
     <!-- 设置面板 -->
     <Modal
       :show="store.showSettings"
@@ -2511,46 +2507,6 @@ watch(
 
 <style lang="scss" scoped>
 .settings {
-  .set-btn {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 42px;
-    height: 42px;
-    padding: 0;
-    border-radius: 25px;
-    box-shadow: 0 6px 10px -4px var(--main-dark-shadow);
-    .iconfont {
-      font-size: 22px;
-      margin-left: 10px;
-      transition: color 0.3s;
-    }
-    .set-text {
-      margin-left: 10px;
-      display: inline-flex;
-      opacity: 0;
-      font-size: 14px;
-      line-height: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      transition: opacity 0.3s;
-    }
-    &:hover {
-      width: 140px;
-      color: var(--main-card-background);
-      border-color: var(--main-color);
-      background-color: var(--main-color);
-      .iconfont {
-        color: var(--main-card-background);
-      }
-      .set-text {
-        opacity: 1;
-      }
-    }
-    @media (min-width: 769px) {
-      display: none;
-    }
-  }
 }
 .set-list {
   .title {

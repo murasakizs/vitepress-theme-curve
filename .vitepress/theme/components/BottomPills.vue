@@ -1,7 +1,7 @@
 <!-- 底部播放器（拓展样式）：三层堆叠 -->
 <template>
   <Teleport to="body">
-    <div v-if="visible" class="pill-stack">
+    <div v-if="visible" :class="['pill-stack', { 'pill-hidden': pillStackHidden }]">
       <!-- 第三层（最上）：列表/歌词卡片 -->
       <div class="pill-layer pill-layer-card">
         <Transition name="pill-expand">
@@ -63,7 +63,7 @@
       </div>
       <!-- 第一层（最底）：封面 + 歌词 药丸 -->
       <div class="pill-layer pill-layer-lyric">
-        <div :class="['pill-lyric', { 'island-theme-color': store.islandUseThemeColor }]" :style="{ width: pillLyricWidth + 'px' }" @click="store.playerFolded = !store.playerFolded">
+        <div :class="['pill-lyric', { 'island-theme-color': store.islandUseThemeColor }]" :style="pillLyricStyle" @click="store.playerFolded = !store.playerFolded">
           <div :class="['pill-lyric-cover-wrap', { 'cover-fading': showOldCover }]">
             <div v-if="showOldCover && prevCover" class="cover-old-wrap">
               <img :src="prevCover" :class="['pill-lyric-cover', { spinning: store.playState }]" alt="" />
@@ -91,6 +91,8 @@ const store = mainStore();
 const { playerData, playState } = storeToRefs(store);
 
 const visible = computed(() => store.islandStyle === 'extended');
+const pillStackHidden = ref(false);
+const isMobile = ref(typeof window !== 'undefined' && window.innerWidth <= 768);
 
 // 显示歌词：播放中但未到第一行时显示第一行，暂停后保持当前歌词
 const displayLyric = computed(() => {
@@ -117,6 +119,12 @@ const pillLyricWidth = computed(() => {
     return capped * 14 + 32;
   }
   return 'Player'.length * 14 + 32;
+});
+
+const pillLyricStyle = computed(() => {
+  const textWidth = pillLyricWidth.value;
+  const maxW = Math.min(480, window.innerWidth - 32);
+  return { width: Math.min(textWidth, maxW) + 'px' };
 });
 
 // 从全局播放器同步
@@ -222,6 +230,27 @@ const playSongByIdx = (idx) => { window.$player?.list.switch(idx); window.$playe
 // 定时同步 + 监听切歌（暂停时也能捕获）
 let timer = null;
 let audioListeners = [];
+
+// 页面滚动时自动折叠播放器面板，滚动到底部时收起胶囊
+let scrollHandler = null;
+let lastScrollY = 0;
+onMounted(() => {
+  scrollHandler = () => {
+    const st = window.scrollY;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    if (!store.playerFolded) store.playerFolded = true;
+    if (st >= maxScroll - 50) {
+      pillStackHidden.value = true;
+    } else if (st < lastScrollY) {
+      pillStackHidden.value = false;
+    }
+    lastScrollY = st;
+  };
+  window.addEventListener("scroll", scrollHandler, { passive: true });
+});
+onBeforeUnmount(() => {
+  if (scrollHandler) window.removeEventListener("scroll", scrollHandler);
+});
 const attachAudioListeners = () => {
   const audio = window.$player?.audio;
   if (!audio || audio._pillBound) return;
@@ -239,6 +268,9 @@ onMounted(() => {
   const retryTimer = setInterval(() => {
     if (window.$player?.audio) { attachAudioListeners(); clearInterval(retryTimer); }
   }, 500);
+  // 监听窗口大小变化
+  const onResize = () => { isMobile.value = window.innerWidth <= 768; };
+  window.addEventListener("resize", onResize);
 });
 onBeforeUnmount(() => {
   if (timer) clearInterval(timer);
@@ -253,12 +285,19 @@ onBeforeUnmount(() => {
   position: fixed;
   bottom: 24px;
   left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   z-index: 9999;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  &.pill-hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+  }
   @media (max-width: 768px) {
     bottom: 16px;
     width: calc(100vw - 32px);
@@ -267,6 +306,7 @@ onBeforeUnmount(() => {
 .pill-layer {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 // ---- 第一层：封面 + 歌词 ----
@@ -369,6 +409,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   width: 400px;
+  max-width: 100%;
   padding: 6px 14px 6px 18px;
   border-radius: 999px;
   background-color: var(--main-card-background);
@@ -382,7 +423,7 @@ onBeforeUnmount(() => {
   }
   @media (max-width: 768px) {
     width: 100%;
-    padding: 4px 10px 4px 14px;
+    padding: 4px 8px 4px 12px;
   }
 }
 .pill-ctrl-name {
@@ -428,6 +469,11 @@ onBeforeUnmount(() => {
     background-color: var(--main-color-bg);
   }
   &:active { transform: scale(0.92); }
+  @media (max-width: 768px) {
+    width: 38px;
+    height: 38px;
+    svg { width: 18px; height: 18px; }
+  }
 }
 
 // ---- 第三层：列表/歌词卡片 ----
@@ -464,6 +510,10 @@ onBeforeUnmount(() => {
       border-bottom-color: var(--main-color);
     }
   }
+  @media (max-width: 768px) {
+    padding: 8px 12px 6px;
+    font-size: 13px;
+  }
 }
 .pill-card-list {
   height: 300px;
@@ -482,6 +532,10 @@ onBeforeUnmount(() => {
   transition: background-color 0.2s;
   &:hover { background-color: var(--main-color-bg); }
   &.active .pill-card-item-name { color: var(--main-color); font-weight: 600; }
+  @media (max-width: 768px) {
+    padding: 6px 8px;
+    gap: 8px;
+  }
 }
 .pill-card-item-cover {
   width: 36px;
@@ -489,6 +543,10 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
+  @media (max-width: 768px) {
+    width: 32px;
+    height: 32px;
+  }
 }
 .pill-card-item-info {
   display: flex;
@@ -503,6 +561,9 @@ onBeforeUnmount(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
 }
 .pill-card-item-artist {
   font-size: 11px;
@@ -510,6 +571,9 @@ onBeforeUnmount(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  @media (max-width: 768px) {
+    font-size: 10px;
+  }
 }
 .pill-card-lrc {
   height: 300px;
@@ -539,6 +603,10 @@ onBeforeUnmount(() => {
   text-align: center;
   transition: color 0.3s, font-weight 0.3s;
   &.active { color: var(--main-color); font-weight: 600; }
+  @media (max-width: 768px) {
+    padding: 4px 0;
+    font-size: 12px;
+  }
 }
 
 // ---- 动画 ----

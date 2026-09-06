@@ -123,7 +123,7 @@ const pillLyricWidth = computed(() => {
 
 const pillLyricStyle = computed(() => {
   const textWidth = pillLyricWidth.value;
-  const maxW = Math.min(480, window.innerWidth - 32);
+  const maxW = typeof window !== 'undefined' ? Math.min(480, window.innerWidth - 32) : 480;
   return { width: Math.min(textWidth, maxW) + 'px' };
 });
 

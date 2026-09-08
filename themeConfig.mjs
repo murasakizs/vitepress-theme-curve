@@ -114,8 +114,13 @@ export const themeConfig = {
   // ===== 评论 =====
   comment: {
     enable: true,
-    type: "artalk",
-    artalk: { site: "泠の小站", server: "https://myartalkapi.sgexilq.com" },
+    type: "twikoo",
+    twikoo: {
+      js: "https://cdn.jsdelivr.net/npm/twikoo@1.6.42/dist/twikoo.all.min.js",
+      envId: "https://mytwikooapi.sgexilq.com",
+      region: "",
+      lang: "zh-CN",
+    },
   },
 
   // ===== 侧边栏 =====

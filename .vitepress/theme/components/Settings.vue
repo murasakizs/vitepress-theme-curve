@@ -1440,31 +1440,31 @@
               <div class="set-item">
                 <span class="set-label">反馈与建议</span>
                 <div class="set-options">
-                  <a href="mailto:sgexilq.top" target="_blank" class="options">EMail</a>
-                  <a href="https://myat-q.sgexilq.top" target="_blank" class="options">QQ</a>
+                  <a href="mailto:sgexilq.com" target="_blank" class="options">EMail</a>
+                  <a href="https://myat-q.sgexilq.com" target="_blank" class="options">QQ</a>
                   <a href="https://github.com/murasakizs/vitepress-theme-curve/issues" target="_blank" class="options">Github</a>
                 </div>
               </div>
               <div v-if="channelMode >= 2 && channelMode <= 4" class="set-item">
                 <span class="set-label">前往预览测试频道</span>
                 <div class="set-options">
-                  <a href="https://beta.sgexilq.top" target="_blank" :class="['options', { choose: channelMode === 2 }]">beta频道{{ channelMode === 2 ? '（当前频道）' : '' }}</a>
-                  <a href="https://dev.sgexilq.top" target="_blank" :class="['options', { choose: channelMode === 3 }]">dev频道{{ channelMode === 3 ? '（当前频道）' : '' }}</a>
-                  <a href="https://canary.sgexilq.top" target="_blank" :class="['options', { choose: channelMode === 4 }]">canary频道{{ channelMode === 4 ? '（当前频道）' : '' }}</a>
+                  <a href="https://beta.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 2 }]">beta频道{{ channelMode === 2 ? '（当前频道）' : '' }}</a>
+                  <a href="https://dev.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 3 }]">dev频道{{ channelMode === 3 ? '（当前频道）' : '' }}</a>
+                  <a href="https://canary.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 4 }]">canary频道{{ channelMode === 4 ? '（当前频道）' : '' }}</a>
                 </div>
               </div>
               <div v-else-if="effectiveChannelMode === 5" class="set-item">
                 <span class="set-label">预览测试频道</span>
                 <div class="set-options">
-                  <a href="https://beta.sgexilq.top" target="_blank" class="options">beta频道</a>
-                  <a href="https://dev.sgexilq.top" target="_blank" class="options">dev频道</a>
-                  <a href="https://canary.sgexilq.top" target="_blank" class="options">canary频道</a>
+                  <a href="https://beta.sgexilq.com" target="_blank" class="options">beta频道</a>
+                  <a href="https://dev.sgexilq.com" target="_blank" class="options">dev频道</a>
+                  <a href="https://canary.sgexilq.com" target="_blank" class="options">canary频道</a>
                 </div>
               </div>
               <div class="set-item">
                 <span class="set-label">返回正式频道</span>
                 <div class="set-options">
-                  <a href="https://sgexilq.top" target="_blank" class="options">前往</a>
+                  <a href="https://sgexilq.com" target="_blank" class="options">前往</a>
                 </div>
               </div>
             </template>
@@ -1501,9 +1501,9 @@
                   <div class="set-item" style="margin-bottom: 4px;">
                     <span class="set-label">前往预览测试频道</span>
                     <div class="set-options">
-                      <a href="https://beta.sgexilq.top" target="_blank" class="options">beta频道</a>
-                      <a href="https://dev.sgexilq.top" target="_blank" class="options">dev频道</a>
-                      <a href="https://canary.sgexilq.top" target="_blank" class="options">canary频道</a>
+                      <a href="https://beta.sgexilq.com" target="_blank" class="options">beta频道</a>
+                      <a href="https://dev.sgexilq.com" target="_blank" class="options">dev频道</a>
+                      <a href="https://canary.sgexilq.com" target="_blank" class="options">canary频道</a>
                     </div>
                   </div>
                   <div class="set-item" style="min-height: 36px;">

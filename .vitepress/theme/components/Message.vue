@@ -102,10 +102,10 @@
               <span class="pill-prefix error">{{ pillText }}</span>
             </template>
             <template v-else-if="pillChannel">
-              <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}</span><span>.sgexilq</span><span class="pill-domain">.top</span>
+              <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}</span><span>.sgexilq</span><span class="pill-domain">.com</span>
             </template>
             <template v-else>
-              <span>sgexilq</span><span class="pill-domain">.top</span>
+              <span>sgexilq</span><span class="pill-domain">.com</span>
             </template>
           </span>
         </div>
@@ -174,7 +174,7 @@ const pillText = computed(() => {
   const mode = effectiveChannelMode.value;
   if (mode === 5) return '开发模式';
   const channel = pillChannel.value;
-  return channel ? `${channel}.sgexilq.top` : 'sgexilq.top';
+  return channel ? `${channel}.sgexilq.com` : 'sgexilq.com';
 });
 
 // 灵动模式消息末尾的频道文本

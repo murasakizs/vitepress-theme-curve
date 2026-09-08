@@ -223,7 +223,7 @@ export default withPwa(
           },
           // 文章详情页路由
           {
-            urlPattern: /^\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\/?$/i,
+            urlPattern: /^\/[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)+\/?$/i,
             handler: "NetworkFirst",
             options: {
               cacheName: "post-cache",

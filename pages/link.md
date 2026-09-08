@@ -23,21 +23,21 @@ import Link from "@/views/Link.vue";
 
 - 名称：`泠の小站`
 - 描述：`一个莫名其妙的小站（？）`
-- 地址：`https://sgexilq.top/`
-- 头像：`https://sgexilq.top/images/logo/favicon-256.png`
+- 地址：`https://sgexilq.com/`
+- 头像：`https://sgexilq.com/images/logo/favicon-256.png`
 - 站点图片：`麻烦自行拍摄（不加也行`
 
 ```yml
 name: 泠の小站
 desc: 一个莫名其妙的小站（？）
-url: https://sgexilq.top/
-avatar: https://sgexilq.top/images/logo/favicon-256.png
+url: https://sgexilq.com/
+avatar: https://sgexilq.com/images/logo/favicon-256.png
 screenshot: 麻烦自行拍摄（不加也行
 ```
 
 ### 申请友链
 
-- 我已添加 [泠の小站](https://sgexilq.top/) 的友情链接。
+- 我已添加 [泠の小站](https://sgexilq.com/) 的友情链接。
 - 本站不添加 **采集站**、**纯搬运站点**、**论坛类站点** 等非 **个人博客** 类型的站点。
 - 站点目前可以在 **中国大陆区域** 正常访问。
 - 需要是独立域名，不接受 `github.io`、`vercel.app` 等第三方域名。

@@ -13,7 +13,7 @@
       <span
         v-if="!loading"
         class="status-dot-ping"
-        :class="`ping--${status}`"
+        :class="pingClass"
       />
       <span
         class="status-dot"
@@ -38,7 +38,7 @@
       <span
         v-if="!loading"
         class="status-dot-ping"
-        :class="`ping--${status}`"
+        :class="pingClass"
       />
       <span
         class="status-dot"
@@ -53,6 +53,10 @@
 </template>
 
 <script setup lang="ts">
+import { mainStore } from "@/store/index.js";
+
+const store = mainStore();
+
 // 获取状态页 URL
 // 通过 useData 获取 theme 配置，假设配置在该处，或者直接使用 env
 // VitePress 注入
@@ -115,17 +119,53 @@ const status = computed(() => {
   return data.value?.status || "unknown";
 });
 
-const label = computed(() => data.value?.label || "Unknown");
+// 频道模式下的标签（1 = release频道，2 = beta频道，3 = dev频道，4 = canary频道）
+const channelLabel = computed(() => {
+  const mode = store.channelMode;
+  let base = '';
+  if (mode === 1) base = 'release';
+  else if (mode === 2) base = 'beta';
+  else if (mode === 3) base = 'dev';
+  else if (mode === 4) base = 'canary';
+  if (!base) return '';
+  if (store.devMode === 2) return `${base}频道（开发模式）`;
+  return `${base}频道`;
+});
+
+// 是否处于频道模式（1+devMode 或 2/3/4）
+const isChannelMode = computed(() => {
+  if (store.channelMode >= 2 && store.channelMode <= 4) return true;
+  if (store.channelMode === 1 && store.devMode === 2) return true;
+  return false;
+});
+
+// release频道（开发模式）用红色，其余用蓝色
+const isReleaseDevMode = computed(() => store.channelMode === 1 && store.devMode === 2);
+
+const label = computed(() => {
+  if (isChannelMode.value) return channelLabel.value;
+  return data.value?.label || "Unknown";
+});
 
 // 动态样式类
 const statusClass = computed(() => {
   if (loading.value) return "status--loading";
+  if (isReleaseDevMode.value) return "status--channel-release";
+  if (isChannelMode.value) return "status--channel";
   return `status--${status.value}`;
 });
 
 const dotClass = computed(() => {
   if (loading.value) return "dot--loading";
+  if (isReleaseDevMode.value) return "dot--channel-release";
+  if (isChannelMode.value) return "dot--channel";
   return `dot--${status.value}`;
+});
+
+const pingClass = computed(() => {
+  if (isReleaseDevMode.value) return "ping--channel-release";
+  if (isChannelMode.value) return "ping--channel";
+  return `ping--${status.value}`;
 });
 
 // 限流：5秒内最多3次
@@ -213,6 +253,18 @@ const handleRefresh = () => {
     color: var(--main-info-color);
   }
 
+  // 频道模式 - 蓝色
+  &.status--channel {
+    background: var(--main-info-color-gray);
+    color: var(--main-info-color);
+  }
+
+  // release频道（开发模式）- 红色
+  &.status--channel-release {
+    background: var(--main-error-color-gray);
+    color: var(--main-error-color);
+  }
+
   // 错误/未知状态 - 灰色
   &.status--error,
   &.status--unknown {
@@ -247,6 +299,8 @@ const handleRefresh = () => {
   &.ping--partial { background-color: var(--main-warning-color); }
   &.ping--major { background-color: var(--main-error-color); }
   &.ping--maintenance { background-color: var(--main-info-color); }
+  &.ping--channel { background-color: var(--main-info-color); }
+  &.ping--channel-release { background-color: var(--main-error-color); }
   &.ping--error, &.ping--unknown { background-color: var(--main-font-second-color); }
 }
 
@@ -268,6 +322,8 @@ const handleRefresh = () => {
   &.dot--partial { background-color: var(--main-warning-color); }
   &.dot--major { background-color: var(--main-error-color); }
   &.dot--maintenance { background-color: var(--main-info-color); }
+  &.dot--channel { background-color: var(--main-info-color); }
+  &.dot--channel-release { background-color: var(--main-error-color); }
   &.dot--error, &.dot--unknown { background-color: var(--main-font-second-color); }
 }
 

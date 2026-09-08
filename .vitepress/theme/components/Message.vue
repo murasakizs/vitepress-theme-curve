@@ -27,6 +27,7 @@
           </span>
           <span v-if="messageHtml" class="text" v-html="messageContent"></span>
           <span v-else class="text">{{ messageContent || "默认消息内容" }}</span>
+          <span v-if="messageIsland && islandChannelText" :class="['island-channel', islandChannelClass]">{{ islandChannelText }}</span>
           <span v-if="messageClose" class="close">
             <i class="iconfont icon-close"></i>
           </span>
@@ -69,21 +70,31 @@
           <span class="pill-text">{{ { success: '成功 Success', warning: '警告 Warning', error: '错误 Error', info: '信息 Info' }[bottomMessageType] }}</span>
         </div>
         <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
-          <span class="pill-text" v-if="store.islandShowDate">
-            <span class="time-date">{{ currentDate }}</span>&nbsp;
-            <span v-if="store.islandShowSeconds">
+          <template v-if="store.islandPlayerSupport && store.playState && store.playerShow">
+            <span class="pill-text pill-music">
+              <img v-if="store.playerData?.cover" :src="store.playerData.cover" :class="['pill-music-cover', { spinning: store.playState }]" alt="" />
+              <span class="pill-music-info">
+                <span class="pill-music-name">{{ store.playerData?.name || '未知曲目' }}</span>
+              </span>
+            </span>
+          </template>
+          <template v-else>
+            <span class="pill-text" v-if="store.islandShowDate">
+              <span class="time-date">{{ currentDate }}</span>&nbsp;
+              <span v-if="store.islandShowSeconds">
+                <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
+              </span>
+              <span v-else>
+                <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
+              </span>
+            </span>
+            <span class="pill-text" v-else-if="store.islandShowSeconds">
               <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
             </span>
-            <span v-else>
+            <span class="pill-text" v-else>
               <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
             </span>
-          </span>
-          <span class="pill-text" v-else-if="store.islandShowSeconds">
-            <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
-          </span>
-          <span class="pill-text" v-else>
-            <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
-          </span>
+          </template>
         </div>
         <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
           <span class="pill-text">
@@ -164,6 +175,26 @@ const pillText = computed(() => {
   if (mode === 5) return '开发模式';
   const channel = pillChannel.value;
   return channel ? `${channel}.sgexilq.top` : 'sgexilq.top';
+});
+
+// 灵动模式消息末尾的频道文本
+const islandChannelText = computed(() => {
+  const mode = effectiveChannelMode.value;
+  if (mode === 5) return '开发模式';
+  if (mode === 2) return 'beta频道';
+  if (mode === 3) return 'dev频道';
+  if (mode === 4) return 'canary频道';
+  return '';
+});
+
+// 灵动模式频道文本颜色类
+const islandChannelClass = computed(() => {
+  const mode = effectiveChannelMode.value;
+  if (mode === 5) return 'channel-devmode';
+  if (mode === 2) return 'channel-beta';
+  if (mode === 3) return 'channel-dev';
+  if (mode === 4) return 'channel-canary';
+  return '';
 });
 
 // 拓展模式消息数组
@@ -608,6 +639,18 @@ onUnmounted(() => {
       .message-content .text {
         color: #ffffff;
       }
+      .message-content .island-channel {
+        &.channel-beta {
+          color: rgba(144, 147, 153, 0.8);
+        }
+        &.channel-dev,
+        &.channel-canary {
+          color: rgba(230, 162, 60, 0.8);
+        }
+        &.channel-devmode {
+          color: rgba(245, 108, 108, 0.8);
+        }
+      }
       .message-content .close .iconfont {
         color: #ffffff;
       }
@@ -631,9 +674,25 @@ onUnmounted(() => {
       white-space: nowrap;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 10px;
       .text {
         color: var(--main-font-color);
+      }
+      .island-channel {
+        font-size: 14px;
+        margin-left: -6px;
+        &.channel-beta {
+          color: var(--main-info-color);
+        }
+        &.channel-dev,
+        &.channel-canary {
+          color: var(--main-warning-color);
+        }
+        &.channel-devmode {
+          color: var(--main-error-color);
+          font-weight: bold;
+        }
       }
       .close .iconfont {
         color: var(--main-font-color);
@@ -719,6 +778,38 @@ onUnmounted(() => {
     .pill-progress {
       width: 20px;
       height: 20px;
+    }
+    .pill-music {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pill-music-cover {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      &.spinning {
+        animation: pill-cover-rotate 8s linear infinite;
+      }
+    }
+    @keyframes pill-cover-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .pill-music-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .pill-music-name {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
     }
     @media (max-width: 768px) {
       padding: 8px 12px;

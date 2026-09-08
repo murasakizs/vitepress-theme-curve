@@ -1,10 +1,6 @@
 <!-- 全局设置 -->
 <template>
   <div class="settings">
-    <div class="set-btn s-card" @click="store.changeShowStatus('showSettings')">
-      <i class="iconfont icon-style"></i>
-      <span class="set-text">个性化配置</span>
-    </div>
     <!-- 设置面板 -->
     <Modal
       :show="store.showSettings"
@@ -76,6 +72,23 @@
                   <span
                     :class="['options', { choose: showAllGroups }]"
                     @click="showAllGroups = true"
+                  >
+                    on
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">expand all settings groups</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: !expandAllGroups }]"
+                    @click="handleCollapseAllGroups"
+                  >
+                    off
+                  </span>
+                  <span
+                    :class="['options', { choose: expandAllGroups }]"
+                    @click="handleExpandAllGroups"
                   >
                     on
                   </span>
@@ -172,7 +185,7 @@
                   <template v-else>
                     <div style="display: flex; align-items: center; justify-content: space-between">
                       <span class="warn-text">are you sure you want to turn off development mode</span>
-                      <span class="options" @click.stop="saveStoreDefaults({ DEFAULT_DEV_MODE: 1, bumpVersion: true }); store.devMode = 1; closeDevModeConfirmVisible = false">confirm</span>
+                      <span class="options" @click.stop="saveStoreDefaults({ DEFAULT_DEV_MODE: 1, resetVersion: 1 }); store.devMode = 1; closeDevModeConfirmVisible = false">confirm</span>
                     </div>
                   </template>
                 </div>
@@ -367,7 +380,7 @@
               <div class="set-options">
                 <span
                   :class="['options', { choose: moreFontsExpanded }]"
-                  @click="moreFontsExpanded = !moreFontsExpanded"
+                  @click="handleMoreFontsClick"
                 >
                   {{ moreFontsExpanded ? '收起' : '展开' }}
                 </span>
@@ -413,6 +426,39 @@
                   </div>
                 </Transition>
               </div>
+            </Transition>
+            <!-- 开发模式入口 -->
+            <Transition name="fade-up">
+              <template v-if="devModeEntryVisible">
+                <div v-if="devModeEntrySuccess" class="set-warn" @click="devModeEntryClose" style="cursor: pointer">
+                  <span class="warn-text">success</span>
+                  <span class="options">ok</span>
+                </div>
+                <div v-else-if="devModeEntryError" class="set-warn">
+                  <span class="warn-text">error</span>
+                  <span class="options" @click="devModeEntryClose">ok</span>
+                </div>
+                <div v-else-if="devModeEntryStep === 0" class="set-item">
+                  <span class="set-label" style="color: var(--main-error-color)">confirm entry into development mode</span>
+                  <div class="set-options">
+                    <span class="options" @click="devModeEntryClose">no</span>
+                    <span class="options devmode-yes-btn" @click="devModeEntryStep = 1">yes</span>
+                  </div>
+                </div>
+                <div v-else-if="devModeEntryStep === 1" class="set-item">
+                  <span class="set-label" style="color: var(--main-error-color)">verification required</span>
+                  <div class="set-options">
+                    <input
+                      v-model="devModeEntryInput"
+                      class="devmode-entry-input"
+                      type="text"
+                      placeholder="verification code"
+                      @keyup.enter="devModeEntryVerify"
+                    />
+                    <span class="options devmode-yes-btn" @click="devModeEntryVerify">continue</span>
+                  </div>
+                </div>
+              </template>
             </Transition>
             <span class="title">实验性功能</span>
             <span class="set-desc">以下选项处于实验性阶段，可能出现未知的问题</span>
@@ -956,22 +1002,143 @@
                     </div>
                   </div>
                   <div class="set-item">
-                    <span class="set-label">播放器</span>
+                    <span class="set-label">音乐播放器</span>
                     <div class="set-options">
                       <span
-                        :class="['options', { choose: !playerShow }]"
-                        @click="playerShow = false"
+                        :class="['options', { choose: musicPlayerExpanded }]"
+                        @click="musicPlayerExpanded = !musicPlayerExpanded"
                       >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: playerShow }]"
-                        @click="playerShow = true"
-                      >
-                        开启
+                        {{ musicPlayerExpanded ? '收起' : '展开' }}
                       </span>
                     </div>
                   </div>
+                  <Transition name="fade-up">
+                    <div v-if="musicPlayerExpanded" class="set-expand-box">
+                      <div class="set-item">
+                        <span class="set-label">音乐播放器</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !playerShow }]"
+                            @click="playerShow = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: playerShow }]"
+                            @click="playerShow = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">样式</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: islandStyle === 'standard' }]"
+                            @click="islandStyle = 'standard'"
+                          >
+                            标准
+                          </span>
+                          <span
+                            :class="['options', { choose: islandStyle === 'extended' }]"
+                            @click="islandStyle = 'extended'"
+                          >
+                            拓展
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">进入站点自动播放音乐</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !playerAutoPlay }]"
+                            @click="playerAutoPlay = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: playerAutoPlay }]"
+                            @click="playerAutoPlay = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">播放模式</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: playerPlayMode === 'list' }]"
+                            @click="playerPlayMode = 'list'"
+                          >
+                            顺序
+                          </span>
+                          <span
+                            :class="['options', { choose: playerPlayMode === 'shuffle' }]"
+                            @click="playerPlayMode = 'shuffle'"
+                          >
+                            随机
+                          </span>
+                          <span
+                            :class="['options', { choose: playerPlayMode === 'single' }]"
+                            @click="playerPlayMode = 'single'"
+                          >
+                            单曲循环
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">歌单来源</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: playerMusicSource === 'preset' }]"
+                            @click="playerMusicSource = 'preset'"
+                          >
+                            泠の预设
+                          </span>
+                          <span
+                            :class="['options', { choose: playerMusicSource === 'custom' }]"
+                            @click="playerMusicSource = 'custom'"
+                          >
+                            自定义
+                          </span>
+                        </div>
+                      </div>
+                      <Transition name="fade-up">
+                        <div v-if="playerMusicSource === 'custom'" class="set-item">
+                          <span class="set-label">自定义歌单ID（网易云音乐）</span>
+                          <div class="set-options">
+                            <input
+                              v-model="playerCustomIdsInput"
+                              type="text"
+                              style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 120px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                              placeholder="多个ID用逗号分隔"
+                              @keyup.enter="confirmCustomIds"
+                            />
+                            <span class="options" @click="confirmCustomIds">确定</span>
+                          </div>
+                        </div>
+                      </Transition>
+                      <div class="set-item">
+                        <span class="set-label">超级岛支持</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !islandPlayerSupport }]"
+                            @click="islandPlayerSupport = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: islandPlayerSupport }]"
+                            @click="islandPlayerSupport = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
                   <div class="set-item">
                     <span class="set-label">定时切换明暗显示外观</span>
                     <div class="set-options">
@@ -1011,6 +1178,102 @@
                       />
                     </div>
                   </div>
+                  <div class="set-item">
+                    <span class="set-label">天气小组件</span>
+                    <div class="set-options">
+                      <span
+                        :class="['options', { choose: weatherSectionExpanded }]"
+                        @click="weatherSectionExpanded = !weatherSectionExpanded"
+                      >
+                        {{ weatherSectionExpanded ? '收起' : '展开' }}
+                      </span>
+                    </div>
+                  </div>
+                  <Transition name="fade-up">
+                    <div v-if="weatherSectionExpanded" class="set-expand-box">
+                      <div class="set-item">
+                        <span class="set-label">天气小组件</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: !weatherWidgetEnabled }]"
+                            @click="weatherWidgetEnabled = false"
+                          >
+                            关闭
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherWidgetEnabled }]"
+                            @click="weatherWidgetEnabled = true"
+                          >
+                            开启
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">定位方式</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: weatherLocationMode === 'satellite' }]"
+                            @click="switchLocationMode('satellite', '自动')"
+                          >
+                            自动
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherLocationMode === 'ip' }]"
+                            @click="switchLocationMode('ip', 'IP地址')"
+                          >
+                            IP地址
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherLocationMode === 'manual' }]"
+                            @click="switchLocationMode('manual', '自定义')"
+                          >
+                            自定义
+                          </span>
+                        </div>
+                      </div>
+                      <div v-if="weatherLocationMode === 'manual'" class="set-item">
+                        <span class="set-label">城市名称</span>
+                        <div class="set-options">
+                          <input
+                            v-model="weatherManualCity"
+                            type="text"
+                            style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 80px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                            placeholder="例如：苏州"
+                            @keyup.enter="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
+                          />
+                          <span
+                            class="options"
+                            @click="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
+                          >
+                            确认
+                          </span>
+                        </div>
+                      </div>
+                      <div class="set-item">
+                        <span class="set-label">天气数据源</span>
+                        <div class="set-options">
+                          <span
+                            :class="['options', { choose: weatherProvider === 'amap' }]"
+                            @click="switchWeatherProvider('amap')"
+                          >
+                            高德
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherProvider === 'wttr' }]"
+                            @click="switchWeatherProvider('wttr')"
+                          >
+                            wttr.in
+                          </span>
+                          <span
+                            :class="['options', { choose: weatherProvider === 'openmeteo' }]"
+                            @click="switchWeatherProvider('openmeteo')"
+                          >
+                            Open-Meteo
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
 
                   </template>
                 </div>
@@ -1325,7 +1588,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
 
 // 有效频道模式（响应式）
@@ -1455,8 +1718,51 @@ const handleLayoutOk = () => {
 // 消息设置展开状态
 const messageSettingsExpanded = ref(false);
 const moreFontsExpanded = ref(false);
+// 开发模式入口
+const devModeEntryClickCount = ref(0);
+const devModeEntryVisible = ref(false);
+const devModeEntryStep = ref(0);
+const devModeEntryInput = ref('');
+const devModeEntryError = ref(false);
+const devModeEntrySuccess = ref(false);
 // 超级岛设置展开状态
 const islandSettingsExpanded = ref(false);
+// 音乐播放器设置展开状态
+const musicPlayerExpanded = ref(false);
+// 自定义歌单 ID 临时输入值
+const playerCustomIdsInput = ref(playerCustomIds.value);
+const confirmCustomIds = () => {
+  playerCustomIds.value = playerCustomIdsInput.value;
+  if (typeof $message !== "undefined") {
+    $message.success("歌单 ID 已更新");
+  }
+};
+// 展开所有设置分组
+const expandAllGroups = ref(false);
+const handleExpandAllGroups = () => {
+  expandAllGroups.value = true;
+  showMoreSettings.value = true;
+  showMoreSettingsConfirmed.value = true;
+  moreFontsExpanded.value = true;
+  messageSettingsExpanded.value = true;
+  islandSettingsExpanded.value = true;
+  betaChannelExpanded.value = true;
+  devChannelExpanded.value = true;
+  canaryChannelExpanded.value = true;
+};
+const handleCollapseAllGroups = () => {
+  expandAllGroups.value = false;
+  showMoreSettings.value = false;
+  showMoreSettingsConfirmed.value = false;
+  moreFontsExpanded.value = false;
+  messageSettingsExpanded.value = false;
+  islandSettingsExpanded.value = false;
+  // 频道展开状态恢复为默认：当前频道展开，其他关闭
+  const mode = channelMode.value;
+  betaChannelExpanded.value = mode === 2;
+  devChannelExpanded.value = mode === 3;
+  canaryChannelExpanded.value = mode === 4;
+};
 // 主题颜色设置展开状态
 const themeColorExpanded = ref(false);
 // 开发模式选项展开状态（已移至 store 持久化）
@@ -1477,6 +1783,55 @@ const fontSizeEditing = ref(false);
 const fontSizeWarnVisible = ref(false);
 const removeAnimationsWarnVisible = ref(false);
 const showMoreSettingsWarnVisible = ref(false);
+
+// 开发模式入口方法
+const handleMoreFontsClick = () => {
+  moreFontsExpanded.value = !moreFontsExpanded.value;
+  devModeEntryClickCount.value++;
+
+  // 10秒内按12下展示开发模式入口
+  if (devModeEntryClickCount.value >= 12 && store.devMode !== 2) {
+    devModeEntryVisible.value = true;
+    devModeEntryStep.value = 0;
+    devModeEntryError.value = false;
+    devModeEntrySuccess.value = false;
+    devModeEntryInput.value = '';
+  }
+
+  // 10秒内没有继续点击则重置计数
+  setTimeout(() => {
+    if (devModeEntryClickCount.value < 12) {
+      devModeEntryClickCount.value = 0;
+    }
+  }, 10000);
+};
+
+const devModeEntryVerify = () => {
+  if (devModeEntryInput.value === 'devyes') {
+    devModeEntrySuccess.value = true;
+    devModeEntryError.value = false;
+  } else {
+    devModeEntryError.value = true;
+    devModeEntryInput.value = '';
+  }
+};
+
+const devModeEntryClose = () => {
+  if (devModeEntrySuccess.value) {
+    store.devMode = 2;
+    saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 2, bumpVersion: true });
+    if (typeof $message !== "undefined") {
+      $message.success("开发模式已启用");
+    }
+  }
+  devModeEntryVisible.value = false;
+  devModeEntryClickCount.value = 0;
+  devModeEntryStep.value = 0;
+  devModeEntryInput.value = '';
+  devModeEntryError.value = false;
+  devModeEntrySuccess.value = false;
+};
+
 const resetFontSize = () => {
   store.fontSize = 17;
   if (typeof document !== 'undefined') {
@@ -1512,37 +1867,77 @@ const saveStoreDefaults = async (data) => {
   }
 };
 
+// 切换天气定位方式
+const switchLocationMode = (mode, label) => {
+  weatherLocationMode.value = mode;
+  window.dispatchEvent(new Event('weather-refresh'));
+  if (typeof $message !== 'undefined') {
+    $message.success(`天气定位方式已切换为 ${label}`);
+  }
+};
+
+// 切换天气数据提供商
+const switchWeatherProvider = (provider) => {
+  weatherProvider.value = provider;
+  window.dispatchEvent(new Event('weather-refresh'));
+  if (typeof $message !== 'undefined') {
+    $message.success('已切换天气数据源');
+  }
+};
+
 // 关闭开发模式（保存版本到 store/index.js）
 const confirmCloseDevMode = async () => {
-  await saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 1, bumpVersion: true });
+  await saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 1, resetVersion: 1 });
   store.devMode = 1;
   closeDevModeConfirmVisible.value = false;
+  if (typeof $message !== "undefined") {
+    $message.warning("已关闭开发模式");
+  }
 };
 
 // 清除数据但保留当前频道和开发模式选项
 const handleClearDataKeepChannel = async () => {
+  if (typeof $message !== "undefined") {
+    $message.warning("数据已清除，页面即将刷新");
+  }
   const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
   const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value };
   const savedVersion = localStorage.getItem('siteDataVersion');
   saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value });
+
+  // 清除 localStorage 和 sessionStorage
   localStorage.clear();
   sessionStorage.clear();
+
+  // 注销所有 Service Worker
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      for (const reg of registrations) {
-        reg.unregister();
-      }
-    });
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const reg of registrations) {
+      await reg.unregister();
+    }
   }
+
+  // 清除所有 Cache API 缓存
   if ("caches" in window) {
-    caches.keys().then((names) => {
-      for (const name of names) {
-        caches.delete(name);
-      }
-    });
+    const names = await caches.keys();
+    for (const name of names) {
+      await caches.delete(name);
+    }
   }
+
+  // 清除所有 IndexedDB
+  if ("indexedDB" in window) {
+    const databases = await indexedDB.databases();
+    for (const db of databases) {
+      if (db.name) {
+        indexedDB.deleteDatabase(db.name);
+      }
+    }
+  }
+
+  // 恢复保留的数据
   localStorage.setItem("siteData", JSON.stringify(savedData));
   if (savedVersion) localStorage.setItem("siteDataVersion", savedVersion);
   window.location.reload();
@@ -1558,6 +1953,9 @@ const scrollToResetWarn = () => {
 };
 const handleResetConfig = async () => {
   showResetConfirm.value = false;
+  if (typeof $message !== "undefined") {
+    $message.warning("配置已恢复默认，页面即将刷新");
+  }
   const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
@@ -1567,20 +1965,28 @@ const handleResetConfig = async () => {
   // 清空 localStorage 和 sessionStorage
   localStorage.clear();
   sessionStorage.clear();
-  // 注销 Service Worker 并清除缓存
+  // 注销所有 Service Worker
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      for (const reg of registrations) {
-        reg.unregister();
-      }
-    });
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const reg of registrations) {
+      await reg.unregister();
+    }
   }
+  // 清除所有 Cache API 缓存
   if ("caches" in window) {
-    caches.keys().then((names) => {
-      for (const name of names) {
-        caches.delete(name);
+    const names = await caches.keys();
+    for (const name of names) {
+      await caches.delete(name);
+    }
+  }
+  // 清除所有 IndexedDB
+  if ("indexedDB" in window) {
+    const databases = await indexedDB.databases();
+    for (const db of databases) {
+      if (db.name) {
+        indexedDB.deleteDatabase(db.name);
       }
-    });
+    }
   }
   localStorage.setItem("siteData", JSON.stringify(savedData));
   if (savedVersion) localStorage.setItem("siteDataVersion", savedVersion);
@@ -2059,6 +2465,8 @@ watch(
       moreFontsExpanded.value = false;
       islandSettingsExpanded.value = false;
       themeColorExpanded.value = false;
+      musicPlayerExpanded.value = false;
+      playerCustomIdsInput.value = playerCustomIds.value;
       showAllGroups.value = false;
       closeDevModeConfirmVisible.value = false;
       layoutWarnVisible.value = false;
@@ -2099,46 +2507,6 @@ watch(
 
 <style lang="scss" scoped>
 .settings {
-  .set-btn {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 42px;
-    height: 42px;
-    padding: 0;
-    border-radius: 25px;
-    box-shadow: 0 6px 10px -4px var(--main-dark-shadow);
-    .iconfont {
-      font-size: 22px;
-      margin-left: 10px;
-      transition: color 0.3s;
-    }
-    .set-text {
-      margin-left: 10px;
-      display: inline-flex;
-      opacity: 0;
-      font-size: 14px;
-      line-height: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      transition: opacity 0.3s;
-    }
-    &:hover {
-      width: 140px;
-      color: var(--main-card-background);
-      border-color: var(--main-color);
-      background-color: var(--main-color);
-      .iconfont {
-        color: var(--main-card-background);
-      }
-      .set-text {
-        opacity: 1;
-      }
-    }
-    @media (min-width: 769px) {
-      display: none;
-    }
-  }
 }
 .set-list {
   .title {
@@ -2302,6 +2670,27 @@ watch(
         background-color: transparent;
         box-shadow: none;
       }
+    }
+  }
+  .devmode-entry-input {
+    padding: 6px 10px;
+    border: 1px solid var(--main-card-border);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    background-color: var(--main-card-background);
+    color: var(--main-font-color);
+    outline: none;
+    min-width: 140px;
+    margin: 4px 8px;
+    &:focus {
+      border-color: var(--main-color);
+    }
+  }
+  .devmode-yes-btn {
+    background-color: var(--main-error-color) !important;
+    color: #fff !important;
+    &:hover {
+      background-color: color-mix(in srgb, var(--main-error-color) 80%, #000) !important;
     }
   }
   .set-warn-channel {

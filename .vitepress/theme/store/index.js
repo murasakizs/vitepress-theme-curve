@@ -4,7 +4,7 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 2;
+const PERSIST_VERSION = 1;
 // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
 const DEFAULT_CHANNEL_MODE = 2;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
@@ -63,12 +63,24 @@ export const mainStore = defineStore("main", {
       showSettings: false,
       // 播放器数据
       playState: false,
-      playerShow: false,
+      playerShow: true,
+      playerAutoPlay: false,
+      playerPlayMode: "list",
+      playerMusicSource: "preset",
+      playerCustomIds: "",
       playerVolume: 0.7,
       playerData: {
         name: "未知曲目",
         artist: "未知艺术家",
+        cover: "",
+        lrc: "",
       },
+      playerLyric: "",
+      playerFolded: true,
+      playerPanelTab: "list",
+      // 超级岛播放器联动
+      islandPlayerSupport: false,
+      islandStyle: "extended",
       // 移动端菜单显示
       mobileMenuShow: false,
       // 使用自定义右键菜单
@@ -143,6 +155,18 @@ export const mainStore = defineStore("main", {
       imageLazyEnabled: true,
       imageWebpEnabled: false,
       imageLightboxEnabled: true,
+      // 天气小组件开关
+      weatherWidgetEnabled: true,
+      // 天气小组件折叠状态
+      weatherSectionExpanded: false,
+      // 天气数据源（amap = 高德，wttr = wttr.in，openmeteo = Open-Meteo）
+      weatherProvider: "amap",
+      // 天气定位方式（satellite = 卫星定位，ip = IP定位，manual = 手动输入）
+      weatherLocationMode: "ip",
+      // 手动输入的城市名
+      weatherManualCity: "",
+      // 天气刷新触发器（手动输入确认时 +1）
+      weatherRefreshTrigger: 0,
       // 定时切换明暗显示外观
       scheduledThemeEnabled: false,
       scheduledLightTime: "07:00",
@@ -196,7 +220,7 @@ export const mainStore = defineStore("main", {
       // 禁止壁纸模式切换
       if (this.backgroundType === "image") {
         if (typeof $message !== "undefined") { 
-          $message.warning("无法在壁纸模式下切换明暗模式");
+          $message.error("无法在壁纸模式下切换明暗模式");
         }
         return false;
       }
@@ -395,7 +419,13 @@ export const mainStore = defineStore("main", {
         "useRightMenu",
         "useCustomCursor",
         "playerShow",
+        "playerAutoPlay",
+        "playerPlayMode",
+        "playerMusicSource",
+        "playerCustomIds",
         "playerVolume",
+        "islandPlayerSupport",
+        "islandStyle",
         "backgroundBlur",
         "backgroundType",
         "fontFamily",
@@ -435,6 +465,10 @@ export const mainStore = defineStore("main", {
         "imageLazyEnabled",
         "imageWebpEnabled",
         "imageLightboxEnabled",
+        "weatherProvider",
+        "weatherLocationMode",
+        "weatherManualCity",
+        "weatherWidgetEnabled",
         "scheduledThemeEnabled",
         "scheduledLightTime",
         "scheduledDarkTime",

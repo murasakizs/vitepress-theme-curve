@@ -14,7 +14,7 @@
         <span class="desc">{{ theme.siteMeta.description }}</span>
       </div>
       <div class="link">
-        <a href="https://myat-g.sgexilq.top" target="_blank" class="social-link">
+        <a href="https://myat-g.sgexilq.com" target="_blank" class="social-link">
           <i class="iconfont icon-github"></i>
         </a>
         <a href="mailto:sgexilq@qq.com" target="_blank" class="social-link">

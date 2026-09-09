@@ -73,6 +73,9 @@
     text-align: left;
     letter-spacing: 0.6px;
     line-height: 2;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-all;
     // 行内代码
     code {
       display: inline-flex;

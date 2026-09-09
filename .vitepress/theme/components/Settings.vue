@@ -2388,8 +2388,6 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.settings {
-}
 .set-list {
   .title {
     display: block;

@@ -10,8 +10,8 @@
       @modal-close="store.changeShowStatus('showSettings')"
     >
       <div class="set-list">
-        <div v-if="channelMode >= 2 && channelMode <= 4 && store.devMode !== 2" class="set-warn set-warn-channel">
-          <span class="warn-text">当前处于测试频道（{{ channelMode === 2 ? 'beta' : channelMode === 3 ? 'dev' : 'canary' }}分支）</span>
+        <div v-if="channelMode >= 2 && channelMode <= 3 && store.devMode !== 2" class="set-warn set-warn-channel">
+          <span class="warn-text">当前处于测试分支（{{ channelMode === 2 ? 'beta' : 'dev' }}分支）</span>
         </div>
         <div v-if="store.devMode === 2" class="set-warn">
           <span class="warn-text">当前处于开发模式，提交代码时应退出开发模式</span>
@@ -52,29 +52,6 @@
                   >
                     dev
                   </span>
-                  <span
-                    :class="['options', { choose: channelMode === 4 }]"
-                    @click="switchChannelMode(4)"
-                  >
-                    canary
-                  </span>
-                </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">show all test channel options</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: !showAllGroups }]"
-                    @click="showAllGroups = false"
-                  >
-                    off
-                  </span>
-                  <span
-                    :class="['options', { choose: showAllGroups }]"
-                    @click="showAllGroups = true"
-                  >
-                    on
-                  </span>
                 </div>
               </div>
               <div class="set-item">
@@ -106,23 +83,6 @@
                   <span
                     :class="['options', { choose: devChannelMerged === 2 }]"
                     @click="devChannelMerged = 2; saveStoreDefaults({ DEFAULT_DEV_CHANNEL_MERGED: 2, bumpVersion: true })"
-                  >
-                    on
-                  </span>
-                </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">canary no content</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: canaryChannelMerged !== 2 }]"
-                    @click="canaryChannelMerged = 0; saveStoreDefaults({ DEFAULT_CANARY_CHANNEL_MERGED: 0, bumpVersion: true })"
-                  >
-                    off
-                  </span>
-                  <span
-                    :class="['options', { choose: canaryChannelMerged === 2 }]"
-                    @click="canaryChannelMerged = 2; saveStoreDefaults({ DEFAULT_CANARY_CHANNEL_MERGED: 2, bumpVersion: true })"
                   >
                     on
                   </span>
@@ -193,7 +153,7 @@
             </div>
           </Transition>
         </template>
-        <span class="title">通用</span>
+        <span class="title">基本</span>
         <div class="set-item">
           <span class="set-label">首页样式（ Banner 高度 ）</span>
           <div class="set-options">
@@ -298,7 +258,584 @@
             </span>
           </div>
         </div>
-        <span class="title">更多</span>
+        <span class="title">高级</span>
+        <div class="set-item">
+          <span class="set-label">主题颜色</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: themeColorExpanded }]"
+              @click="themeColorExpanded = !themeColorExpanded"
+            >
+              {{ themeColorExpanded ? '收起' : '展开' }}
+            </span>
+          </div>
+        </div>
+        <Transition name="fade-up">
+          <div v-if="themeColorExpanded" class="set-expand-box">
+            <template v-if="highContrast !== 'max'">
+              <template v-if="!customThemeEnabled">
+                <div class="set-item">
+                  <span class="set-label">预设主题</span>
+                  <div class="set-options">
+                    <span
+                      v-for="color in themeColorList"
+                      :key="color.value"
+                      :class="['options', { choose: themeColor === color.value }]"
+                      @click="setThemeColor(color.value)"
+                    >
+                      {{ color.label }}
+                    </span>
+                  </div>
+                </div>
+              </template>
+              <div v-else class="set-item">
+                <span class="set-label">启用预设主题需要先关闭 自定义主题</span>
+                <div class="set-options">
+                  <span class="options" @click="toggleCustomTheme(false)">确认</span>
+                </div>
+              </div>
+            </template>
+            <div v-else class="set-item">
+              <span class="set-label">切换主题需要先关闭 高对比度模式（最高）</span>
+              <div class="set-options">
+                <span class="options" @click="setHighContrast(false)">确认</span>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">高对比度模式</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: !highContrast }]"
+                  @click="setHighContrast(false)"
+                >
+                  关闭
+                </span>
+                <span
+                  :class="['options', { choose: highContrast === true }]"
+                  @click="setHighContrast(true)"
+                >
+                  开启
+                </span>
+                <span
+                  :class="['options', { choose: highContrast === 'max' }]"
+                  @click="setHighContrast('max')"
+                >
+                  最高
+                </span>
+              </div>
+            </div>
+            <template v-if="highContrast !== 'max'">
+              <div class="set-item">
+                <span class="set-label">自定义主题</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: !customThemeEnabled }]"
+                    @click="toggleCustomTheme(false)"
+                  >
+                    关闭
+                  </span>
+                  <span
+                    :class="['options', { choose: customThemeEnabled }]"
+                    @click="toggleCustomTheme(true)"
+                  >
+                    开启
+                  </span>
+                </div>
+              </div>
+              <template v-if="customThemeEnabled">
+                <div class="set-item">
+                  <span class="set-label">自定义主要色（#RRGGBB）</span>
+                  <div class="set-options">
+                    <div class="color-preview" :style="{ backgroundColor: customPrimaryColor }" @click="$refs.primaryColorInput.click()"></div>
+                    <input
+                      ref="primaryColorInput"
+                      v-model="customPrimaryColor"
+                      type="color"
+                      class="color-input-hidden"
+                    />
+                    <input
+                      v-model="customPrimaryColor"
+                      type="text"
+                      class="text-input"
+                      placeholder="#RRGGBB"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">自定义辅助色（#RRGGBB）</span>
+                  <div class="set-options">
+                    <div class="color-preview" :style="{ backgroundColor: customSecondaryColor }" @click="$refs.secondaryColorInput.click()"></div>
+                    <input
+                      ref="secondaryColorInput"
+                      v-model="customSecondaryColor"
+                      type="color"
+                      class="color-input-hidden"
+                    />
+                    <input
+                      v-model="customSecondaryColor"
+                      type="text"
+                      class="text-input"
+                      placeholder="#RRGGBB"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">保存当前自定义主题色</span>
+                  <div class="set-options">
+                    <span class="options" @click="revertCustomTheme">撤销</span>
+                    <span class="options" @click="applyCustomTheme">应用</span>
+                  </div>
+                </div>
+              </template>
+            </template>
+            <div class="set-item">
+              <span class="set-label">移除动画</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: !removeAnimations }]"
+                  @click="setRemoveAnimations(false)"
+                >
+                  关闭
+                </span>
+                <span
+                  :class="['options', { choose: removeAnimations }]"
+                  @click="removeAnimations = true; removeAnimationsWarnVisible = true"
+                >
+                  开启
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="removeAnimationsWarnVisible" class="set-warn" @click="removeAnimations = false; removeAnimationsWarnVisible = false">
+                <span class="warn-text">开启此选项将移除所有过渡动画，你确定要继续吗</span>
+                <span class="options" @click.stop="applyRemoveAnimations">确认</span>
+              </div>
+            </Transition>
+          </div>
+        </Transition>
+        <div class="set-item">
+          <span class="set-label">消息样式</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: messageSettingsExpanded }]"
+              @click="messageSettingsExpanded = !messageSettingsExpanded"
+            >
+              {{ messageSettingsExpanded ? '收起' : '展开' }}
+            </span>
+          </div>
+        </div>
+        <Transition name="fade-up">
+          <div v-if="messageSettingsExpanded" class="set-expand-box">
+            <div class="set-item">
+              <span class="set-label">消息样式</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: messageStyle === 'bar' }]"
+                  @click="setMessageStyle('bar')"
+                >
+                  传统（不推荐）
+                </span>
+                <span
+                  :class="['options', { choose: messageStyle === 'card' }]"
+                  @click="setMessageStyle('card')"
+                >
+                  卡片
+                </span>
+                <span
+                  :class="['options', { choose: messageStyle === 'island' }]"
+                  @click="setMessageStyle('island')"
+                >
+                  超级岛
+                </span>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">消息位置</span>
+              <div class="set-options">
+                <template v-if="messageStyle === 'island'">
+                  <span class="options choose">顶部居中</span>
+                </template>
+                <template v-else-if="messageStyle === 'bar'">
+                  <span
+                    :class="['options', { choose: messagePosition === 'bar-top' }]"
+                    @click="setMessagePosition('bar-top')"
+                  >
+                    顶部
+                  </span>
+                  <span
+                    :class="['options', { choose: messagePosition === 'bar-bottom' }]"
+                    @click="setMessagePosition('bar-bottom')"
+                  >
+                    底部
+                  </span>
+                </template>
+                <template v-else>
+                  <template v-if="isMobileLayout">
+                    <span
+                      :class="['options', { choose: messagePosition === 'top-center' }]"
+                      @click="setMessagePosition('top-center')"
+                    >
+                      顶部
+                    </span>
+                    <span
+                      :class="['options', { choose: messagePosition === 'bottom-center' }]"
+                      @click="setMessagePosition('bottom-center')"
+                    >
+                      底部
+                    </span>
+                  </template>
+                  <template v-else>
+                  <span
+                    :class="['options', { choose: messagePosition === 'left-top' }]"
+                    @click="setMessagePosition('left-top')"
+                  >
+                    左上
+                  </span>
+                  <span
+                    :class="['options', { choose: messagePosition === 'left-bottom' }]"
+                    @click="setMessagePosition('left-bottom')"
+                  >
+                    左下
+                  </span>
+                  <span
+                    :class="['options', { choose: messagePosition === 'right-top' }]"
+                    @click="setMessagePosition('right-top')"
+                  >
+                    右上
+                  </span>
+                  <span
+                    :class="['options', { choose: messagePosition === 'right-bottom' }]"
+                    @click="setMessagePosition('right-bottom')"
+                  >
+                    右下
+                  </span>
+                  <span
+                    :class="['options', { choose: messagePosition === 'top-center' }]"
+                    @click="setMessagePosition('top-center')"
+                  >
+                    顶部居中
+                  </span>
+                  <span
+                    :class="['options', { choose: messagePosition === 'bottom-center' }]"
+                    @click="setMessagePosition('bottom-center')"
+                  >
+                    底部居中
+                  </span>
+                  </template>
+                </template>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">进度条方向</span>
+              <div class="set-options">
+                <span
+                  v-if="messageDuration > 0"
+                  :class="['options', { choose: progressDirection === 'normal' }]"
+                  @click="setProgressDirection('normal')"
+                >
+                  正向
+                </span>
+                <span
+                  v-if="messageDuration > 0"
+                  :class="['options', { choose: progressDirection === 'reverse' }]"
+                  @click="setProgressDirection('reverse')"
+                >
+                  逆向
+                </span>
+                <span
+                  :class="['options', { choose: progressDirection === 'decorative' }]"
+                  @click="setProgressDirection('decorative')"
+                >
+                  装饰
+                </span>
+                <span
+                  :class="['options', { choose: progressDirection === 'disabled' }]"
+                  @click="setProgressDirection('disabled')"
+                >
+                  关闭
+                </span>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">显示时间</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: messageDuration === 1000 }]"
+                  @click="setMessageDuration(1000)"
+                >
+                  1秒
+                </span>
+                <span
+                  :class="['options', { choose: messageDuration === 2000 }]"
+                  @click="setMessageDuration(2000)"
+                >
+                  2秒
+                </span>
+                <span
+                  :class="['options', { choose: messageDuration === 3000 }]"
+                  @click="setMessageDuration(3000)"
+                >
+                  3秒
+                </span>
+                <span
+                  :class="['options', { choose: messageDuration === 5000 }]"
+                  @click="setMessageDuration(5000)"
+                >
+                  5秒
+                </span>
+                <span
+                  :class="['options', { choose: messageDuration === 0 }]"
+                  @click="setMessageDuration(0)"
+                >
+                  手动关闭
+                </span>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">发送测试消息</span>
+              <div class="set-options">
+                <span class="options" @click="sendTestMessage('success')">成功</span>
+                <span class="options" @click="sendTestMessage('warning')">警告</span>
+                <span class="options" @click="sendTestMessage('error')">错误</span>
+                <span class="options" @click="sendTestMessage('info')">信息</span>
+              </div>
+            </div>
+          </div>
+        </Transition>
+        <div class="set-item">
+          <span class="set-label">超级岛</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: islandSettingsExpanded }]"
+              @click="islandSettingsExpanded = !islandSettingsExpanded"
+            >
+              {{ islandSettingsExpanded ? '收起' : '展开' }}
+            </span>
+          </div>
+        </div>
+        <Transition name="fade-up">
+          <div v-if="islandSettingsExpanded" class="set-expand-box">
+            <template v-if="messageStyle === 'island'">
+              <div class="set-item">
+                <span class="set-label">超级岛模式</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: islandMode === 'dynamic' }]"
+                    @click="setIslandMode('dynamic')"
+                  >
+                    灵动
+                  </span>
+                  <span
+                    :class="['options', { choose: islandMode === 'extended' }]"
+                    @click="setIslandMode('extended')"
+                  >
+                    拓展
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">使用主题色</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: !islandUseThemeColor }]"
+                    @click="setIslandUseThemeColor(false)"
+                  >
+                    关闭
+                  </span>
+                  <span
+                    :class="['options', { choose: islandUseThemeColor }]"
+                    @click="setIslandUseThemeColor(true)"
+                  >
+                    开启
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">时间读秒</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: !islandShowSeconds }]"
+                    @click="setIslandShowSeconds(false)"
+                  >
+                    关闭
+                  </span>
+                  <span
+                    :class="['options', { choose: islandShowSeconds }]"
+                    @click="setIslandShowSeconds(true)"
+                  >
+                    开启
+                  </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">显示日期</span>
+                <div class="set-options">
+                  <span
+                    :class="['options', { choose: !islandShowDate }]"
+                    @click="setIslandShowDate(false)"
+                  >
+                    关闭
+                  </span>
+                  <span
+                    :class="['options', { choose: islandShowDate }]"
+                    @click="setIslandShowDate(true)"
+                  >
+                    开启
+                  </span>
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              <div class="set-item">
+                <span class="set-label">需要先将消息类型切换为 超级岛</span>
+                <div class="set-options">
+                  <span class="options" @click="setMessageStyle('island')">确认</span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </Transition>
+        <div class="set-item">
+          <span class="set-label">音乐播放器</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: musicPlayerExpanded }]"
+              @click="musicPlayerExpanded = !musicPlayerExpanded"
+            >
+              {{ musicPlayerExpanded ? '收起' : '展开' }}
+            </span>
+          </div>
+        </div>
+        <Transition name="fade-up">
+          <div v-if="musicPlayerExpanded" class="set-expand-box">
+            <div class="set-item">
+              <span class="set-label">音乐播放器</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: !playerShow }]"
+                  @click="playerShow = false"
+                >
+                  关闭
+                </span>
+                <span
+                  :class="['options', { choose: playerShow }]"
+                  @click="playerShow = true"
+                >
+                  开启
+                </span>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">样式</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: islandStyle === 'standard' }]"
+                  @click="islandStyle = 'standard'"
+                >
+                  标准
+                </span>
+                <span
+                  :class="['options', { choose: islandStyle === 'extended' }]"
+                  @click="islandStyle = 'extended'"
+                >
+                  拓展
+                </span>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">进入站点自动播放音乐</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: !playerAutoPlay }]"
+                  @click="playerAutoPlay = false"
+                >
+                  关闭
+                </span>
+                <span
+                  :class="['options', { choose: playerAutoPlay }]"
+                  @click="playerAutoPlay = true"
+                >
+                  开启
+                </span>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">播放模式</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: playerPlayMode === 'list' }]"
+                  @click="playerPlayMode = 'list'"
+                >
+                  顺序
+                </span>
+                <span
+                  :class="['options', { choose: playerPlayMode === 'shuffle' }]"
+                  @click="playerPlayMode = 'shuffle'"
+                >
+                  随机
+                </span>
+                <span
+                  :class="['options', { choose: playerPlayMode === 'single' }]"
+                  @click="playerPlayMode = 'single'"
+                >
+                  单曲循环
+                </span>
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">歌单来源</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: playerMusicSource === 'preset' }]"
+                  @click="playerMusicSource = 'preset'"
+                >
+                  泠の预设
+                </span>
+                <span
+                  :class="['options', { choose: playerMusicSource === 'custom' }]"
+                  @click="playerMusicSource = 'custom'"
+                >
+                  自定义
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="playerMusicSource === 'custom'" class="set-item">
+                <span class="set-label">自定义歌单ID（网易云音乐）</span>
+                <div class="set-options">
+                  <input
+                    v-model="playerCustomIdsInput"
+                    type="text"
+                    style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 120px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                    placeholder="多个ID用逗号分隔"
+                    @keyup.enter="confirmCustomIds"
+                  />
+                  <span class="options" @click="confirmCustomIds">确定</span>
+                </div>
+              </div>
+            </Transition>
+            <div class="set-item">
+              <span class="set-label">超级岛支持</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: !islandPlayerSupport }]"
+                  @click="islandPlayerSupport = false"
+                >
+                  关闭
+                </span>
+                <span
+                  :class="['options', { choose: islandPlayerSupport }]"
+                  @click="islandPlayerSupport = true"
+                >
+                  开启
+                </span>
+              </div>
+            </div>
+          </div>
+        </Transition>
+        <span class="title">杂项</span>
         <div class="set-item">
           <span class="set-label">额外信息显示位置</span>
           <div class="set-options">
@@ -345,6 +882,23 @@
             <span
               :class="['options', { choose: useCustomCursor }]"
               @click="setCustomCursor(true)"
+            >
+              开启
+            </span>
+          </div>
+        </div>
+        <div class="set-item">
+          <span class="set-label">阅读进度条</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: !readingProgressEnabled }]"
+              @click="readingProgressEnabled = false"
+            >
+              关闭
+            </span>
+            <span
+              :class="['options', { choose: readingProgressEnabled }]"
+              @click="readingProgressEnabled = true"
             >
               开启
             </span>
@@ -503,469 +1057,152 @@
               </div>
             </Transition>
             <div class="set-item">
-              <span class="set-label">主题颜色</span>
+              <span class="set-label">定时切换明暗显示外观</span>
               <div class="set-options">
                 <span
-                  :class="['options', { choose: themeColorExpanded }]"
-                  @click="themeColorExpanded = !themeColorExpanded"
+                  :class="['options', { choose: !scheduledThemeEnabled }]"
+                  @click="toggleScheduledTheme(false)"
                 >
-                  {{ themeColorExpanded ? '收起' : '展开' }}
+                  关闭
+                </span>
+                <span
+                  :class="['options', { choose: scheduledThemeEnabled }]"
+                  @click="toggleScheduledTheme(true)"
+                >
+                  开启
+                </span>
+              </div>
+            </div>
+            <div v-if="scheduledThemeEnabled" class="set-item">
+              <span class="set-label">浅色模式时间</span>
+              <div class="set-options">
+                <input
+                  v-model="scheduledLightTime"
+                  type="time"
+                  class="time-input"
+                  @change="onScheduledTimeChange"
+                />
+              </div>
+            </div>
+            <div v-if="scheduledThemeEnabled" class="set-item">
+              <span class="set-label">深色模式时间</span>
+              <div class="set-options">
+                <input
+                  v-model="scheduledDarkTime"
+                  type="time"
+                  class="time-input"
+                  @change="onScheduledTimeChange"
+                />
+              </div>
+            </div>
+            <div class="set-item">
+              <span class="set-label">天气小组件</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: weatherSectionExpanded }]"
+                  @click="weatherSectionExpanded = !weatherSectionExpanded"
+                >
+                  {{ weatherSectionExpanded ? '收起' : '展开' }}
                 </span>
               </div>
             </div>
             <Transition name="fade-up">
-              <div v-if="themeColorExpanded" class="set-expand-box">
-                <template v-if="highContrast !== 'max'">
-                  <template v-if="!customThemeEnabled">
-                    <div class="set-item">
-                      <span class="set-label">预设主题</span>
-                      <div class="set-options">
-                        <span
-                          v-for="color in themeColorList"
-                          :key="color.value"
-                          :class="['options', { choose: themeColor === color.value }]"
-                          @click="setThemeColor(color.value)"
-                        >
-                          {{ color.label }}
-                        </span>
-                      </div>
-                    </div>
-                  </template>
-                  <div v-else class="set-item">
-                    <span class="set-label">启用预设主题需要先关闭 自定义主题</span>
-                    <div class="set-options">
-                      <span class="options" @click="toggleCustomTheme(false)">确认</span>
-                    </div>
-                  </div>
-                </template>
-                <div v-else class="set-item">
-                  <span class="set-label">切换主题需要先关闭 高对比度模式（最高）</span>
-                  <div class="set-options">
-                    <span class="options" @click="setHighContrast(false)">确认</span>
-                  </div>
-                </div>
+              <div v-if="weatherSectionExpanded" class="set-expand-box">
                 <div class="set-item">
-                  <span class="set-label">高对比度模式</span>
+                  <span class="set-label">天气小组件</span>
                   <div class="set-options">
                     <span
-                      :class="['options', { choose: !highContrast }]"
-                      @click="setHighContrast(false)"
+                      :class="['options', { choose: !weatherWidgetEnabled }]"
+                      @click="weatherWidgetEnabled = false"
                     >
                       关闭
                     </span>
                     <span
-                      :class="['options', { choose: highContrast === true }]"
-                      @click="setHighContrast(true)"
+                      :class="['options', { choose: weatherWidgetEnabled }]"
+                      @click="weatherWidgetEnabled = true"
                     >
                       开启
                     </span>
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">定位方式</span>
+                  <div class="set-options">
                     <span
-                      :class="['options', { choose: highContrast === 'max' }]"
-                      @click="setHighContrast('max')"
+                      :class="['options', { choose: weatherLocationMode === 'satellite' }]"
+                      @click="switchLocationMode('satellite', '自动')"
                     >
-                      最高
+                      自动
+                    </span>
+                    <span
+                      :class="['options', { choose: weatherLocationMode === 'ip' }]"
+                      @click="switchLocationMode('ip', 'IP地址')"
+                    >
+                      IP地址
+                    </span>
+                    <span
+                      :class="['options', { choose: weatherLocationMode === 'manual' }]"
+                      @click="switchLocationMode('manual', '自定义')"
+                    >
+                      自定义
                     </span>
                   </div>
                 </div>
-                <template v-if="highContrast !== 'max'">
-                  <div class="set-item">
-                    <span class="set-label">自定义主题</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !customThemeEnabled }]"
-                        @click="toggleCustomTheme(false)"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: customThemeEnabled }]"
-                        @click="toggleCustomTheme(true)"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <template v-if="customThemeEnabled">
-                    <div class="set-item">
-                      <span class="set-label">自定义主要色（#RRGGBB）</span>
-                      <div class="set-options">
-                        <div class="color-preview" :style="{ backgroundColor: customPrimaryColor }" @click="$refs.primaryColorInput.click()"></div>
-                        <input
-                          ref="primaryColorInput"
-                          v-model="customPrimaryColor"
-                          type="color"
-                          class="color-input-hidden"
-                        />
-                        <input
-                          v-model="customPrimaryColor"
-                          type="text"
-                          class="text-input"
-                          placeholder="#RRGGBB"
-                          maxlength="7"
-                        />
-                      </div>
-                    </div>
-                    <div class="set-item">
-                      <span class="set-label">自定义辅助色（#RRGGBB）</span>
-                      <div class="set-options">
-                        <div class="color-preview" :style="{ backgroundColor: customSecondaryColor }" @click="$refs.secondaryColorInput.click()"></div>
-                        <input
-                          ref="secondaryColorInput"
-                          v-model="customSecondaryColor"
-                          type="color"
-                          class="color-input-hidden"
-                        />
-                        <input
-                          v-model="customSecondaryColor"
-                          type="text"
-                          class="text-input"
-                          placeholder="#RRGGBB"
-                          maxlength="7"
-                        />
-                      </div>
-                    </div>
-                    <div class="set-item">
-                      <span class="set-label">保存当前自定义主题色</span>
-                      <div class="set-options">
-                        <span class="options" @click="revertCustomTheme">撤销</span>
-                        <span class="options" @click="applyCustomTheme">应用</span>
-                      </div>
-                    </div>
-                  </template>
-                </template>
-              </div>
-            </Transition>
-            <div class="set-item">
-              <span class="set-label">消息样式</span>
-              <div class="set-options">
-                <span
-                  :class="['options', { choose: messageSettingsExpanded }]"
-                  @click="messageSettingsExpanded = !messageSettingsExpanded"
-                >
-                  {{ messageSettingsExpanded ? '收起' : '展开' }}
-                </span>
-              </div>
-            </div>
-            <Transition name="fade-up">
-              <div v-if="messageSettingsExpanded" class="set-expand-box">
-                <div class="set-item">
-                  <span class="set-label">消息样式</span>
+                <div v-if="weatherLocationMode === 'manual'" class="set-item">
+                  <span class="set-label">城市名称</span>
                   <div class="set-options">
+                    <input
+                      v-model="weatherManualCity"
+                      type="text"
+                      style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 80px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                      placeholder="例如：苏州"
+                      @keyup.enter="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
+                    />
                     <span
-                      :class="['options', { choose: messageStyle === 'bar' }]"
-                      @click="setMessageStyle('bar')"
+                      class="options"
+                      @click="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
                     >
-                      传统（不推荐）
-                    </span>
-                    <span
-                      :class="['options', { choose: messageStyle === 'card' }]"
-                      @click="setMessageStyle('card')"
-                    >
-                      卡片
-                    </span>
-                    <span
-                      :class="['options', { choose: messageStyle === 'island' }]"
-                      @click="setMessageStyle('island')"
-                    >
-                      超级岛
+                      确认
                     </span>
                   </div>
                 </div>
                 <div class="set-item">
-                  <span class="set-label">消息位置</span>
-                  <div class="set-options">
-                    <template v-if="messageStyle === 'island'">
-                      <span class="options choose">顶部居中</span>
-                    </template>
-                    <template v-else-if="messageStyle === 'bar'">
-                      <span
-                        :class="['options', { choose: messagePosition === 'bar-top' }]"
-                        @click="setMessagePosition('bar-top')"
-                      >
-                        顶部
-                      </span>
-                      <span
-                        :class="['options', { choose: messagePosition === 'bar-bottom' }]"
-                        @click="setMessagePosition('bar-bottom')"
-                      >
-                        底部
-                      </span>
-                    </template>
-                    <template v-else>
-                      <template v-if="isMobileLayout">
-                        <span
-                          :class="['options', { choose: messagePosition === 'top-center' }]"
-                          @click="setMessagePosition('top-center')"
-                        >
-                          顶部
-                        </span>
-                        <span
-                          :class="['options', { choose: messagePosition === 'bottom-center' }]"
-                          @click="setMessagePosition('bottom-center')"
-                        >
-                          底部
-                        </span>
-                      </template>
-                      <template v-else>
-                      <span
-                        :class="['options', { choose: messagePosition === 'left-top' }]"
-                        @click="setMessagePosition('left-top')"
-                      >
-                        左上
-                      </span>
-                      <span
-                        :class="['options', { choose: messagePosition === 'left-bottom' }]"
-                        @click="setMessagePosition('left-bottom')"
-                      >
-                        左下
-                      </span>
-                      <span
-                        :class="['options', { choose: messagePosition === 'right-top' }]"
-                        @click="setMessagePosition('right-top')"
-                      >
-                        右上
-                      </span>
-                      <span
-                        :class="['options', { choose: messagePosition === 'right-bottom' }]"
-                        @click="setMessagePosition('right-bottom')"
-                      >
-                        右下
-                      </span>
-                      <span
-                        :class="['options', { choose: messagePosition === 'top-center' }]"
-                        @click="setMessagePosition('top-center')"
-                      >
-                        顶部居中
-                      </span>
-                      <span
-                        :class="['options', { choose: messagePosition === 'bottom-center' }]"
-                        @click="setMessagePosition('bottom-center')"
-                      >
-                        底部居中
-                      </span>
-                      </template>
-                    </template>
-                  </div>
-                </div>
-                <div class="set-item">
-                  <span class="set-label">进度条方向</span>
+                  <span class="set-label">天气数据源</span>
                   <div class="set-options">
                     <span
-                      v-if="messageDuration > 0"
-                      :class="['options', { choose: progressDirection === 'normal' }]"
-                      @click="setProgressDirection('normal')"
+                      :class="['options', { choose: weatherProvider === 'amap' }]"
+                      @click="switchWeatherProvider('amap')"
                     >
-                      正向
+                      高德
                     </span>
                     <span
-                      v-if="messageDuration > 0"
-                      :class="['options', { choose: progressDirection === 'reverse' }]"
-                      @click="setProgressDirection('reverse')"
+                      :class="['options', { choose: weatherProvider === 'wttr' }]"
+                      @click="switchWeatherProvider('wttr')"
                     >
-                      逆向
+                      wttr.in
                     </span>
                     <span
-                      :class="['options', { choose: progressDirection === 'decorative' }]"
-                      @click="setProgressDirection('decorative')"
+                      :class="['options', { choose: weatherProvider === 'openmeteo' }]"
+                      @click="switchWeatherProvider('openmeteo')"
                     >
-                      装饰
+                      Open-Meteo
                     </span>
-                    <span
-                      :class="['options', { choose: progressDirection === 'disabled' }]"
-                      @click="setProgressDirection('disabled')"
-                    >
-                      关闭
-                    </span>
-                  </div>
-                </div>
-                <div class="set-item">
-                  <span class="set-label">显示时间</span>
-                  <div class="set-options">
-                    <span
-                      :class="['options', { choose: messageDuration === 1000 }]"
-                      @click="setMessageDuration(1000)"
-                    >
-                      1秒
-                    </span>
-                    <span
-                      :class="['options', { choose: messageDuration === 2000 }]"
-                      @click="setMessageDuration(2000)"
-                    >
-                      2秒
-                    </span>
-                    <span
-                      :class="['options', { choose: messageDuration === 3000 }]"
-                      @click="setMessageDuration(3000)"
-                    >
-                      3秒
-                    </span>
-                    <span
-                      :class="['options', { choose: messageDuration === 5000 }]"
-                      @click="setMessageDuration(5000)"
-                    >
-                      5秒
-                    </span>
-                    <span
-                      :class="['options', { choose: messageDuration === 0 }]"
-                      @click="setMessageDuration(0)"
-                    >
-                      手动关闭
-                    </span>
-                  </div>
-                </div>
-                <div class="set-item">
-                  <span class="set-label">发送测试消息</span>
-                  <div class="set-options">
-                    <span class="options" @click="sendTestMessage('success')">成功</span>
-                    <span class="options" @click="sendTestMessage('warning')">警告</span>
-                    <span class="options" @click="sendTestMessage('error')">错误</span>
-                    <span class="options" @click="sendTestMessage('info')">信息</span>
                   </div>
                 </div>
               </div>
             </Transition>
-            <div class="set-item">
-              <span class="set-label">超级岛</span>
-              <div class="set-options">
-                <span
-                  :class="['options', { choose: islandSettingsExpanded }]"
-                  @click="islandSettingsExpanded = !islandSettingsExpanded"
-                >
-                  {{ islandSettingsExpanded ? '收起' : '展开' }}
-                </span>
-              </div>
-            </div>
-            <Transition name="fade-up">
-              <div v-if="islandSettingsExpanded" class="set-expand-box">
-                <template v-if="messageStyle === 'island'">
-                  <div class="set-item">
-                    <span class="set-label">超级岛模式</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: islandMode === 'dynamic' }]"
-                        @click="setIslandMode('dynamic')"
-                      >
-                        灵动
-                      </span>
-                      <span
-                        :class="['options', { choose: islandMode === 'extended' }]"
-                        @click="setIslandMode('extended')"
-                      >
-                        拓展
-                      </span>
-                    </div>
-                  </div>
-                  <div class="set-item">
-                    <span class="set-label">使用主题色</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !islandUseThemeColor }]"
-                        @click="setIslandUseThemeColor(false)"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: islandUseThemeColor }]"
-                        @click="setIslandUseThemeColor(true)"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <div class="set-item">
-                    <span class="set-label">时间读秒</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !islandShowSeconds }]"
-                        @click="setIslandShowSeconds(false)"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: islandShowSeconds }]"
-                        @click="setIslandShowSeconds(true)"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <div class="set-item">
-                    <span class="set-label">显示日期</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !islandShowDate }]"
-                        @click="setIslandShowDate(false)"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: islandShowDate }]"
-                        @click="setIslandShowDate(true)"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                </template>
-                <template v-else>
-                  <div class="set-item">
-                    <span class="set-label">需要先将消息类型切换为 超级岛</span>
-                    <div class="set-options">
-                      <span class="options" @click="setMessageStyle('island')">确认</span>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </Transition>
-            <!-- 测试频道（开发环境） -->
+            <!-- 测试分支（开发环境） -->
             <template v-if="channelMode >= 2">
               <div class="set-item">
-                <span class="set-label set-label-channel">来自beta频道的新内容{{ channelMode === 2 ? '（当前频道）' : '' }}</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: betaChannelExpanded }]"
-                    @click="betaChannelExpanded = !betaChannelExpanded"
-                  >
-                    {{ betaChannelExpanded ? '收起' : '展开' }}
-                  </span>
-                </div>
+                <span class="set-label set-label-channel">来自beta分支的新内容</span>
               </div>
-              <Transition name="fade-up">
-                <div v-if="betaChannelExpanded && (channelMode === 2 || showAllGroups)" class="set-expand-box">
-                  <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
-                  <div class="set-item">
-                    <span class="set-label">移除动画</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !removeAnimations }]"
-                        @click="setRemoveAnimations(false)"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: removeAnimations }]"
-                        @click="removeAnimations = true; removeAnimationsWarnVisible = true"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <Transition name="fade-up">
-                    <div v-if="removeAnimationsWarnVisible" class="set-warn" @click="removeAnimations = false; removeAnimationsWarnVisible = false">
-                      <span class="warn-text">开启此选项将移除所有过渡动画，你确定要继续吗</span>
-                      <span class="options" @click.stop="applyRemoveAnimations">确认</span>
-                    </div>
-                  </Transition>
-                </div>
-                <div v-else-if="betaChannelExpanded && channelMode >= 3 && channelMode <= 4 && !showAllGroups" class="set-expand-box">
-                  <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
-                  <div class="set-item">
-                    <span class="set-label">显示选项需要先切换到beta频道</span>
-                  </div>
-                </div>
-              </Transition>
+              <div class="set-expand-box">
+                <span class="set-desc">beta分支推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该分支同样包含对主线的问题修复。</span>
+              </div>
+            </template>
+            <template v-if="channelMode >= 3">
               <div class="set-item">
-                <span class="set-label set-label-channel">来自dev频道的新内容{{ channelMode === 3 ? '（当前频道）' : '' }}</span>
+                <span class="set-label set-label-channel">来自dev分支的新内容</span>
                 <div class="set-options">
                   <span
                     :class="['options', { choose: devChannelExpanded }]"
@@ -977,10 +1214,10 @@
               </div>
               <Transition name="fade-up">
                 <div v-if="devChannelExpanded && (channelMode === 3 || showAllGroups)" class="set-expand-box">
-                  <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                  <span class="set-desc">dev分支推送开发中的新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此分支的绝大部分内容后续都会合并入beta分支。该分支更新较为频繁。<br>不建议下游开发者跟进此分支。<s>（如果你愿意当然是可以的）</s></span>
                   <template v-if="devChannelMerged === 2">
                     <div class="set-item">
-                      <span class="set-label">当前频道内容已全部合并至beta频道，稍后再看看吧</span>
+                      <span class="set-label">当前分支内容已全部合并至beta分支，稍后再看看吧</span>
                     </div>
                   </template>
                   <template v-else>
@@ -1002,309 +1239,6 @@
                     </div>
                   </div>
                   <div class="set-item">
-                    <span class="set-label">音乐播放器</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: musicPlayerExpanded }]"
-                        @click="musicPlayerExpanded = !musicPlayerExpanded"
-                      >
-                        {{ musicPlayerExpanded ? '收起' : '展开' }}
-                      </span>
-                    </div>
-                  </div>
-                  <Transition name="fade-up">
-                    <div v-if="musicPlayerExpanded" class="set-expand-box">
-                      <div class="set-item">
-                        <span class="set-label">音乐播放器</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: !playerShow }]"
-                            @click="playerShow = false"
-                          >
-                            关闭
-                          </span>
-                          <span
-                            :class="['options', { choose: playerShow }]"
-                            @click="playerShow = true"
-                          >
-                            开启
-                          </span>
-                        </div>
-                      </div>
-                      <div class="set-item">
-                        <span class="set-label">样式</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: islandStyle === 'standard' }]"
-                            @click="islandStyle = 'standard'"
-                          >
-                            标准
-                          </span>
-                          <span
-                            :class="['options', { choose: islandStyle === 'extended' }]"
-                            @click="islandStyle = 'extended'"
-                          >
-                            拓展
-                          </span>
-                        </div>
-                      </div>
-                      <div class="set-item">
-                        <span class="set-label">进入站点自动播放音乐</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: !playerAutoPlay }]"
-                            @click="playerAutoPlay = false"
-                          >
-                            关闭
-                          </span>
-                          <span
-                            :class="['options', { choose: playerAutoPlay }]"
-                            @click="playerAutoPlay = true"
-                          >
-                            开启
-                          </span>
-                        </div>
-                      </div>
-                      <div class="set-item">
-                        <span class="set-label">播放模式</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: playerPlayMode === 'list' }]"
-                            @click="playerPlayMode = 'list'"
-                          >
-                            顺序
-                          </span>
-                          <span
-                            :class="['options', { choose: playerPlayMode === 'shuffle' }]"
-                            @click="playerPlayMode = 'shuffle'"
-                          >
-                            随机
-                          </span>
-                          <span
-                            :class="['options', { choose: playerPlayMode === 'single' }]"
-                            @click="playerPlayMode = 'single'"
-                          >
-                            单曲循环
-                          </span>
-                        </div>
-                      </div>
-                      <div class="set-item">
-                        <span class="set-label">歌单来源</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: playerMusicSource === 'preset' }]"
-                            @click="playerMusicSource = 'preset'"
-                          >
-                            泠の预设
-                          </span>
-                          <span
-                            :class="['options', { choose: playerMusicSource === 'custom' }]"
-                            @click="playerMusicSource = 'custom'"
-                          >
-                            自定义
-                          </span>
-                        </div>
-                      </div>
-                      <Transition name="fade-up">
-                        <div v-if="playerMusicSource === 'custom'" class="set-item">
-                          <span class="set-label">自定义歌单ID（网易云音乐）</span>
-                          <div class="set-options">
-                            <input
-                              v-model="playerCustomIdsInput"
-                              type="text"
-                              style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 120px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
-                              placeholder="多个ID用逗号分隔"
-                              @keyup.enter="confirmCustomIds"
-                            />
-                            <span class="options" @click="confirmCustomIds">确定</span>
-                          </div>
-                        </div>
-                      </Transition>
-                      <div class="set-item">
-                        <span class="set-label">超级岛支持</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: !islandPlayerSupport }]"
-                            @click="islandPlayerSupport = false"
-                          >
-                            关闭
-                          </span>
-                          <span
-                            :class="['options', { choose: islandPlayerSupport }]"
-                            @click="islandPlayerSupport = true"
-                          >
-                            开启
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Transition>
-                  <div class="set-item">
-                    <span class="set-label">定时切换明暗显示外观</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !scheduledThemeEnabled }]"
-                        @click="toggleScheduledTheme(false)"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: scheduledThemeEnabled }]"
-                        @click="toggleScheduledTheme(true)"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <div v-if="scheduledThemeEnabled" class="set-item">
-                    <span class="set-label">浅色模式时间</span>
-                    <div class="set-options">
-                      <input
-                        v-model="scheduledLightTime"
-                        type="time"
-                        class="time-input"
-                        @change="onScheduledTimeChange"
-                      />
-                    </div>
-                  </div>
-                  <div v-if="scheduledThemeEnabled" class="set-item">
-                    <span class="set-label">深色模式时间</span>
-                    <div class="set-options">
-                      <input
-                        v-model="scheduledDarkTime"
-                        type="time"
-                        class="time-input"
-                        @change="onScheduledTimeChange"
-                      />
-                    </div>
-                  </div>
-                  <div class="set-item">
-                    <span class="set-label">天气小组件</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: weatherSectionExpanded }]"
-                        @click="weatherSectionExpanded = !weatherSectionExpanded"
-                      >
-                        {{ weatherSectionExpanded ? '收起' : '展开' }}
-                      </span>
-                    </div>
-                  </div>
-                  <Transition name="fade-up">
-                    <div v-if="weatherSectionExpanded" class="set-expand-box">
-                      <div class="set-item">
-                        <span class="set-label">天气小组件</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: !weatherWidgetEnabled }]"
-                            @click="weatherWidgetEnabled = false"
-                          >
-                            关闭
-                          </span>
-                          <span
-                            :class="['options', { choose: weatherWidgetEnabled }]"
-                            @click="weatherWidgetEnabled = true"
-                          >
-                            开启
-                          </span>
-                        </div>
-                      </div>
-                      <div class="set-item">
-                        <span class="set-label">定位方式</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: weatherLocationMode === 'satellite' }]"
-                            @click="switchLocationMode('satellite', '自动')"
-                          >
-                            自动
-                          </span>
-                          <span
-                            :class="['options', { choose: weatherLocationMode === 'ip' }]"
-                            @click="switchLocationMode('ip', 'IP地址')"
-                          >
-                            IP地址
-                          </span>
-                          <span
-                            :class="['options', { choose: weatherLocationMode === 'manual' }]"
-                            @click="switchLocationMode('manual', '自定义')"
-                          >
-                            自定义
-                          </span>
-                        </div>
-                      </div>
-                      <div v-if="weatherLocationMode === 'manual'" class="set-item">
-                        <span class="set-label">城市名称</span>
-                        <div class="set-options">
-                          <input
-                            v-model="weatherManualCity"
-                            type="text"
-                            style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 80px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
-                            placeholder="例如：苏州"
-                            @keyup.enter="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
-                          />
-                          <span
-                            class="options"
-                            @click="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
-                          >
-                            确认
-                          </span>
-                        </div>
-                      </div>
-                      <div class="set-item">
-                        <span class="set-label">天气数据源</span>
-                        <div class="set-options">
-                          <span
-                            :class="['options', { choose: weatherProvider === 'amap' }]"
-                            @click="switchWeatherProvider('amap')"
-                          >
-                            高德
-                          </span>
-                          <span
-                            :class="['options', { choose: weatherProvider === 'wttr' }]"
-                            @click="switchWeatherProvider('wttr')"
-                          >
-                            wttr.in
-                          </span>
-                          <span
-                            :class="['options', { choose: weatherProvider === 'openmeteo' }]"
-                            @click="switchWeatherProvider('openmeteo')"
-                          >
-                            Open-Meteo
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Transition>
-
-                  </template>
-                </div>
-                <div v-else-if="devChannelExpanded && (channelMode === 2 || channelMode === 4) && !showAllGroups" class="set-expand-box">
-                  <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
-                  <div class="set-item">
-                    <span class="set-label">显示选项需要先切换到dev频道</span>
-                  </div>
-                </div>
-              </Transition>
-              <div class="set-item">
-                <span class="set-label set-label-channel">来自canary频道的新内容{{ channelMode === 4 ? '（当前频道）' : '' }}</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: canaryChannelExpanded }]"
-                    @click="canaryChannelExpanded = !canaryChannelExpanded"
-                  >
-                    {{ canaryChannelExpanded ? '收起' : '展开' }}
-                  </span>
-                </div>
-              </div>
-              <Transition name="fade-up">
-                <div v-if="canaryChannelExpanded && (channelMode === 4 || showAllGroups)" class="set-expand-box">
-                  <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
-                  <template v-if="canaryChannelMerged === 2">
-                    <div class="set-item">
-                      <span class="set-label">当前频道内容已全部合并至beta频道，稍后再看看吧</span>
-                    </div>
-                  </template>
-                  <template v-else>
-                  <div class="set-item">
                     <span class="set-label">PWA 缓存增强</span>
                     <div class="set-options">
                       <span
@@ -1321,7 +1255,6 @@
                       </span>
                     </div>
                   </div>
-                  <span class="set-desc">开启后将增强 Service Worker 缓存策略，支持离线阅读已访问过的文章。关闭后仅保留基础预缓存。</span>
                   <div v-if="pwaCacheEnabled" class="set-item">
                     <span class="set-label">缓存条目上限</span>
                     <div class="set-options">
@@ -1335,7 +1268,6 @@
                       </span>
                     </div>
                   </div>
-                  <span v-if="pwaCacheEnabled" class="set-desc">每类缓存的最大条目数，超出后自动清理最早的缓存。选择"无限"则不清理。</span>
                   <div class="set-item">
                     <span class="set-label">清除 PWA 缓存</span>
                     <div class="set-options">
@@ -1347,25 +1279,6 @@
                       </span>
                     </div>
                   </div>
-                  <span class="set-desc">清除运行时缓存（已访问页面、API 数据等），预缓存会在下次加载时自动恢复。</span>
-                  <div class="set-item">
-                    <span class="set-label">阅读进度条</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !readingProgressEnabled }]"
-                        @click="readingProgressEnabled = false"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: readingProgressEnabled }]"
-                        @click="readingProgressEnabled = true"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <span class="set-desc">在文章页面顶部显示阅读进度条，支持阅读时长统计。</span>
                   <div class="set-item">
                     <span class="set-label">图片懒加载</span>
                     <div class="set-options">
@@ -1383,7 +1296,6 @@
                       </span>
                     </div>
                   </div>
-                  <span class="set-desc">开启后图片加载前显示骨架屏，加载完成后渐入显示。</span>
                   <div class="set-item">
                     <span class="set-label">WebP 自动转换</span>
                     <div class="set-options">
@@ -1401,40 +1313,23 @@
                       </span>
                     </div>
                   </div>
-                  <span class="set-desc">浏览器支持 WebP 时自动加载 WebP 版本，减小图片体积。</span>
-                  <div class="set-item">
-                    <span class="set-label">图片灯箱</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !imageLightboxEnabled }]"
-                        @click="imageLightboxEnabled = false"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: imageLightboxEnabled }]"
-                        @click="imageLightboxEnabled = true"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <span class="set-desc">点击图片弹出大图查看，支持缩放、旋转等操作。</span>
+
                   </template>
                 </div>
-                <div v-else-if="canaryChannelExpanded && (channelMode === 2 || channelMode === 3) && !showAllGroups" class="set-expand-box">
-                  <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                <div v-else-if="devChannelExpanded && channelMode === 2 && !showAllGroups" class="set-expand-box">
+                  <span class="set-desc">dev分支推送开发中的新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此分支的绝大部分内容后续都会合并入beta分支。该分支更新较为频繁。<br>不建议下游开发者跟进此分支。<s>（如果你愿意当然是可以的）</s></span>
                   <div class="set-item">
-                    <span class="set-label">显示选项需要先切换到canary频道</span>
+                    <span class="set-label">显示选项需要先切换到dev分支</span>
                   </div>
                 </div>
               </Transition>
+            </template>
+            <template v-if="channelMode >= 2">
               <div class="set-item">
                 <span class="set-label">查看源码</span>
                 <div class="set-options">
-                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/beta" target="_blank" class="options">beta频道</a>
-                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/dev" target="_blank" class="options">dev频道</a>
-                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/canary" target="_blank" class="options">canary频道</a>
+                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/beta" target="_blank" class="options">beta分支</a>
+                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/dev" target="_blank" class="options">dev分支</a>
                 </div>
               </div>
               <div class="set-item">
@@ -1445,33 +1340,31 @@
                   <a href="https://github.com/murasakizs/vitepress-theme-curve/issues" target="_blank" class="options">Github</a>
                 </div>
               </div>
-              <div v-if="channelMode >= 2 && channelMode <= 4" class="set-item">
-                <span class="set-label">前往预览测试频道</span>
+              <div v-if="channelMode >= 2 && channelMode <= 3" class="set-item">
+                <span class="set-label">前往预览测试分支</span>
                 <div class="set-options">
-                  <a href="https://beta.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 2 }]">beta频道{{ channelMode === 2 ? '（当前频道）' : '' }}</a>
-                  <a href="https://dev.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 3 }]">dev频道{{ channelMode === 3 ? '（当前频道）' : '' }}</a>
-                  <a href="https://canary.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 4 }]">canary频道{{ channelMode === 4 ? '（当前频道）' : '' }}</a>
+                  <a href="https://beta.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 2 }]">beta分支{{ channelMode === 2 ? '（当前分支）' : '' }}</a>
+                  <a href="https://dev.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 3 }]">dev分支{{ channelMode === 3 ? '（当前分支）' : '' }}</a>
                 </div>
               </div>
               <div v-else-if="effectiveChannelMode === 5" class="set-item">
-                <span class="set-label">预览测试频道</span>
+                <span class="set-label">预览测试分支</span>
                 <div class="set-options">
-                  <a href="https://beta.sgexilq.com" target="_blank" class="options">beta频道</a>
-                  <a href="https://dev.sgexilq.com" target="_blank" class="options">dev频道</a>
-                  <a href="https://canary.sgexilq.com" target="_blank" class="options">canary频道</a>
+                  <a href="https://beta.sgexilq.com" target="_blank" class="options">beta分支</a>
+                  <a href="https://dev.sgexilq.com" target="_blank" class="options">dev分支</a>
                 </div>
               </div>
               <div class="set-item">
-                <span class="set-label">返回正式频道</span>
+                <span class="set-label">返回正式分支</span>
                 <div class="set-options">
                   <a href="https://sgexilq.com" target="_blank" class="options">前往</a>
                 </div>
               </div>
             </template>
-            <!-- 正式频道（生产环境） -->
+            <!-- 正式分支（生产环境） -->
             <template v-else-if="channelMode === 1">
               <div class="set-item">
-                <span class="set-label">测试频道</span>
+                <span class="set-label">分支策略</span>
                 <div class="set-options">
                   <span
                     :class="['options', { choose: stableChannelExpanded }]"
@@ -1484,26 +1377,21 @@
               <Transition name="fade-up">
                 <div v-if="stableChannelExpanded" class="set-expand-box">
                   <div class="set-item">
-                    <span class="set-label">当前处于正式频道（master/selfuse分支）</span>
+                    <span class="set-label" style="color: var(--main-color)">当前处于正式分支（master/selfuse分支）</span>
                   </div>
                   <div class="set-item set-item-channel">
-                    <span class="set-label">beta频道</span>
-                    <span class="set-desc">beta频道推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该频道同样包含对主线的问题修复。</span>
+                    <span class="set-label">beta分支</span>
+                    <span class="set-desc">beta分支推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该分支同样包含对主线的问题修复。</span>
                   </div>
                   <div class="set-item set-item-channel">
-                    <span class="set-label">dev频道</span>
-                    <span class="set-desc">dev频道与canary频道并行，推送开发中的常规新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的绝大部分内容后续都会合并入beta频道。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
-                  </div>
-                  <div class="set-item set-item-channel">
-                    <span class="set-label">canary频道</span>
-                    <span class="set-desc">canary频道与dev频道并行，推送开发中的<s>雷霆</s>激进新功能。代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此频道的内容会有部分合并入beta频道，但绝大部分内容属于探索性质，最终会被直接废弃。该频道更新较为频繁。<br>不建议下游开发者跟进此频道。<s>（如果你愿意当然是可以的）</s></span>
+                    <span class="set-label">dev分支</span>
+                    <span class="set-desc">dev分支推送开发中的新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此分支的绝大部分内容后续都会合并入beta分支。该分支更新较为频繁。<br>不建议下游开发者跟进此分支。<s>（如果你愿意当然是可以的）</s></span>
                   </div>
                   <div class="set-item" style="margin-bottom: 4px;">
-                    <span class="set-label">前往预览测试频道</span>
+                    <span class="set-label">前往预览测试分支</span>
                     <div class="set-options">
-                      <a href="https://beta.sgexilq.com" target="_blank" class="options">beta频道</a>
-                      <a href="https://dev.sgexilq.com" target="_blank" class="options">dev频道</a>
-                      <a href="https://canary.sgexilq.com" target="_blank" class="options">canary频道</a>
+                      <a href="https://beta.sgexilq.com" target="_blank" class="options">beta分支</a>
+                      <a href="https://dev.sgexilq.com" target="_blank" class="options">dev分支</a>
                     </div>
                   </div>
                   <div class="set-item" style="min-height: 36px;">
@@ -1588,13 +1476,13 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, canaryChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, canaryChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
 
-// 有效频道模式（响应式）
+// 有效分支模式（响应式）
 const effectiveChannelMode = computed(() => store.effectiveChannelMode);
 
-// 切换频道模式并清除旧缓存
+// 切换分支模式并清除旧缓存
 const switchChannelMode = (mode) => {
   saveStoreDefaults({ DEFAULT_CHANNEL_MODE: mode, bumpVersion: true });
   const prev = JSON.parse(localStorage.getItem('siteData') || '{}');
@@ -1748,7 +1636,6 @@ const handleExpandAllGroups = () => {
   islandSettingsExpanded.value = true;
   betaChannelExpanded.value = true;
   devChannelExpanded.value = true;
-  canaryChannelExpanded.value = true;
 };
 const handleCollapseAllGroups = () => {
   expandAllGroups.value = false;
@@ -1757,16 +1644,15 @@ const handleCollapseAllGroups = () => {
   moreFontsExpanded.value = false;
   messageSettingsExpanded.value = false;
   islandSettingsExpanded.value = false;
-  // 频道展开状态恢复为默认：当前频道展开，其他关闭
+  // 分支展开状态恢复为默认：当前分支展开，其他关闭
   const mode = channelMode.value;
   betaChannelExpanded.value = mode === 2;
   devChannelExpanded.value = mode === 3;
-  canaryChannelExpanded.value = mode === 4;
 };
 // 主题颜色设置展开状态
 const themeColorExpanded = ref(false);
 // 开发模式选项展开状态（已移至 store 持久化）
-// 显示全部分组（开发模式下展示所有频道分组内容）
+// 显示全部分组（开发模式下展示所有分支分组内容）
 const showAllGroups = ref(false);
 // 关闭开发模式确认提示
 const closeDevModeConfirmVisible = ref(false);
@@ -1782,6 +1668,7 @@ const themeColorList = [
 const fontSizeEditing = ref(false);
 const fontSizeWarnVisible = ref(false);
 const removeAnimationsWarnVisible = ref(false);
+const advancedSettingsExpanded = ref(false);
 const showMoreSettingsWarnVisible = ref(false);
 
 // 开发模式入口方法
@@ -1895,7 +1782,7 @@ const confirmCloseDevMode = async () => {
   }
 };
 
-// 清除数据但保留当前频道和开发模式选项
+// 清除数据但保留当前分支和开发模式选项
 const handleClearDataKeepChannel = async () => {
   if (typeof $message !== "undefined") {
     $message.warning("数据已清除，页面即将刷新");
@@ -2386,35 +2273,30 @@ onMounted(() => {
   if (scheduledThemeEnabled.value) {
     store.startScheduledTheme();
   }
-  // 初始化时强制关闭不属于当前频道的功能选项
+  // 初始化时强制关闭不属于当前分支的功能选项
   const mode = channelMode.value;
   if (mode !== 2 && mode !== 5) {
     removeAnimations.value = false;
   }
   if (mode !== 3 && mode !== 5) {
     backgroundBlur.value = false;
-    playerShow.value = false;
     if (scheduledThemeEnabled.value) {
       scheduledThemeEnabled.value = false;
       store.stopScheduledTheme();
     }
   }
-  if (mode !== 4 && mode !== 5) {
+  if (mode !== 5) {
     pwaCacheEnabled.value = false;
-    readingProgressEnabled.value = false;
     imageLazyEnabled.value = false;
     imageWebpEnabled.value = false;
-    imageLightboxEnabled.value = false;
   }
-  // 根据频道模式设置展开状态
+  // 根据分支模式设置展开状态
   if (showAllGroups.value) {
     betaChannelExpanded.value = true;
     devChannelExpanded.value = true;
-    canaryChannelExpanded.value = true;
   } else if (channelMode.value >= 2 && channelMode.value <= 4) {
     betaChannelExpanded.value = channelMode.value === 2;
     devChannelExpanded.value = channelMode.value === 3;
-    canaryChannelExpanded.value = channelMode.value === 4;
   }
 });
 

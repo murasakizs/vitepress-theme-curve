@@ -29,7 +29,7 @@ const VALID_CONFIG_KEYS = [
   "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
   "removeAnimations", "showMoreSettings",
   "scheduledThemeEnabled", "scheduledLightTime", "scheduledDarkTime",
-  "betaChannelExpanded", "devChannelExpanded", "canaryChannelExpanded",
+  "betaChannelExpanded", "devChannelExpanded",
   "pwaCacheEnabled", "pwaCacheLimit", "readingProgressEnabled",
   "imageLazyEnabled", "imageWebpEnabled", "imageLightboxEnabled",
 ];

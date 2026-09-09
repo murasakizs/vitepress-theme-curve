@@ -90,7 +90,7 @@ import { mainStore } from "@/store";
 const store = mainStore();
 const { playerData, playState } = storeToRefs(store);
 
-const visible = computed(() => store.islandStyle === 'extended');
+const visible = computed(() => store.islandStyle === 'extended' && store.playerShow);
 const pillStackHidden = ref(false);
 const isMobile = ref(typeof window !== 'undefined' && window.innerWidth <= 768);
 

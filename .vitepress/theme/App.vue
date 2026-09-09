@@ -231,15 +231,15 @@ watch(
 onMounted(() => {
   initializeCursor();
   console.log(frontmatter.value, page.value, theme.value);
-  // 测试频道提示（加载遮罩消失后显示）
-  if (store.channelMode >= 2 && store.channelMode <= 4 && typeof $message !== "undefined") {
-    const channelName = store.channelMode === 2 ? 'beta' : store.channelMode === 3 ? 'dev' : 'canary';
+  // 测试分支提示（加载遮罩消失后显示）
+  if (store.channelMode >= 2 && store.channelMode <= 3 && typeof $message !== "undefined") {
+    const channelName = store.channelMode === 2 ? 'beta' : 'dev';
     const unwatch = watch(
       () => loadingStatus.value,
       (newVal, oldVal) => {
         if (oldVal === true && newVal === false) {
           setTimeout(() => {
-            $message.warning(`当前处于测试频道（${channelName}分支）`, { duration: 5000 });
+            $message.warning(`当前处于测试分支（${channelName}分支）`, { duration: 5000 });
           }, 500);
           unwatch();
         }

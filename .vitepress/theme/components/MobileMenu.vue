@@ -90,14 +90,12 @@ const pillChannel = computed(() => {
   const mode = effectiveChannelMode.value;
   if (mode === 2) return 'beta';
   if (mode === 3) return 'dev';
-  if (mode === 4) return 'canary';
   return '';
 });
 const pillChannelClass = computed(() => {
   const mode = effectiveChannelMode.value;
   if (mode === 2) return 'info';
   if (mode === 3) return 'warning';
-  if (mode === 4) return 'warning';
   return '';
 });
 

@@ -121,7 +121,7 @@ import { useIsMobileLayout } from "@/utils/layout.js";
 
 const store = mainStore();
 
-// 有效频道模式（响应式）
+// 有效分支模式（响应式）
 const effectiveChannelMode = computed(() => store.effectiveChannelMode);
 
 // 根据页面布局决定默认消息样式
@@ -155,19 +155,17 @@ const currentDate = ref("");
 let timeInterval = null;
 let progressInterval = null;
 
-// 根据频道模式显示不同的药丸文本
+// 根据分支模式显示不同的药丸文本
 const pillChannel = computed(() => {
   const mode = effectiveChannelMode.value;
   if (mode === 2) return 'beta';
   if (mode === 3) return 'dev';
-  if (mode === 4) return 'canary';
   return '';
 });
 const pillChannelClass = computed(() => {
   const mode = effectiveChannelMode.value;
   if (mode === 2) return 'info';
   if (mode === 3) return 'warning';
-  if (mode === 4) return 'warning';
   return '';
 });
 const pillText = computed(() => {
@@ -177,23 +175,21 @@ const pillText = computed(() => {
   return channel ? `${channel}.sgexilq.com` : 'sgexilq.com';
 });
 
-// 灵动模式消息末尾的频道文本
+// 灵动模式消息末尾的分支文本
 const islandChannelText = computed(() => {
   const mode = effectiveChannelMode.value;
   if (mode === 5) return '开发模式';
-  if (mode === 2) return 'beta频道';
-  if (mode === 3) return 'dev频道';
-  if (mode === 4) return 'canary频道';
+  if (mode === 2) return 'beta分支';
+  if (mode === 3) return 'dev分支';
   return '';
 });
 
-// 灵动模式频道文本颜色类
+// 灵动模式分支文本颜色类
 const islandChannelClass = computed(() => {
   const mode = effectiveChannelMode.value;
   if (mode === 5) return 'channel-devmode';
   if (mode === 2) return 'channel-beta';
   if (mode === 3) return 'channel-dev';
-  if (mode === 4) return 'channel-canary';
   return '';
 });
 
@@ -643,8 +639,7 @@ onUnmounted(() => {
         &.channel-beta {
           color: rgba(144, 147, 153, 0.8);
         }
-        &.channel-dev,
-        &.channel-canary {
+        &.channel-dev {
           color: rgba(230, 162, 60, 0.8);
         }
         &.channel-devmode {
@@ -685,8 +680,7 @@ onUnmounted(() => {
         &.channel-beta {
           color: var(--main-info-color);
         }
-        &.channel-dev,
-        &.channel-canary {
+        &.channel-dev {
           color: var(--main-warning-color);
         }
         &.channel-devmode {

@@ -168,7 +168,7 @@ const getMusicListData = async () => {
     initAPlayer(fullList?.length ? fullList : []);
     loadCurrentLyrics();
   } catch (error) {
-    store.playerShow = false;
+    console.error("获取播放列表出错：", error);
     initAPlayer([]);
   }
 };
@@ -246,7 +246,6 @@ const initAPlayer = async (list) => {
     window.$player = player.value;
   } catch (error) {
     console.error("初始化播放器出错：", error);
-    store.playerShow = false;
   }
 };
 

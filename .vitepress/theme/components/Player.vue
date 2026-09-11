@@ -25,12 +25,12 @@
           </ul>
         </div>
         <div v-show="panelTab === 'lrc'" class="lyrics-panel" ref="lyricsPanelRef">
-          <div v-if="currentLyrics.length" class="lyrics-scroll" ref="lyricsScrollRef">
+          <div v-if="currentLyrics.length" class="lyrics-scroll" ref="lyricsScrollRef" @wheel.passive="pauseLyricFollow" @touchmove.passive="pauseLyricFollow">
             <div
               v-for="(line, idx) in currentLyrics"
               :key="idx"
               :class="['lyric-line', { active: idx === activeLyricIndex }]"
-              :ref="el => { if (idx === activeLyricIndex) activeLyricEl = el }"
+              @click="seekToLine(idx)"
             >{{ line.text }}</div>
           </div>
           <div v-else class="lyrics-empty">暂无歌词</div>
@@ -80,7 +80,8 @@ const lyricsPanelRef = ref(null);
 const lyricsScrollRef = ref(null);
 const currentLyrics = ref([]);
 const activeLyricIndex = ref(-1);
-const activeLyricEl = ref(null);
+const userScrolling = ref(false);
+let followResumeTimer = null;
 
 // 随机轮播
 const rotatePhase = ref("");
@@ -335,6 +336,38 @@ const loadCurrentLyrics = async () => {
   }
 };
 
+// 自动滚动到当前歌词行（面板收起时容器不存在，直接跳过）
+const scrollToActiveLyric = () => {
+  if (userScrolling.value) return;
+  const container = lyricsScrollRef.value;
+  const el = container?.children[activeLyricIndex.value];
+  if (!el) return;
+  const offset = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+  container.scrollTo({ top: offset, behavior: "smooth" });
+};
+
+// 用户手动滚动时暂停跟随，停止滚动 3 秒后回到当前行
+const pauseLyricFollow = () => {
+  userScrolling.value = true;
+  clearTimeout(followResumeTimer);
+  followResumeTimer = setTimeout(() => {
+    userScrolling.value = false;
+    scrollToActiveLyric();
+  }, 3000);
+};
+
+// 点击歌词跳转到对应时间点
+const seekToLine = (idx) => {
+  const line = currentLyrics.value[idx];
+  if (!line) return;
+  player.value?.seek(line.time);
+  activeLyricIndex.value = idx;
+  playerLyric.value = line.text;
+  clearTimeout(followResumeTimer);
+  userScrolling.value = false;
+  nextTick(scrollToActiveLyric);
+};
+
 // 同步歌词高亮（由 initAPlayer 中的 timeupdate 事件驱动）
 const syncLyricsFromTime = (ct) => {
   if (!currentLyrics.value.length) return;
@@ -346,14 +379,7 @@ const syncLyricsFromTime = (ct) => {
   if (idx !== activeLyricIndex.value) {
     activeLyricIndex.value = idx;
     playerLyric.value = idx >= 0 ? currentLyrics.value[idx].text : "";
-    nextTick(() => {
-      if (activeLyricEl.value && lyricsScrollRef.value) {
-        const container = lyricsScrollRef.value;
-        const el = activeLyricEl.value;
-        const offset = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
-        container.scrollTo({ top: offset, behavior: "smooth" });
-      }
-    });
+    nextTick(scrollToActiveLyric);
   }
 };
 
@@ -467,6 +493,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   stopRotate();
+  clearTimeout(followResumeTimer);
   player.value?.destroy();
 });
 </script>
@@ -543,6 +570,7 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 .lyrics-scroll {
+  position: relative;
   max-height: 320px;
   overflow-y: auto;
   scrollbar-width: none;
@@ -556,9 +584,13 @@ onBeforeUnmount(() => {
   line-height: 1.5;
   color: var(--main-font-second-color);
   text-align: center;
+  cursor: pointer;
   transition: color 0.3s, font-size 0.3s, font-weight 0.3s;
   white-space: pre-wrap;
   word-break: break-word;
+  &:hover {
+    color: var(--main-font-color);
+  }
   &.active {
     color: var(--main-color);
     font-weight: 600;

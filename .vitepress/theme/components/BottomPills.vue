@@ -25,11 +25,12 @@
               </div>
             </div>
             <div v-show="store.playerPanelTab === 'lrc'" class="pill-card-lrc">
-              <div v-if="hasPlayedOnce && pillLyrics.length" class="pill-card-lrc-scroll">
+              <div v-if="hasPlayedOnce && pillLyrics.length" ref="lrcScrollRef" class="pill-card-lrc-scroll" @wheel.passive="pauseLyricFollow" @touchmove.passive="pauseLyricFollow">
                 <div
                   v-for="(line, idx) in pillLyrics"
                   :key="idx"
                   :class="['pill-card-lrc-line', { active: idx === pillLyricIdx }]"
+                  @click="seekToLine(idx)"
                 >{{ line.text }}</div>
               </div>
               <div v-else class="pill-card-lrc-empty">没有播放中的音乐</div>
@@ -107,6 +108,9 @@ const allSongs = ref([]);
 const currentSongIdx = ref(0);
 const pillLyrics = ref([]);
 const pillLyricIdx = ref(-1);
+const lrcScrollRef = ref(null);
+const userScrolling = ref(false);
+let followResumeTimer = null;
 const hasPlayedOnce = ref(false);
 const prevCover = ref('');
 
@@ -221,6 +225,50 @@ const syncLyric = () => {
   pillLyricIdx.value = idx;
 };
 
+// 自动滚动到当前歌词行（面板收起时容器不存在，直接跳过）
+const scrollToActiveLyric = () => {
+  if (userScrolling.value) return;
+  const container = lrcScrollRef.value;
+  const el = container?.children[pillLyricIdx.value];
+  if (!el) return;
+  const offset = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+  container.scrollTo({ top: offset, behavior: 'smooth' });
+};
+
+// 用户手动滚动时暂停跟随，停止滚动 3 秒后回到当前行
+const pauseLyricFollow = () => {
+  userScrolling.value = true;
+  clearTimeout(followResumeTimer);
+  followResumeTimer = setTimeout(() => {
+    userScrolling.value = false;
+    scrollToActiveLyric();
+  }, 3000);
+};
+
+// 点击歌词跳转到对应时间点
+const seekToLine = (idx) => {
+  const line = pillLyrics.value[idx];
+  if (!line) return;
+  window.$player?.seek(line.time);
+  pillLyricIdx.value = idx;
+  clearTimeout(followResumeTimer);
+  userScrolling.value = false;
+  nextTick(scrollToActiveLyric);
+};
+
+// 歌词行高亮变化时跟随滚动
+watch(pillLyricIdx, scrollToActiveLyric, { flush: 'post' });
+
+// 展开面板或切换到歌词页时立即定位到当前行
+watch(
+  () => [store.playerFolded, store.playerPanelTab],
+  () => {
+    if (store.playerFolded || store.playerPanelTab !== 'lrc') return;
+    scrollToActiveLyric();
+  },
+  { flush: 'post' },
+);
+
 // 控制
 const togglePlay = () => { window.$player?.toggle(); };
 const prevSong = () => { window.$player?.skipBack(); window.$player?.play(); };
@@ -293,6 +341,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (timer) clearInterval(timer);
   if (coverFadeTimer) clearTimeout(coverFadeTimer);
+  if (followResumeTimer) clearTimeout(followResumeTimer);
   audioListeners.forEach(({ el, fn, evt }) => el.removeEventListener(evt, fn));
 });
 </script>
@@ -599,6 +648,7 @@ onBeforeUnmount(() => {
   padding: 0 16px 12px;
 }
 .pill-card-lrc-scroll {
+  position: relative;
   height: 288px;
   overflow-y: auto;
   scrollbar-width: none;
@@ -619,7 +669,9 @@ onBeforeUnmount(() => {
   line-height: 1.5;
   color: var(--main-font-second-color);
   text-align: center;
+  cursor: pointer;
   transition: color 0.3s, font-weight 0.3s;
+  &:hover { color: var(--main-font-color); }
   &.active { color: var(--main-color); font-weight: 600; }
   @media (max-width: 768px) {
     padding: 4px 0;

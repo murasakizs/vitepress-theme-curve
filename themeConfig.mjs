@@ -145,7 +145,7 @@ export const themeConfig = {
   rewardData: { enable: false },
   music: {
     enable: true,
-    url: "https://metingapi.sgexilq.top/api/meting",
+    url: "https://metingapi.sgexilq.com/api/meting",
     id: ["18348521365", "18351552429", "18351506618"],
     server: "netease",
     type: "playlist",

@@ -12,10 +12,10 @@
               <!-- 网址 -->
               <span class="site-url">
                 <template v-if="pillChannel">
-                  <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}.</span><span>sgexilq</span><span class="pill-domain">.top</span>
+                  <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}.</span><span>sgexilq</span><span class="pill-domain">.com</span>
                 </template>
                 <template v-else>
-                  <span>sgexilq</span><span class="pill-domain">.top</span>
+                  <span>sgexilq</span><span class="pill-domain">.com</span>
                 </template>
               </span>
               <!-- 关闭按钮 -->
@@ -76,13 +76,15 @@
 
 <script setup>
 import { mainStore } from "@/store";
+import { usePostData } from "@/utils/usePostData.mjs";
 
 const store = mainStore();
 const router = useRouter();
 const { theme } = useData();
 
 // 菜单数据
-const { nav, tagsData } = theme.value;
+const { nav } = theme.value;
+const { tagsData, loadPostData } = usePostData();
 
 // 网址显示（与超级岛第三个药丸一致）
 const effectiveChannelMode = computed(() => store.effectiveChannelMode);
@@ -113,6 +115,10 @@ const openSettings = () => {
     store.changeShowStatus("showSettings");
   }, 300);
 };
+
+onMounted(() => {
+  loadPostData();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -266,6 +272,11 @@ const openSettings = () => {
       &:last-child {
         margin-bottom: 0;
       }
+    }
+    // 标签名较长（如 Android玩机）用满整列宽度，不按固定 80px 截断
+    .tags-list .link-child .link-child-btn .name {
+      max-width: 100%;
+      min-width: 0;
     }
     hr {
       margin: 1rem 0;

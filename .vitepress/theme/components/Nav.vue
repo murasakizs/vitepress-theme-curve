@@ -31,7 +31,7 @@
               <span class="link-btn"> {{ item.text }}</span>
               <div v-if="item.items" class="link-child">
                 <span
-                  v-for="(child, childIndex) in item.items"
+                  v-for="(child, childIndex) in desktopNavItems(item.items)"
                   :key="childIndex"
                   class="link-child-btn"
                   @click="goLink(child.link)"
@@ -154,6 +154,9 @@ const SearchModal = defineAsyncComponent(async () => {
 });
 const { scrollData } = storeToRefs(store);
 const { site, theme, frontmatter, page } = useData();
+
+// 标记 mobileOnly 的入口只在移动端侧栏出现
+const desktopNavItems = (items) => (items || []).filter((item) => !item.mobileOnly);
 
 // 站外链接交给浏览器新开标签，router.go 会丢弃 origin 把用户送回站内
 const goLink = (link) => {

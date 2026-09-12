@@ -51,8 +51,9 @@ export const themeConfig = {
       items: [
           { text: "关于泠酱", link: "/pages/about-me", icon: "contacts" },
           { text: "关于本站", link: "/pages/about-website", icon: "code" },
-          { text: "回到主页", link: "/", icon: "home" },
-          { text: "服务状态", link: "https://status.sgexilq.com", icon: "chart" },
+          // mobileOnly：只在移动端侧栏显示，不进桌面导航下拉
+          { text: "回到主页", link: "/", icon: "home", mobileOnly: true },
+          { text: "服务状态", link: "https://status.sgexilq.com", icon: "chart", mobileOnly: true },
         ],
     },
   ],

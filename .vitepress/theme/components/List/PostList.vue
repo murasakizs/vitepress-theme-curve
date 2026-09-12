@@ -44,15 +44,15 @@
               {{ tag }}
             </a>
           </div>
-          <span class="post-time">{{ formatTimestamp(item?.date) }}</span>
-          <span v-if="item?.wordCount" class="post-stat">
-            <i class="iconfont icon-article" />
-            {{ item.wordCount.toLocaleString() }} 字
-          </span>
-          <span v-if="item?.readTime" class="post-stat">
-            <i class="iconfont icon-time" />
-            {{ item.readTime }} 分钟
-          </span>
+          <div class="post-info">
+            <span v-if="item?.wordCount" class="post-stat">
+              共 {{ item.wordCount.toLocaleString() }} 字
+            </span>
+            <span v-if="item?.readTime" class="post-stat read-time">
+              阅读需约 {{ item.readTime }} 分钟
+            </span>
+            <span class="post-time">{{ formatTimestamp(item?.date) }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -224,6 +224,7 @@ const toPost = (event, path) => {
         word-break: break-all;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
       }
       .post-desc {
         margin-top: -0.4rem;
@@ -235,6 +236,7 @@ const toPost = (event, path) => {
         word-break: break-all;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
       }
       .post-meta {
         display: flex;
@@ -282,6 +284,17 @@ const toPost = (event, path) => {
             flex-wrap: nowrap;
           }
         }
+        // 时间 / 字数 / 阅读时间聚成一组，不再被 space-between 摊到整行
+        .post-info {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          flex-shrink: 0;
+          // 与前一项保持间隔，与排列顺序无关
+          > * + * {
+            margin-left: 12px;
+          }
+        }
         .post-time {
           opacity: 0.6;
           font-size: 13px;
@@ -293,10 +306,11 @@ const toPost = (event, path) => {
           opacity: 0.6;
           font-size: 13px;
           white-space: nowrap;
-          margin-left: 12px;
-          .iconfont {
-            margin-right: 4px;
-            font-size: 12px;
+        }
+        // 窄屏卡片不再显示阅读时间
+        .read-time {
+          @media (max-width: 768px) {
+            display: none;
           }
         }
       }

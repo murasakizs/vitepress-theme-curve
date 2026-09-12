@@ -34,7 +34,7 @@
                   v-for="(child, childIndex) in item.items"
                   :key="childIndex"
                   class="link-child-btn"
-                  @click="router.go(child.link)"
+                  @click="goLink(child.link)"
                 >
                   <i v-if="child.icon" :class="`iconfont icon-${child.icon}`" />
                   {{ child.text }}
@@ -154,6 +154,16 @@ const SearchModal = defineAsyncComponent(async () => {
 });
 const { scrollData } = storeToRefs(store);
 const { site, theme, frontmatter, page } = useData();
+
+// 站外链接交给浏览器新开标签，router.go 会丢弃 origin 把用户送回站内
+const goLink = (link) => {
+  if (!link) return;
+  if (/^https?:\/\//i.test(link)) {
+    window.open(link, "_blank", "noopener");
+    return;
+  }
+  router.go(link);
+};
 
 // 右键菜单开关
 const rightMenuSwitch = () => {

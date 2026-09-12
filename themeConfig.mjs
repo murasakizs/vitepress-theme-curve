@@ -51,6 +51,8 @@ export const themeConfig = {
       items: [
           { text: "关于泠酱", link: "/pages/about-me", icon: "contacts" },
           { text: "关于本站", link: "/pages/about-website", icon: "code" },
+          { text: "回到主页", link: "/", icon: "home" },
+          { text: "服务状态", link: "https://status.sgexilq.com", icon: "chart" },
         ],
     },
   ],

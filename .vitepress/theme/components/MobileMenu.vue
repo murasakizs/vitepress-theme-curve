@@ -105,6 +105,11 @@ const pillChannelClass = computed(() => {
 const pageJump = (url) => {
   if (!url) return false;
   store.changeShowStatus("mobileMenuShow");
+  // 站外链接交给浏览器新开标签，router.go 会丢弃 origin 把用户送回站内
+  if (/^https?:\/\//i.test(url)) {
+    window.open(url, "_blank", "noopener");
+    return;
+  }
   router.go(url);
 };
 

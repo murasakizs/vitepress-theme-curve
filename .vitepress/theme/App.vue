@@ -28,8 +28,12 @@
   <Teleport to="body">
     <!-- 左侧菜单 -->
     <div :class="['left-menu', { hidden: footerIsShow }]">
-            <!-- 全局播放器 -->
-      <Player />
+            <!-- 全局播放器（拓展模式下隐藏但保留挂载） -->
+      <ClientOnly>
+        <div v-show="store.islandStyle !== 'extended'">
+          <Player />
+        </div>
+      </ClientOnly>
       <!-- 全局设置 -->
       <Settings />
     </div>
@@ -38,6 +42,10 @@
   <RightMenu ref="rightMenuRef" />
   <!-- 全局消息 -->
   <Message />
+  <!-- 底部固定药丸 -->
+  <ClientOnly>
+    <BottomPills />
+  </ClientOnly>
   <!-- 导入后检查弹窗 -->
   <Teleport to="body">
     <div v-if="importCheckVisible" class="import-check-overlay">
@@ -223,15 +231,15 @@ watch(
 onMounted(() => {
   initializeCursor();
   console.log(frontmatter.value, page.value, theme.value);
-  // 测试频道提示（加载遮罩消失后显示）
-  if (store.channelMode >= 2 && store.channelMode <= 4 && typeof $message !== "undefined") {
-    const channelName = store.channelMode === 2 ? 'beta' : store.channelMode === 3 ? 'dev' : 'canary';
+  // 测试分支提示（加载遮罩消失后显示）
+  if (store.channelMode >= 2 && store.channelMode <= 3 && typeof $message !== "undefined") {
+    const channelName = store.channelMode === 2 ? 'beta' : 'dev';
     const unwatch = watch(
       () => loadingStatus.value,
       (newVal, oldVal) => {
         if (oldVal === true && newVal === false) {
           setTimeout(() => {
-            $message.warning(`当前处于测试频道（${channelName}分支）`, { duration: 5000 });
+            $message.warning(`当前处于测试分支（${channelName}分支）`, { duration: 5000 });
           }, 500);
           unwatch();
         }

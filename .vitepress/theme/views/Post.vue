@@ -30,35 +30,39 @@
         {{ postMetaData.title || "未命名文章" }}
       </h1>
       <div class="other-meta">
-        <span class="meta date">
-          <i class="iconfont icon-date" />
-          {{ formatTimestamp(postMetaData.date) }}
-        </span>
-        <span class="update meta">
-          <i class="iconfont icon-time" />
-          {{ formatTimestamp(page?.lastUpdated || postMetaData.lastModified) }}
-        </span>
-        <!-- 字数 -->
-        <span v-if="postMetaData.wordCount" class="meta">
-          <i class="iconfont icon-article" />
-          {{ postMetaData.wordCount.toLocaleString() }} 字
-        </span>
-        <!-- 阅读时间 -->
-        <span v-if="postMetaData.readTime" class="meta">
-          <i class="iconfont icon-time" />
-          约 {{ postMetaData.readTime }} 分钟
-        </span>
-        <!-- 热度 -->
-        <span class="hot meta">
-          <i class="iconfont icon-fire" />
-          <span id="twikoo_visitors" class="artalk-pv-count">-</span>
-        </span>
-        <!-- 评论数 -->
-        <!-- <span class="chat meta hover" @click="commentRef?.scrollToComments">
-          <i class="iconfont icon-chat" />
-          <span id="twikoo_comments" class="artalk-comment-count">0</span>
-        </span> -->
+        <div class="meta-row">
+          <span class="meta date">
+            <i class="iconfont icon-date" />
+            {{ formatTimestamp(postMetaData.date) }}
+          </span>
+          <span class="update meta">
+            <i class="iconfont icon-time" />
+            {{ formatTimestamp(page?.lastUpdated || postMetaData.lastModified) }}
+          </span>
+          <!-- 热度 -->
+          <span class="hot meta">
+            <i class="iconfont icon-fire" />
+            <span id="twikoo_visitors" class="artalk-pv-count">-</span>
+          </span>
+        </div>
+        <div class="meta-row stats">
+          <!-- 字数 -->
+          <span v-if="postMetaData.wordCount" class="meta">
+            <i class="iconfont icon-article" />
+            {{ postMetaData.wordCount.toLocaleString() }} 字
+          </span>
+          <!-- 阅读时间 -->
+          <span v-if="postMetaData.readTime" class="meta">
+            <i class="iconfont icon-time" />
+            约 {{ postMetaData.readTime }} 分钟
+          </span>
+        </div>
       </div>
+      <!-- 评论数 -->
+      <!-- <span class="chat meta hover" @click="commentRef?.scrollToComments">
+        <i class="iconfont icon-chat" />
+        <span id="twikoo_comments" class="artalk-comment-count">0</span>
+      </span> -->
     </div>
     <!-- 密码保护 - 全屏显示 -->
     <div v-if="hasPassword && !isUnlocked" class="password-protect-wrapper">
@@ -71,6 +75,17 @@
     <!-- 文章正文内容 -->
     <div v-else class="post-content">
       <article class="post-article s-card">
+        <!-- 字数 / 阅读时间：移动端挪到正文开头，桌面端仍在标题下方 -->
+        <div class="article-stats">
+          <span v-if="postMetaData.wordCount" class="meta">
+            <i class="iconfont icon-article" />
+            {{ postMetaData.wordCount.toLocaleString() }} 字
+          </span>
+          <span v-if="postMetaData.readTime" class="meta">
+            <i class="iconfont icon-time" />
+            约 {{ postMetaData.readTime }} 分钟
+          </span>
+        </div>
         <!-- 过期提醒 -->
         <div class="expired s-card" v-if="postMetaData?.expired >= 180">
           本文发表于 <strong>{{ postMetaData?.expired }}</strong> 天前，其中的信息可能已经事过境迁
@@ -295,6 +310,10 @@ onMounted(() => {
       display: flex;
       flex-direction: row;
       align-items: center;
+      // 桌面端把两个分组拆平，单项排列顺序与拆分前保持一致
+      .meta-row {
+        display: contents;
+      }
       .meta {
         display: flex;
         flex-direction: row;
@@ -303,6 +322,7 @@ onMounted(() => {
         font-size: 14px;
         border-radius: 8px;
         opacity: 0.8;
+        white-space: nowrap;
         .iconfont {
           margin-right: 6px;
           transition: color 0.3s;
@@ -311,6 +331,8 @@ onMounted(() => {
           padding-left: 0;
         }
         &.hot {
+          // 热度被编进了第一组，桌面端用 order 还原到末位
+          order: 5;
           .iconfont {
             font-size: 18px;
           }
@@ -343,6 +365,33 @@ onMounted(() => {
       cursor: auto;
       &:hover {
         border-color: var(--main-card-border);
+      }
+      // 移动端专属：字数 / 阅读时间，桌面端隐藏（值仍在标题下方）
+      .article-stats {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        margin-bottom: 1.2rem;
+        font-size: 14px;
+        color: var(--main-font-second-color);
+        .meta {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 6px 12px;
+          border-radius: 8px;
+          opacity: 0.8;
+          white-space: nowrap;
+          .iconfont {
+            margin-right: 6px;
+          }
+          // 首项贴齐正文左边缘（与标题下方 .meta.date 的处理一致）
+          &:first-child {
+            padding-left: 0;
+          }
+        }
       }
       .expired {
         border: solid transparent 0;
@@ -445,12 +494,27 @@ onMounted(() => {
       }
       .other-meta {
         justify-content: center;
+        // 窄屏把分组还原成真实容器
+        .meta-row {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        // 字数 / 阅读时间在移动端移到正文开头
+        .meta-row.stats {
+          display: none;
+        }
       }
     }
     .post-content {
       .post-article {
         border: none;
         padding: 20px 30px;
+        .article-stats {
+          display: flex;
+        }
         .other-meta {
           margin: 1rem 0 2rem 0;
           flex-direction: column;

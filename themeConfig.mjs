@@ -9,12 +9,12 @@ export const themeConfig = {
     title: "泠の小站",
     description: "愿每个人都被世界温柔以待~",
     logo: "/images/logo/favicon-256.png",
-    site: "https://sgexilq.top",
+    site: "https://sgexilq.com",
     author: {
       name: "泠诗尘",
       cover: "/images/logo/favicon-256.png",
       email: "sgexilq@qq.com",
-      link: "https://sgexilq.top",
+      link: "https://sgexilq.com",
     },
   },
   // 备案信息（留空则不显示）
@@ -51,6 +51,9 @@ export const themeConfig = {
       items: [
           { text: "关于泠酱", link: "/pages/about-me", icon: "contacts" },
           { text: "关于本站", link: "/pages/about-website", icon: "code" },
+          // mobileOnly：只在移动端侧栏显示，不进桌面导航下拉
+          { text: "回到主页", link: "/", icon: "home", mobileOnly: true },
+          { text: "服务状态", link: "https://status.sgexilq.com", icon: "chart", mobileOnly: true },
         ],
     },
   ],
@@ -59,7 +62,7 @@ export const themeConfig = {
       name: "项目",
       list: [
         { icon: "/images/logo/favicon-256.png", name: "泠の小站", url: "/" },
-        { icon: "/images/logo/favicon-256.png", name: "精神状态", url: "https://whendie.sgexilq.top" },
+        { icon: "/images/logo/favicon-256.png", name: "精神状态", url: "https://whendie.sgexilq.com" },
       ],
     },
   ],
@@ -68,11 +71,11 @@ export const themeConfig = {
   footer: {
     social: [
       { icon: "email", link: "mailto:sgexilq@qq.com" },
-      { icon: "qq", link: "https://myat-q.sgexilq.top" },
-      { icon: "github", link: "https://myat-g.sgexilq.top" },
-      { icon: "bilibili", link: "https://myat-b.sgexilq.top" },
-      { icon: "/images/icon/xiaohongshu.svg", iconType: "image", link: "https://myat-h.sgexilq.top" },
-      { icon: "/images/icon/steam.svg", iconType: "image", link: "https://myat-s.sgexilq.top" },
+      { icon: "qq", link: "https://myat-q.sgexilq.com" },
+      { icon: "github", link: "https://myat-g.sgexilq.com" },
+      { icon: "bilibili", link: "https://myat-b.sgexilq.com" },
+      { icon: "/images/icon/xiaohongshu.svg", iconType: "image", link: "https://myat-h.sgexilq.com" },
+      { icon: "/images/icon/steam.svg", iconType: "image", link: "https://myat-s.sgexilq.com" },
     ],
     sitemap: [
       {
@@ -88,7 +91,7 @@ export const themeConfig = {
         text: "项目",
         items: [
           { text: "本站源码", link: "https://github.com/murasakizs/vitepress-theme-curve", newTab: true },
-          { text: "精神状态", link: "https://whendie.sgexilq.top", newTab: true },
+          { text: "精神状态", link: "https://whendie.sgexilq.com", newTab: true },
         ],
       },
       {
@@ -96,14 +99,14 @@ export const themeConfig = {
         items: [
           { text: "关于泠酱", link: "/pages/about-me" },
           { text: "关于本站", link: "/pages/about-website" },
-          { text: "友情链接", link: "/pages/friend-link" },
+          { text: "友情链接", link: "/pages/link" },
           { text: "TO DO", link: "/pages/todo" },
         ],
       },
       {
         text: "服务",
         items: [
-          { text: "站点状态", link: "https://status.sgexilq.top", newTab: true },
+          { text: "站点状态", link: "https://status.sgexilq.com", newTab: true },
           { text: "隐私政策", link: "/pages/privacy" },
           { text: "版权协议", link: "/pages/cc" },
         ],
@@ -114,8 +117,13 @@ export const themeConfig = {
   // ===== 评论 =====
   comment: {
     enable: true,
-    type: "artalk",
-    artalk: { site: "泠の小站", server: "" }, // TODO: 填入 Artalk 服务端地址
+    type: "twikoo",
+    twikoo: {
+      js: "https://cdn.jsdelivr.net/npm/twikoo@1.6.42/dist/twikoo.all.min.js",
+      envId: "https://mytwikooapi.sgexilq.com",
+      region: "",
+      lang: "zh-CN",
+    },
   },
 
   // ===== 侧边栏 =====
@@ -138,7 +146,13 @@ export const themeConfig = {
 
   // ===== 功能开关 =====
   rewardData: { enable: false },
-  music: { enable: false }, // TODO: 获取网易云歌单 ID 后启用
+  music: {
+    enable: true,
+    url: "https://metingapi.sgexilq.com/api/meting",
+    id: ["18348521365", "18351552429", "18351506618"],
+    server: "netease",
+    type: "playlist",
+  },
   search: { enable: false }, // TODO: 获取 Algolia appId 和 apiKey 后启用
   // 图片灯箱（点击放大查看）
   fancybox: {

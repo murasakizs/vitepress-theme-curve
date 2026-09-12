@@ -10,7 +10,7 @@ const linkData = [
         name: "泠の小站",
         avatar: "/images/logo/favicon-256.png",
         desc: "一个莫名其妙的小站（？）",
-        url: "https://sgexilq.top",
+        url: "https://sgexilq.com",
       },
     ],
   },

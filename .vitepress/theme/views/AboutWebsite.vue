@@ -57,7 +57,7 @@
 
       <div class="about-item child">
         <div class="about-item" style="padding: 1.2rem 1.2rem 1.2rem 1.8rem; justify-content: center">
-          <span class="title2"><strong>sgexilq</strong><strong style="color: var(--main-color)">.</strong><strong style="color: var(--main-color)">top</strong></span>
+          <span class="title2"><strong>sgexilq</strong><strong style="color: var(--main-color)">.</strong><strong style="color: var(--main-color)">com</strong></span>
         </div>
         <div class="about-item info" style="align-items: center; justify-content: center; padding-left: 1.7rem">
           <span class="title2" style="white-space: nowrap">

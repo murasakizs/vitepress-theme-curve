@@ -31,10 +31,10 @@
               <span class="link-btn"> {{ item.text }}</span>
               <div v-if="item.items" class="link-child">
                 <span
-                  v-for="(child, childIndex) in item.items"
+                  v-for="(child, childIndex) in desktopNavItems(item.items)"
                   :key="childIndex"
                   class="link-child-btn"
-                  @click="router.go(child.link)"
+                  @click="goLink(child.link)"
                 >
                   <i v-if="child.icon" :class="`iconfont icon-${child.icon}`" />
                   {{ child.text }}
@@ -154,6 +154,19 @@ const SearchModal = defineAsyncComponent(async () => {
 });
 const { scrollData } = storeToRefs(store);
 const { site, theme, frontmatter, page } = useData();
+
+// 标记 mobileOnly 的入口只在移动端侧栏出现
+const desktopNavItems = (items) => (items || []).filter((item) => !item.mobileOnly);
+
+// 站外链接交给浏览器新开标签，router.go 会丢弃 origin 把用户送回站内
+const goLink = (link) => {
+  if (!link) return;
+  if (/^https?:\/\//i.test(link)) {
+    window.open(link, "_blank", "noopener");
+    return;
+  }
+  router.go(link);
+};
 
 // 右键菜单开关
 const rightMenuSwitch = () => {
@@ -544,12 +557,12 @@ const rightMenuSwitch = () => {
           visibility: hidden;
           transform-origin: right top;
           transform: translateY(-10px) scale(0.8);
-          padding: 8px;
+          padding: 6px 2px;
           display: flex;
           flex-direction: row;
           align-items: center;
           background-color: var(--main-card-background);
-          border: 1px solid var(--main-card-border);
+          border: 1.5px solid var(--main-color);
           box-shadow: 0 8px 12px -3px var(--main-color-bg);
           border-radius: 50px;
           transition:
@@ -572,8 +585,8 @@ const rightMenuSwitch = () => {
             width: 42px;
             height: 42px;
             border-radius: 50%;
-            border: 1px solid var(--main-card-border);
-            background-color: var(--main-card-background);
+            border: none;
+            background-color: transparent;
             transition:
               transform 0.3s,
               background-color 0.3s;
@@ -583,14 +596,11 @@ const rightMenuSwitch = () => {
               color: var(--main-font-color);
               transition: color 0.3s;
             }
-            &.open {
+            &:hover {
               background-color: var(--main-color);
               .iconfont {
                 color: #fff;
               }
-            }
-            &:hover {
-              transform: scale(1.08);
             }
             &:active {
               transform: scale(1);
@@ -601,14 +611,13 @@ const rightMenuSwitch = () => {
             align-items: center;
             margin: 0 4px;
             height: 42px;
-            padding: 0 16px;
+            padding: 0 12px;
             border-radius: 50px;
-            border: 1px solid var(--main-card-border);
-            background-color: var(--main-card-background);
+            border: none;
+            background-color: transparent;
             white-space: nowrap;
             transition:
-              background-color 0.3s,
-              border-color 0.3s;
+              background-color 0.3s;
             cursor: pointer;
             .iconfont {
               font-size: 18px;
@@ -624,7 +633,6 @@ const rightMenuSwitch = () => {
             }
             &:hover {
               background-color: var(--main-color);
-              border-color: var(--main-color);
               .iconfont,
               .capsule-text {
                 color: #fff;

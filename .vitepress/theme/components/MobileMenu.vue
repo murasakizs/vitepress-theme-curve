@@ -7,9 +7,32 @@
         <div class="menu-mask" @click="store.changeShowStatus('mobileMenuShow')" />
         <Transition name="toLeft" mode="out-in">
           <div v-show="store.mobileMenuShow" class="menu-content s-card">
-            <!-- 关闭按钮 -->
-            <div class="close-control" @click="store.changeShowStatus('mobileMenuShow')">
-              <i class="iconfont icon-close"></i>
+            <!-- 顶部控制栏 -->
+            <div class="menu-top-control">
+              <!-- 网址 -->
+              <span class="site-url">
+                <template v-if="pillChannel">
+                  <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}.</span><span>sgexilq</span><span class="pill-domain">.com</span>
+                </template>
+                <template v-else>
+                  <span>sgexilq</span><span class="pill-domain">.com</span>
+                </template>
+              </span>
+              <!-- 关闭按钮 -->
+              <div class="close-control" @click="store.changeShowStatus('mobileMenuShow')">
+                <i class="iconfont icon-close"></i>
+              </div>
+            </div>
+            <!-- 个性化配置 -->
+            <div class="menu-top-control">
+              <div
+                class="settings-btn"
+                title="个性化配置"
+                @click="openSettings"
+              >
+                <i class="iconfont icon-style"></i>
+                <span class="capsule-text">个性化配置</span>
+              </div>
             </div>
             <!-- 菜单 -->
             <div class="menu-list">
@@ -53,20 +76,54 @@
 
 <script setup>
 import { mainStore } from "@/store";
+import { usePostData } from "@/utils/usePostData.mjs";
 
 const store = mainStore();
 const router = useRouter();
 const { theme } = useData();
 
 // 菜单数据
-const { nav, tagsData } = theme.value;
+const { nav } = theme.value;
+const { tagsData, loadPostData } = usePostData();
+
+// 网址显示（与超级岛第三个药丸一致）
+const effectiveChannelMode = computed(() => store.effectiveChannelMode);
+const pillChannel = computed(() => {
+  const mode = effectiveChannelMode.value;
+  if (mode === 2) return 'beta';
+  if (mode === 3) return 'dev';
+  return '';
+});
+const pillChannelClass = computed(() => {
+  const mode = effectiveChannelMode.value;
+  if (mode === 2) return 'info';
+  if (mode === 3) return 'warning';
+  return '';
+});
 
 // 页面跳转
 const pageJump = (url) => {
   if (!url) return false;
   store.changeShowStatus("mobileMenuShow");
+  // 站外链接交给浏览器新开标签，router.go 会丢弃 origin 把用户送回站内
+  if (/^https?:\/\//i.test(url)) {
+    window.open(url, "_blank", "noopener");
+    return;
+  }
   router.go(url);
 };
+
+// 关闭侧栏后弹出个性化配置
+const openSettings = () => {
+  store.changeShowStatus("mobileMenuShow");
+  setTimeout(() => {
+    store.changeShowStatus("showSettings");
+  }, 300);
+};
+
+onMounted(() => {
+  loadPostData();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -96,10 +153,54 @@ const pageJump = (url) => {
     border-radius: 12px 0 0 12px;
     padding: 20px;
     overflow: auto;
+    .menu-top-control {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      margin-right: -5px;
+    }
+    .site-url {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--main-font-color);
+      .pill-prefix {
+        &.info { color: #3498db; }
+        &.warning { color: #e67e22; }
+        &.error { color: #e74c3c; }
+      }
+      .pill-domain {
+        color: var(--main-color);
+      }
+    }
+    .settings-btn {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      height: 42px;
+      padding: 0 16px 0 10px;
+      border-radius: 12px;
+      background-color: var(--main-color);
+      transition: opacity 0.3s;
+      cursor: pointer;
+      .iconfont {
+        font-size: 22px;
+        color: var(--main-card-background);
+      }
+      .capsule-text {
+        margin-left: 10px;
+        font-size: 14px;
+        line-height: 1;
+        color: var(--main-card-background);
+      }
+      &:hover {
+        opacity: 0.8;
+      }
+      &:active {
+        transform: scale(0.95);
+      }
+    }
     .close-control {
-      position: absolute;
-      top: 10px;
-      right: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -176,6 +277,11 @@ const pageJump = (url) => {
       &:last-child {
         margin-bottom: 0;
       }
+    }
+    // 标签名较长（如 Android玩机）用满整列宽度，不按固定 80px 截断
+    .tags-list .link-child .link-child-btn .name {
+      max-width: 100%;
+      min-width: 0;
     }
     hr {
       margin: 1rem 0;

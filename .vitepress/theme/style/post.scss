@@ -73,6 +73,9 @@
     text-align: left;
     letter-spacing: 0.6px;
     line-height: 2;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-all;
     // 行内代码
     code {
       display: inline-flex;
@@ -391,9 +394,15 @@
   // 分割线
   hr {
     margin: 1rem 0;
-    height: 2px;
+    height: 1px;
     border: none;
-    background-color: var(--main-card-border);
+    background: repeating-linear-gradient(
+      90deg,
+      var(--main-card-border) 0,
+      var(--main-card-border) 2px,
+      transparent 2px,
+      transparent 4px
+    );
   }
   // 其他
   label {
@@ -427,8 +436,11 @@
     &.tip {
       background-color: var(--main-info-color-gray);
       border-left-color: var(--main-info-color);
-      p {
-        color: var(--main-info-color);
+      p, li, a, strong {
+        color: var(--main-info-color) !important;
+      }
+      a::before {
+        background-color: var(--main-info-color) !important;
       }
     }
     &.warning {

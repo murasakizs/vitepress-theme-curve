@@ -4,15 +4,13 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 3;
-// 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
-const DEFAULT_CHANNEL_MODE = 1;
+const PERSIST_VERSION = 1;
+// 分支模式（1 = 正式分支，2 = beta分支，3 = dev分支，5 = 开发模式）
+const DEFAULT_CHANNEL_MODE = 2;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
 const DEFAULT_DEV_MODE = 1;
-// dev频道合并状态（1 = 未合并，2 = 已合并至beta）
+// dev分支合并状态（1 = 未合并，2 = 已合并至beta）
 const DEFAULT_DEV_CHANNEL_MERGED = 0;
-// canary频道合并状态（1 = 未合并，2 = 已合并至beta）
-const DEFAULT_CANARY_CHANNEL_MERGED = 0;
 
 // 模块加载时立即检查版本，确保在 pinia-persistedstate 水合之前清除旧缓存
 if (typeof localStorage !== 'undefined') {
@@ -63,12 +61,24 @@ export const mainStore = defineStore("main", {
       showSettings: false,
       // 播放器数据
       playState: false,
-      playerShow: false,
+      playerShow: true,
+      playerAutoPlay: false,
+      playerPlayMode: "list",
+      playerMusicSource: "preset",
+      playerCustomIds: "",
       playerVolume: 0.7,
       playerData: {
         name: "未知曲目",
         artist: "未知艺术家",
+        cover: "",
+        lrc: "",
       },
+      playerLyric: "",
+      playerFolded: true,
+      playerPanelTab: "list",
+      // 超级岛播放器联动
+      islandPlayerSupport: false,
+      islandStyle: "extended",
       // 移动端菜单显示
       mobileMenuShow: false,
       // 使用自定义右键菜单
@@ -92,15 +102,13 @@ export const mainStore = defineStore("main", {
       // 显示更多设置
       showMoreSettings: false,
       showMoreSettingsConfirmed: false,
-      // 频道展开状态
+      // 分支展开状态
       betaChannelExpanded: false,
       devChannelExpanded: false,
-      canaryChannelExpanded: false,
       stableChannelExpanded: false,
-      // 频道合并标记（1 = 未合并，2 = 已合并至beta）
+      // 分支合并标记（1 = 未合并，2 = 已合并至beta）
       devChannelMerged: DEFAULT_DEV_CHANNEL_MERGED,
-      canaryChannelMerged: DEFAULT_CANARY_CHANNEL_MERGED,
-      // 频道模式（1 = 正式频道，2 = beta频道，3 = dev频道，4 = canary频道，5 = 开发模式）
+      // 分支模式（1 = 正式分支，2 = beta分支，3 = dev分支，5 = 开发模式）
       channelMode: DEFAULT_CHANNEL_MODE,
       // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
       devMode: DEFAULT_DEV_MODE,
@@ -143,18 +151,30 @@ export const mainStore = defineStore("main", {
       imageLazyEnabled: true,
       imageWebpEnabled: false,
       imageLightboxEnabled: true,
+      // 天气小组件开关
+      weatherWidgetEnabled: true,
+      // 天气小组件折叠状态
+      weatherSectionExpanded: false,
+      // 天气数据源（amap = 高德，wttr = wttr.in，openmeteo = Open-Meteo）
+      weatherProvider: "amap",
+      // 天气定位方式（satellite = 卫星定位，ip = IP定位，manual = 手动输入）
+      weatherLocationMode: "ip",
+      // 手动输入的城市名
+      weatherManualCity: "",
+      // 天气刷新触发器（手动输入确认时 +1）
+      weatherRefreshTrigger: 0,
       // 定时切换明暗显示外观
       scheduledThemeEnabled: false,
       scheduledLightTime: "07:00",
       scheduledDarkTime: "19:00",
       scheduledThemeTimer: null,
       // 站点版本信息（运行时覆盖，用于关于本站页面）
-      siteVersion: "V1.2",
-      siteVersionDate: "2026.8.27",
+      siteVersion: "V1.3",
+      siteVersionDate: "2026.9.12",
     };
   },
   getters: {
-    // 有效频道模式：devMode 开启时强制返回5（开发模式），否则返回实际 channelMode
+    // 有效分支模式：devMode 开启时强制返回5（开发模式），否则返回实际 channelMode
     effectiveChannelMode(state) {
       return state.devMode === 2 ? 5 : state.channelMode;
     },
@@ -196,7 +216,7 @@ export const mainStore = defineStore("main", {
       // 禁止壁纸模式切换
       if (this.backgroundType === "image") {
         if (typeof $message !== "undefined") { 
-          $message.warning("无法在壁纸模式下切换明暗模式");
+          $message.error("无法在壁纸模式下切换明暗模式");
         }
         return false;
       }
@@ -395,7 +415,13 @@ export const mainStore = defineStore("main", {
         "useRightMenu",
         "useCustomCursor",
         "playerShow",
+        "playerAutoPlay",
+        "playerPlayMode",
+        "playerMusicSource",
+        "playerCustomIds",
         "playerVolume",
+        "islandPlayerSupport",
+        "islandStyle",
         "backgroundBlur",
         "backgroundType",
         "fontFamily",
@@ -409,7 +435,6 @@ export const mainStore = defineStore("main", {
         "devMode",
         "devModeOptionsExpanded",
         "devChannelMerged",
-        "canaryChannelMerged",
         "highContrast",
         "siteLayout",
         "siteLayoutPending",
@@ -435,6 +460,10 @@ export const mainStore = defineStore("main", {
         "imageLazyEnabled",
         "imageWebpEnabled",
         "imageLightboxEnabled",
+        "weatherProvider",
+        "weatherLocationMode",
+        "weatherManualCity",
+        "weatherWidgetEnabled",
         "scheduledThemeEnabled",
         "scheduledLightTime",
         "scheduledDarkTime",

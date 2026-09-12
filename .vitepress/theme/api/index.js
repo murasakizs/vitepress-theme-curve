@@ -75,15 +75,25 @@ export const getSiteInfo = async (url) => {
  * @returns {Promise<Object>} - 音乐详情
  */
 export const getMusicList = async (url, id, server = "netease", type = "playlist") => {
-  const result = await fetch(`${url}?server=${server}&type=${type}&id=${id}`);
-  const list = await result.json();
-  return list.map((song) => {
-    const { pic, ...data } = song;
-    return {
-      ...data,
-      cover: pic,
-    };
-  });
+  const ids = Array.isArray(id) ? id : [id];
+  const results = await Promise.all(
+    ids.map((pid) =>
+      fetch(`${url}?server=${server}&type=${type}&id=${pid}`).then((r) => r.json())
+    )
+  );
+  const merged = results.flat();
+  // 按 id 去重
+  const seen = new Set();
+  return merged
+    .filter((song) => {
+      if (seen.has(song.id)) return false;
+      seen.add(song.id);
+      return true;
+    })
+    .map((song) => {
+      const { pic, ...data } = song;
+      return { ...data, cover: pic };
+    });
 };
 
 /**
@@ -131,6 +141,29 @@ export const getWeather = async (key, city) => {
     `https://restapi.amap.com/v3/weather/weatherInfo?key=${key}&city=${city}`,
   );
   return await res.json();
+};
+
+// 获取 wttr.in 天气信息（无需 API Key）
+export const getWeatherWttr = async (city) => {
+  const res = await fetch(`https://wttr.in/${encodeURIComponent(city)}?format=j1`);
+  return await res.json();
+};
+
+// 获取 Open-Meteo 天气信息（无需 API Key，需要经纬度）
+export const getWeatherOpenMeteo = async (lat, lon) => {
+  const res = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code`,
+  );
+  return await res.json();
+};
+
+// 根据经纬度获取城市名（Open-Meteo 逆地理编码）
+export const getCityByCoords = async (lat, lon) => {
+  const res = await fetch(
+    `https://geocoding-api.open-meteo.com/v1/search?name=&latitude=${lat}&longitude=${lon}&count=1&language=zh`,
+  );
+  const data = await res.json();
+  return data?.results?.[0]?.name || null;
 };
 
 

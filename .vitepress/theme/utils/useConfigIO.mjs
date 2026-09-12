@@ -25,10 +25,11 @@ const VALID_CONFIG_KEYS = [
   "fontSize", "infoPosition", "backgroundUrl", "highContrast", "siteLayout",
   "messageStyle", "messagePosition", "progressDirection", "messageDuration",
   "islandMode", "islandUseThemeColor", "islandShowSeconds", "islandShowDate",
+  "islandPlayerSupport", "islandStyle",
   "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
   "removeAnimations", "showMoreSettings",
   "scheduledThemeEnabled", "scheduledLightTime", "scheduledDarkTime",
-  "betaChannelExpanded", "devChannelExpanded", "canaryChannelExpanded",
+  "betaChannelExpanded", "devChannelExpanded",
   "pwaCacheEnabled", "pwaCacheLimit", "readingProgressEnabled",
   "imageLazyEnabled", "imageWebpEnabled", "imageLightboxEnabled",
 ];
@@ -51,7 +52,7 @@ export const useConfigIO = (siteVersion = "V1.0") => {
       const siteData = localStorage.getItem("siteData");
       if (!siteData) {
         if (typeof $message !== "undefined") {
-          $message.warning("没有可导出的配置数据");
+          $message.error("没有可导出的配置数据");
         }
         return;
       }

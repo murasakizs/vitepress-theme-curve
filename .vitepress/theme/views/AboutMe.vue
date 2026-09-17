@@ -68,8 +68,8 @@
           <p>高一｜175cm/60kg｜重庆&苏州</p>
           <p>天残党QAQ｜想要变可爱｜友所有人｜同类贴贴｜缺爱</p>
           <p>INFP-T｜双｜二次元｜音游｜百合｜术力口</p>
-          <p>好姐妹 @lan2984</p>
         </div>
+        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.9.17</p>
       </div>
 
       <!-- Row 5 -->
@@ -88,6 +88,7 @@
           <p>不是男娘，反刻板印象，雷大众雷</p>
           <p>猜你会雷：生心不一/空间多转发&碎碎念/微负(yyz/ptsd)</p>
         </div>
+        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.8.19</p>
       </div>
     </div>
     <!-- 记忆卡片 -->

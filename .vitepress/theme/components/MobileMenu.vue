@@ -48,6 +48,11 @@
                     <i v-if="child.icon" :class="`iconfont icon-${child.icon}`" />
                     <span class="name">{{ child.text }}</span>
                   </div>
+                  <!-- 随机文章（仅文库） -->
+                  <div v-if="index === 0" class="link-child-btn" @click="shuffleGo">
+                    <i class="iconfont icon-shuffle"></i>
+                    <span class="name">随便看看</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -77,6 +82,7 @@
 <script setup>
 import { mainStore } from "@/store";
 import { usePostData } from "@/utils/usePostData.mjs";
+import { shufflePost } from "@/utils/helper";
 
 const store = mainStore();
 const router = useRouter();
@@ -111,6 +117,15 @@ const pageJump = (url) => {
     return;
   }
   router.go(url);
+};
+
+// 随机文章
+const shuffleGo = async () => {
+  store.changeShowStatus("mobileMenuShow");
+  const data = await loadPostData();
+  if (data?.length) {
+    router.go(shufflePost(data));
+  }
 };
 
 // 关闭侧栏后弹出个性化配置

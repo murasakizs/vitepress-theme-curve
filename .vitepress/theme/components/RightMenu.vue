@@ -35,7 +35,7 @@
             <div
               v-if="clickedType === 'normal'"
               class="btn"
-              @click="router.go(shufflePost(theme.postData))"
+              @click="shuffleGo"
             >
               <i class="iconfont icon-shuffle"></i>
               <span class="name">随便逛逛</span>
@@ -227,12 +227,14 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 import { smoothScrolling, shufflePost, copyText, copyImage, downloadImage } from "@/utils/helper";
 import { useIsMobileLayout } from "@/utils/layout.js";
+import { usePostData } from "@/utils/usePostData.mjs";
 
 const isMobileLayout = useIsMobileLayout();
 
 const router = useRouter();
 const store = mainStore();
 const { theme } = useData();
+const { loadPostData } = usePostData();
 const { useRightMenu, themeType, playerShow, playerVolume, playState, playerData } =
   storeToRefs(store);
 
@@ -333,6 +335,15 @@ const checkClickType = (target) => {
         clickedType.value = "normal";
       }
       break;
+  }
+};
+
+// 随机文章
+const shuffleGo = async () => {
+  rightMenuShow.value = false;
+  const data = await loadPostData();
+  if (data?.length) {
+    router.go(shufflePost(data));
   }
 };
 

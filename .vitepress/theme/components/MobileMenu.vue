@@ -7,7 +7,7 @@
         <div class="menu-mask" @click="store.changeShowStatus('mobileMenuShow')" />
         <Transition name="toLeft" mode="out-in">
           <div v-show="store.mobileMenuShow" class="menu-content s-card">
-            <!-- 顶部控制栏 -->
+            <!-- 顶部控制栏：网址 + 关闭按钮 -->
             <div class="menu-top-control">
               <!-- 网址 -->
               <span class="site-url">
@@ -23,8 +23,11 @@
                 <i class="iconfont icon-close"></i>
               </div>
             </div>
-            <!-- 个性化配置 -->
-            <div class="menu-top-control">
+            <!-- 站点名称 -->
+            <span class="site-label">泠の小站</span>
+            <hr />
+            <!-- 个性化配置 + 主题切换 -->
+            <div class="menu-top-control settings-row">
               <div
                 class="settings-btn"
                 title="个性化配置"
@@ -32,6 +35,13 @@
               >
                 <i class="iconfont icon-style"></i>
                 <span class="capsule-text">个性化配置</span>
+              </div>
+              <div
+                class="theme-toggle-btn"
+                title="显示模式切换"
+                @click.stop="toggleTheme"
+              >
+                <i :key="store.themeType" :class="`iconfont icon-${store.themeType} theme-icon-animated`"></i>
               </div>
             </div>
             <!-- 菜单 -->
@@ -128,6 +138,11 @@ const shuffleGo = async () => {
   }
 };
 
+// 主题切换
+const toggleTheme = () => {
+  store.changeThemeType();
+};
+
 // 关闭侧栏后弹出个性化配置
 const openSettings = () => {
   store.changeShowStatus("mobileMenuShow");
@@ -142,6 +157,14 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.theme-icon-animated {
+  animation: themeIconSwitch 0.3s ease-out forwards;
+  transform-origin: center center;
+}
+@keyframes themeIconSwitch {
+  0% { opacity: 0; transform: rotate(180deg) scale(0.5); }
+  100% { opacity: 1; transform: rotate(0deg) scale(1); }
+}
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -171,14 +194,43 @@ onMounted(() => {
     .menu-top-control {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       margin-bottom: 10px;
       margin-right: -5px;
+      &.settings-row {
+        margin-top: 4px;
+        gap: 8px;
+        align-items: center;
+        justify-content: flex-start;
+      }
+    }
+    .theme-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background-color: var(--main-card-background);
+      border: 1px solid var(--main-card-border);
+      flex-shrink: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      .iconfont {
+        font-size: 22px;
+        color: var(--main-font-color);
+        transition: color 0.3s;
+      }
+      &:hover .iconfont {
+        color: var(--main-color);
+      }
     }
     .site-url {
       font-size: 14px;
       font-weight: 500;
       color: var(--main-font-color);
+      line-height: 35px;
       .pill-prefix {
         &.info { color: #3498db; }
         &.warning { color: #e67e22; }
@@ -187,6 +239,14 @@ onMounted(() => {
       .pill-domain {
         color: var(--main-color);
       }
+    }
+    .site-label {
+      display: block;
+      font-size: 16px;
+      color: var(--main-font-color);
+      font-weight: bold;
+      margin-top: -16px;
+      margin-bottom: 0;
     }
     .settings-btn {
       display: flex;
@@ -222,6 +282,7 @@ onMounted(() => {
       width: 35px;
       height: 35px;
       padding: 0;
+      flex-shrink: 0;
       transition:
         background-color 0.3s,
         opacity 0.3s;

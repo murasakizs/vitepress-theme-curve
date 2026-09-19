@@ -114,6 +114,7 @@ onBeforeUnmount(() => {
     }
     &:active {
       transform: scale(1);
+      transition-duration: var(--press-in);
     }
   }
   .content {
@@ -187,6 +188,10 @@ onBeforeUnmount(() => {
           .iconfont {
             color: var(--main-font-color);
           }
+        }
+        &:active {
+          transform: scale(0.95);
+          transition-duration: var(--press-in);
         }
       }
     }

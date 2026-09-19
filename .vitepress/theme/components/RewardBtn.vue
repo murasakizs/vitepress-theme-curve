@@ -84,7 +84,7 @@
     border-radius: 8px;
     color: #fff;
     background-color: var(--main-color-red);
-    transition: box-shadow 0.5s;
+    transition: box-shadow 0.5s, transform var(--press-out) var(--press-ease);
     .iconfont {
       color: #fff;
       font-weight: normal;
@@ -92,6 +92,10 @@
     }
     &:hover {
       box-shadow: 0 0 40px 6px #ff384270;
+    }
+    &:active {
+      transform: scale(0.95);
+      transition-duration: var(--press-in);
     }
   }
 }
@@ -112,6 +116,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: transform var(--press-out) var(--press-ease);
       img {
         width: 100%;
         height: auto;
@@ -132,6 +137,10 @@
         .iconfont {
           color: var(--main-color);
         }
+      }
+      &:active {
+        transform: scale(0.98);
+        transition-duration: var(--press-in);
       }
     }
   }
@@ -156,6 +165,10 @@
       .title {
         color: var(--main-color);
       }
+    }
+    &:active {
+      transform: scale(0.98);
+      transition-duration: var(--press-in);
     }
   }
 }

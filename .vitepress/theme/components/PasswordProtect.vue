@@ -164,6 +164,7 @@ onMounted(() => {
 
       &:active {
         transform: scale(0.98);
+        transition-duration: var(--press-in);
       }
     }
   }

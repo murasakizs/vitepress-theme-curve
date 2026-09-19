@@ -535,7 +535,7 @@ defineExpose({ openRightMenu });
         .iconfont {
           color: var(--main-font-second-color);
           font-size: 20px;
-          transition: color 0.3s;
+          transition: color 0.3s, opacity 0.2s;
           cursor: pointer;
           &:first-child {
             margin-right: 6px;
@@ -545,6 +545,11 @@ defineExpose({ openRightMenu });
           }
           &:hover {
             color: var(--main-color);
+          }
+          // 行内元素不支持 transform，用透明度做按下反馈
+          &:active {
+            opacity: 0.6;
+            transition-duration: var(--press-in);
           }
         }
       }
@@ -571,7 +576,8 @@ defineExpose({ openRightMenu });
       padding: 8px;
       transition:
         color 0.3s,
-        background-color 0.3s;
+        background-color 0.3s,
+        transform var(--press-out) var(--press-ease);
       .iconfont {
         font-size: 20px;
         transition: color 0.3s;
@@ -584,6 +590,16 @@ defineExpose({ openRightMenu });
         background-color: var(--main-color);
         .iconfont {
           color: var(--main-card-background);
+        }
+      }
+      &:active {
+        color: var(--main-card-background);
+        background-color: var(--main-color);
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
+        .iconfont {
+          color: var(--main-card-background);
+          transition-duration: var(--press-in);
         }
       }
     }

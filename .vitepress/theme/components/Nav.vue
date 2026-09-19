@@ -693,9 +693,6 @@ const rightMenuSwitch = () => {
                 color: #fff;
               }
             }
-            &:active {
-              transform: scale(1);
-            }
           }
           .control-capsule {
             display: flex;
@@ -728,9 +725,6 @@ const rightMenuSwitch = () => {
               .capsule-text {
                 color: #fff;
               }
-            }
-            &:active {
-              transform: scale(0.95);
             }
           }
         }
@@ -870,7 +864,7 @@ const rightMenuSwitch = () => {
     width: 35px;
     height: 35px;
     padding: 0;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform var(--press-out) var(--press-ease);
     border-radius: 50%;
     cursor: pointer;
     .iconfont {
@@ -886,6 +880,17 @@ const rightMenuSwitch = () => {
       .site-name {
         color: var(--main-card-background);
       }
+    }
+    // 按下反馈只给移动端布局，桌面端顶栏靠 hover 就够了
+    @media (max-width: 768px) {
+      html:not(.force-pc) &:active {
+        transform: scale(0.9);
+        transition-duration: var(--press-in);
+      }
+    }
+    html.force-mobile &:active {
+      transform: scale(0.9);
+      transition-duration: var(--press-in);
     }
   }
 }

@@ -266,7 +266,7 @@ const toPost = (event, path) => {
             align-items: center;
             margin-right: 12px;
             white-space: nowrap;
-            transition: color 0.3s;
+            transition: color 0.3s, transform var(--press-out) var(--press-ease);
             .iconfont {
               font-weight: normal;
               opacity: 0.6;
@@ -278,6 +278,10 @@ const toPost = (event, path) => {
               .iconfont {
                 color: var(--main-color);
               }
+            }
+            &:active {
+              transform: scale(0.95);
+              transition-duration: var(--press-in);
             }
           }
           @media (max-width: 768px) {

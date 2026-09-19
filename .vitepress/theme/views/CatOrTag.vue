@@ -113,6 +113,11 @@ onMounted(() => {
           color: var(--main-card-background);
         }
       }
+      // 按下时缩小，覆盖 :hover 的放大（同特异性、后置生效）
+      &:active {
+        transform: scale(0.98);
+        transition-duration: var(--press-in);
+      }
     }
   }
 }

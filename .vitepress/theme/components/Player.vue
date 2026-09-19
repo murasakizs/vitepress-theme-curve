@@ -544,10 +544,14 @@ onBeforeUnmount(() => {
     cursor: pointer;
     padding-bottom: 2px;
     border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
+    transition: color 0.2s, border-color 0.2s, transform var(--press-out) var(--press-ease);
     &.active {
       color: var(--main-color);
       border-bottom-color: var(--main-color);
+    }
+    &:active {
+      transform: scale(0.95);
+      transition-duration: var(--press-in);
     }
   }
 }
@@ -585,11 +589,15 @@ onBeforeUnmount(() => {
   color: var(--main-font-second-color);
   text-align: center;
   cursor: pointer;
-  transition: color 0.3s, font-size 0.3s, font-weight 0.3s;
+  transition: color 0.3s, font-size 0.3s, font-weight 0.3s, transform var(--press-out) var(--press-ease);
   white-space: pre-wrap;
   word-break: break-word;
   &:hover {
     color: var(--main-font-color);
+  }
+  &:active {
+    transform: scale(0.98);
+    transition-duration: var(--press-in);
   }
   &.active {
     color: var(--main-color);
@@ -611,9 +619,13 @@ onBeforeUnmount(() => {
   padding: 8px 12px;
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform var(--press-out) var(--press-ease);
   &:hover {
     background-color: var(--main-color-light);
+  }
+  &:active {
+    transform: scale(0.98);
+    transition-duration: var(--press-in);
   }
   &.active {
     background-color: var(--main-color-light);
@@ -661,6 +673,7 @@ onBeforeUnmount(() => {
   transition: transform 0.3s;
   &:active {
     transform: scale(0.98);
+    transition-duration: var(--press-in);
   }
 }
 
@@ -669,6 +682,11 @@ onBeforeUnmount(() => {
   position: relative;
   height: 44px;
   cursor: pointer;
+  transition: transform var(--press-out) var(--press-ease);
+  &:active {
+    transform: scale(0.95);
+    transition-duration: var(--press-in);
+  }
   .player-content {
     position: relative;
     margin: 0;
@@ -914,6 +932,7 @@ onBeforeUnmount(() => {
   }
   &:active {
     transform: scale(0.92);
+    transition-duration: var(--press-in);
   }
 }
 </style>

@@ -52,6 +52,10 @@ onMounted(() => {
         color: var(--main-color);
         background-color: var(--main-color-bg);
       }
+      &:active {
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
+      }
     }
     &::after {
       content: "";
@@ -79,6 +83,10 @@ onMounted(() => {
       color: var(--main-color);
       border-color: var(--main-color-bg);
       background-color: var(--main-color-bg);
+    }
+    &:active {
+      transform: scale(0.98);
+      transition-duration: var(--press-in);
     }
   }
 }

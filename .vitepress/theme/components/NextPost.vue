@@ -143,6 +143,11 @@ onBeforeUnmount(() => {
       color: var(--main-card-background);
     }
   }
+  // .fixed/.show 已用 transform 做位移动画，按下反馈改用透明度
+  &:active {
+    opacity: 0.6;
+    transition-duration: var(--press-in);
+  }
   @media (max-width: 768px) {
     display: none;
   }

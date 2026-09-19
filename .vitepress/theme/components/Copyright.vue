@@ -65,6 +65,10 @@ const route = useRoute();
       &:hover {
         opacity: 1;
       }
+      &:active {
+        opacity: 1;
+        transition-duration: var(--press-in);
+      }
     }
   }
   .post-meta {

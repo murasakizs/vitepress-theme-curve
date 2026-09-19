@@ -999,6 +999,7 @@ onBeforeUnmount(() => {
 
     &:active {
       transform: scale(0.92);
+      transition-duration: var(--press-in);
     }
 
     &.active {
@@ -1021,6 +1022,7 @@ onBeforeUnmount(() => {
 
       &:active {
         transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
   }
@@ -1111,10 +1113,15 @@ onBeforeUnmount(() => {
       padding: 8px 16px;
       gap: 12px;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, transform var(--press-out) var(--press-ease);
 
       &:hover {
         background-color: var(--main-mask-Inverse-background);
+      }
+
+      &:active {
+        transform: scale(0.98);
+        transition-duration: var(--press-in);
       }
 
       &.active {

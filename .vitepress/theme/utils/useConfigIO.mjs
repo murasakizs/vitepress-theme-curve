@@ -31,7 +31,7 @@ const VALID_CONFIG_KEYS = [
   "scheduledThemeEnabled", "scheduledLightTime", "scheduledDarkTime",
   "betaChannelExpanded", "devChannelExpanded",
   "pwaCacheEnabled", "pwaCacheLimit", "readingProgressEnabled",
-  "imageLazyEnabled", "imageWebpEnabled", "imageLightboxEnabled",
+  "imageWebpEnabled",
 ];
 
 /**

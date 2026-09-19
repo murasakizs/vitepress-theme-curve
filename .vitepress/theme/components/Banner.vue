@@ -239,6 +239,12 @@ onBeforeUnmount(() => {
     -webkit-box-orient: vertical; // WebKit 引擎兼容性
 
     line-clamp: 2; // 标准的 line-clamp 属性，提高兼容性
+    transition: opacity var(--press-out) var(--press-ease);
+    // 点击反馈：文本行整体缩放观感较差，使用透明度
+    &:active {
+      opacity: 0.6;
+      transition-duration: var(--press-in);
+    }
   }
 }
   .icon-up {
@@ -249,6 +255,12 @@ onBeforeUnmount(() => {
     transform: rotate(180deg);
     animation: moveDown 2s ease-in-out infinite;
     cursor: pointer;
+    transition: opacity var(--press-out) var(--press-ease);
+    // 点击反馈：已有 rotate 与 moveDown 动画，使用透明度
+    &:active {
+      opacity: 0.6;
+      transition-duration: var(--press-in);
+    }
   }
   @media (max-width: 768px) {
     align-items: flex-start;

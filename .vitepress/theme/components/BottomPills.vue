@@ -388,10 +388,18 @@ onBeforeUnmount(() => {
   border: 1px solid var(--main-card-border);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
   cursor: pointer;
-  transition: border-color 0.3s, box-shadow 0.3s, width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform var(--press-out) var(--press-ease);
   &:hover {
     border-color: var(--main-color);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  }
+  &:active {
+    transform: scale(0.97);
+    transition-duration: var(--press-in);
   }
   @media (max-width: 768px) {
     padding: 0 12px 0 4px;
@@ -535,7 +543,10 @@ onBeforeUnmount(() => {
     color: var(--main-color);
     background-color: var(--main-color-bg);
   }
-  &:active { transform: scale(0.92); }
+  &:active {
+    transform: scale(0.92);
+    transition-duration: var(--press-in);
+  }
   @media (max-width: 768px) {
     width: 38px;
     height: 38px;
@@ -571,10 +582,15 @@ onBeforeUnmount(() => {
     cursor: pointer;
     padding-bottom: 2px;
     border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
+    transition: color 0.2s, border-color 0.2s, opacity 0.2s;
     &.active {
       color: var(--main-color);
       border-bottom-color: var(--main-color);
+    }
+    // 行内元素不支持 transform，用透明度做按下反馈
+    &:active {
+      opacity: 0.6;
+      transition-duration: var(--press-in);
     }
   }
   @media (max-width: 768px) {
@@ -596,8 +612,12 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform var(--press-out) var(--press-ease);
   &:hover { background-color: var(--main-color-bg); }
+  &:active {
+    transform: scale(0.98);
+    transition-duration: var(--press-in);
+  }
   &.active .pill-card-item-name { color: var(--main-color); font-weight: 600; }
   @media (max-width: 768px) {
     padding: 6px 8px;
@@ -670,8 +690,12 @@ onBeforeUnmount(() => {
   color: var(--main-font-second-color);
   text-align: center;
   cursor: pointer;
-  transition: color 0.3s, font-weight 0.3s;
+  transition: color 0.3s, font-weight 0.3s, transform var(--press-out) var(--press-ease);
   &:hover { color: var(--main-font-color); }
+  &:active {
+    transform: scale(0.98);
+    transition-duration: var(--press-in);
+  }
   &.active { color: var(--main-color); font-weight: 600; }
   @media (max-width: 768px) {
     padding: 4px 0;

@@ -215,8 +215,8 @@ onMounted(() => {
       border: 1px solid var(--main-card-border);
       flex-shrink: 0;
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
       user-select: none;
+      transition: transform var(--press-out) var(--press-ease);
       .iconfont {
         font-size: 22px;
         color: var(--main-font-color);
@@ -224,6 +224,10 @@ onMounted(() => {
       }
       &:hover .iconfont {
         color: var(--main-color);
+      }
+      &:active {
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
     .site-url {
@@ -256,7 +260,7 @@ onMounted(() => {
       padding: 0 16px 0 10px;
       border-radius: 12px;
       background-color: var(--main-color);
-      transition: opacity 0.3s;
+      transition: opacity 0.3s, transform var(--press-out) var(--press-ease);
       cursor: pointer;
       .iconfont {
         font-size: 22px;
@@ -273,6 +277,7 @@ onMounted(() => {
       }
       &:active {
         transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
     .close-control {
@@ -300,6 +305,14 @@ onMounted(() => {
         background-color: var(--main-color);
         .iconfont {
           color: var(--main-card-background);
+        }
+      }
+      &:active {
+        background-color: var(--main-color);
+        transition-duration: var(--press-in);
+        .iconfont {
+          color: var(--main-card-background);
+          transition-duration: var(--press-in);
         }
       }
     }
@@ -331,6 +344,7 @@ onMounted(() => {
           background-color: var(--main-card-background);
           border: 1px solid var(--main-card-border);
           box-shadow: 0 8px 16px -4px var(--main-border-shadow);
+          transition: transform var(--press-out) var(--press-ease);
           font-size: 15px;
           .iconfont {
             margin-right: 6px;
@@ -347,6 +361,10 @@ onMounted(() => {
             font-size: 12px;
             margin-bottom: auto;
             margin-left: 4px;
+          }
+          &:active {
+            transform: scale(0.95);
+            transition-duration: var(--press-in);
           }
         }
       }

@@ -76,6 +76,10 @@ defineExpose({ scrollToComments });
         opacity: 1;
         color: var(--main-color);
       }
+      &:active {
+        opacity: 1;
+        transition-duration: var(--press-in);
+      }
     }
   }
 }

@@ -148,9 +148,7 @@ export const mainStore = defineStore("main", {
       // 阅读进度条
       readingProgressEnabled: true,
       // 图片功能开关
-      imageLazyEnabled: true,
       imageWebpEnabled: false,
-      imageLightboxEnabled: true,
       // 天气小组件开关
       weatherWidgetEnabled: true,
       // 天气小组件折叠状态
@@ -457,9 +455,7 @@ export const mainStore = defineStore("main", {
         "pwaCacheEnabled",
         "pwaCacheLimit",
         "readingProgressEnabled",
-        "imageLazyEnabled",
         "imageWebpEnabled",
-        "imageLightboxEnabled",
         "weatherProvider",
         "weatherLocationMode",
         "weatherManualCity",

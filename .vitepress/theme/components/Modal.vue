@@ -240,10 +240,14 @@ watch(
         font-size: 1rem;
         border-radius: 8px;
         padding: 8px;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s, transform var(--press-out) var(--press-ease);
         cursor: pointer;
         &:hover {
           background-color: var(--main-card-border);
+        }
+        &:active {
+          transform: scale(0.9);
+          transition-duration: var(--press-in);
         }
       }
     }
@@ -296,6 +300,7 @@ watch(
         transition: background-color 0.3s;
         &:active {
           background-color: var(--main-card-border);
+          transition-duration: var(--press-in);
         }
       }
       .close {

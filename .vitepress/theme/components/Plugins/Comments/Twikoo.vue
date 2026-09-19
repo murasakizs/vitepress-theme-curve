@@ -3,7 +3,6 @@
 </template>
 
 <script setup>
-import { jumpRedirect } from "@/utils/commonTools";
 import initComments from "@/utils/initComments";
 
 const props = defineProps({
@@ -31,7 +30,6 @@ const initTwikoo = async () => {
       envId: comment.twikoo.envId,
       onCommentLoaded: () => {
         if (props.fill) fillComments(props.fill);
-        jumpRedirect(null, theme.value, true);
       },
     });
     return twikoo.value;

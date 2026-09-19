@@ -5,7 +5,7 @@
     :key="router.route.path"
     ref="mainCommentRef"
     id="main-comment"
-    class="comment"
+    class="comment vp-raw"
   >
     <div v-if="!fill" class="title">
       <span class="name">

@@ -2469,18 +2469,6 @@ watch(
     &:last-child {
       margin-bottom: 0;
     }
-    @media (max-width: 512px) {
-      flex-direction: column;
-      align-items: flex-start;
-      .set-options {
-        margin-top: 8px;
-        .options {
-          &:first-child {
-            margin-left: 0;
-          }
-        }
-      }
-    }
   }
   .set-expand-box {
     border: none;
@@ -2497,22 +2485,6 @@ watch(
       min-height: 40px;
       &:last-child {
         margin-bottom: 0;
-      }
-      @media (max-width: 512px) {
-        flex-direction: column;
-        align-items: flex-start;
-        .set-options {
-          margin-top: 8px;
-          margin-bottom: 8px;
-          height: auto;
-          flex-wrap: wrap;
-          align-items: flex-start;
-          .options {
-            &:first-child {
-              margin-left: 0;
-            }
-          }
-        }
       }
     }
     .set-item-channel {

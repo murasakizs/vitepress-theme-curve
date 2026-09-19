@@ -306,6 +306,24 @@ watch(
       max-height: calc(100vh - 48px - 64px - 40px);
       max-height: calc(100dvh - 48px - 64px - 40px);
     }
+    // 移动端布局：设置面板按钮换行（穿透 slot 内容）
+    :deep(.set-list .set-item),
+    :deep(.set-list .set-expand-box .set-item) {
+      flex-direction: column;
+      align-items: flex-start;
+      .set-options {
+        margin-top: 8px;
+        margin-bottom: 8px;
+        height: auto;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        .options {
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+      }
+    }
   }
 }
 .modal-wrapper-mobile {

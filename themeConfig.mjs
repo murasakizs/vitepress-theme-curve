@@ -72,10 +72,10 @@ export const themeConfig = {
     social: [
       { icon: "email", link: "mailto:sgexilq@qq.com" },
       { icon: "qq", link: "https://myat-q.sgexilq.com" },
+      { icon: "telegram", link: "https://myat-t.sgexilq.com" },
+      { icon: "twitter-x", link: "https://myat-x.sgexilq.com" },
       { icon: "github", link: "https://myat-g.sgexilq.com" },
       { icon: "bilibili", link: "https://myat-b.sgexilq.com" },
-      { icon: "/images/icon/xiaohongshu.svg", iconType: "image", link: "https://myat-h.sgexilq.com" },
-      { icon: "/images/icon/steam.svg", iconType: "image", link: "https://myat-s.sgexilq.com" },
     ],
     sitemap: [
       {

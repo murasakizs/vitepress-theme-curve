@@ -6,7 +6,7 @@
         <div class="left-nav">
           <!-- 移动端返回按钮 -->
           <div
-            v-show="isMobileLayout"
+            v-show="isMobileLayout && frontmatter.layout !== 'home'"
             class="back-btn nav-btn"
             title="返回"
             @click="goBack"

@@ -827,6 +827,9 @@ const rightMenuSwitch = () => {
         opacity: 1;
         pointer-events: auto;
         transition: opacity 0.3s, visibility 0s;
+        .back-btn {
+          display: flex;
+        }
       }
       .nav-center {
         position: absolute;
@@ -861,6 +864,7 @@ const rightMenuSwitch = () => {
 
   }
   .nav-btn {
+    display: flex;
     align-items: center;
     justify-content: center;
     width: 35px;

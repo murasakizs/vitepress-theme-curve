@@ -4,9 +4,9 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 2;
+const PERSIST_VERSION = 1;
 // 分支模式（1 = 正式分支，2 = beta分支，3 = dev分支，5 = 开发模式）
-const DEFAULT_CHANNEL_MODE = 1;
+const DEFAULT_CHANNEL_MODE = 3;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
 const DEFAULT_DEV_MODE = 1;
 // dev分支合并状态（1 = 未合并，2 = 已合并至beta）
@@ -156,7 +156,7 @@ export const mainStore = defineStore("main", {
       // 天气数据源（amap = 高德，wttr = wttr.in，openmeteo = Open-Meteo）
       weatherProvider: "amap",
       // 天气定位方式（satellite = 卫星定位，ip = IP定位，manual = 手动输入）
-      weatherLocationMode: "ip",
+      weatherLocationMode: "satellite",
       // 手动输入的城市名
       weatherManualCity: "",
       // 天气刷新触发器（手动输入确认时 +1）

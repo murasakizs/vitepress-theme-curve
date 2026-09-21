@@ -190,6 +190,10 @@ const toggleBadge = (index) => {
         transform: scale(1.1);
         border-color: var(--main-color);
       }
+      &:active {
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
+      }
     }
   }
   .footer-social {
@@ -227,6 +231,7 @@ const toggleBadge = (index) => {
       }
       &:active {
         transform: scale(1);
+        transition-duration: var(--press-in);
       }
     }
     .logo {
@@ -244,6 +249,7 @@ const toggleBadge = (index) => {
       }
       &:active {
         transform: scale(1);
+        transition-duration: var(--press-in);
       }
     }
     @media (max-width: 768px) {
@@ -305,11 +311,16 @@ const toggleBadge = (index) => {
           border-radius: 12px;
           transition:
             color 0.3s,
-            background-color 0.3s;
+            background-color 0.3s,
+            transform var(--press-out) var(--press-ease);
           cursor: pointer;
           &:hover {
             color: var(--main-color);
             background-color: var(--main-color-bg);
+          }
+          &:active {
+            transform: scale(0.95);
+            transition-duration: var(--press-in);
           }
         }
       }
@@ -348,7 +359,8 @@ const toggleBadge = (index) => {
         transition:
           max-width 0.4s ease,
           padding 0.4s ease,
-          border-color 0.3s ease;
+          border-color 0.3s ease,
+          transform var(--press-out) var(--press-ease);
         .badge-icon {
           font-size: 20px;
           flex-shrink: 0;
@@ -374,6 +386,10 @@ const toggleBadge = (index) => {
             opacity: 1;
             margin-left: 8px;
           }
+        }
+        &:active {
+          transform: scale(0.95);
+          transition-duration: var(--press-in);
         }
       }
     }

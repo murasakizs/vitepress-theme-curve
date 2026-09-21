@@ -39,11 +39,16 @@ const router = useRouter();
     border: none;
     transition:
       color 0.3s,
-      background-color 0.3s;
+      background-color 0.3s,
+      transform var(--press-out) var(--press-ease);
     cursor: pointer;
     &:hover {
       color: var(--main-card-background);
       background-color: var(--main-color);
+    }
+    &:active {
+      transform: scale(0.95);
+      transition-duration: var(--press-in);
     }
   }
 }

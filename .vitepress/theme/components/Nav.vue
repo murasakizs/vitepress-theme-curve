@@ -6,7 +6,8 @@
         <div class="left-nav">
           <!-- 移动端返回按钮 -->
           <div
-            class="back-btn nav-btn mobile-only"
+            v-show="isMobileLayout && frontmatter.layout !== 'home'"
+            class="back-btn nav-btn"
             title="返回"
             @click="goBack"
           >
@@ -148,10 +149,12 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 import { smoothScrolling, shufflePost } from "@/utils/helper";
 import { usePostData } from "@/utils/usePostData.mjs";
+import { useIsMobileLayout } from "@/utils/layout.js";
 
 const router = useRouter();
 const store = mainStore();
 const { loadPostData } = usePostData();
+const isMobileLayout = useIsMobileLayout();
 const app = getCurrentInstance()?.appContext.app;
 const SearchModal = defineAsyncComponent(async () => {
   const [{ default: InstantSearch }, searchComponent] = await Promise.all([
@@ -270,6 +273,21 @@ const rightMenuSwitch = () => {
             transition: opacity 0.3s, visibility 0s 0.3s;
           }
         }
+        .force-mobile & {
+          .left-nav,
+          .right-nav {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            transition: opacity 0.3s, visibility 0s;
+          }
+          .nav-center {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, visibility 0s 0.3s;
+          }
+        }
       }
     }
     @media (max-width: 768px) {
@@ -288,6 +306,23 @@ const rightMenuSwitch = () => {
             pointer-events: auto;
             transition: opacity 0.3s, visibility 0s;
           }
+        }
+      }
+    }
+    .force-mobile &:not(.top):not(.up) {
+      .nav-all {
+        .left-nav,
+        .right-nav {
+          visibility: hidden;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s, visibility 0s 0.3s;
+        }
+        .nav-center {
+          visibility: visible;
+          opacity: 1;
+          pointer-events: auto;
+          transition: opacity 0.3s, visibility 0s;
         }
       }
     }
@@ -382,12 +417,6 @@ const rightMenuSwitch = () => {
             transform: translateY(0) scale(1);
             visibility: visible;
           }
-        }
-      }
-      .back-btn.mobile-only {
-        display: none;
-        @media (max-width: 768px) {
-          display: flex;
         }
       }
       .site-name {
@@ -664,9 +693,6 @@ const rightMenuSwitch = () => {
                 color: #fff;
               }
             }
-            &:active {
-              transform: scale(1);
-            }
           }
           .control-capsule {
             display: flex;
@@ -699,9 +725,6 @@ const rightMenuSwitch = () => {
               .capsule-text {
                 color: #fff;
               }
-            }
-            &:active {
-              transform: scale(0.95);
             }
           }
         }
@@ -786,7 +809,7 @@ const rightMenuSwitch = () => {
         }
       }
     }
-    @media (max-width: 768px) {
+    @mixin mobile-nav-styles {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
@@ -798,6 +821,9 @@ const rightMenuSwitch = () => {
         opacity: 1;
         pointer-events: auto;
         transition: opacity 0.3s, visibility 0s;
+        .back-btn {
+          display: flex;
+        }
       }
       .nav-center {
         position: absolute;
@@ -823,15 +849,22 @@ const rightMenuSwitch = () => {
         }
       }
     }
+    @media (max-width: 768px) {
+      @include mobile-nav-styles;
+    }
+    .force-mobile & {
+      @include mobile-nav-styles;
+    }
 
   }
   .nav-btn {
+    display: flex;
     align-items: center;
     justify-content: center;
     width: 35px;
     height: 35px;
     padding: 0;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform var(--press-out) var(--press-ease);
     border-radius: 50%;
     cursor: pointer;
     .iconfont {
@@ -847,6 +880,17 @@ const rightMenuSwitch = () => {
       .site-name {
         color: var(--main-card-background);
       }
+    }
+    // 按下反馈只给移动端布局，桌面端顶栏靠 hover 就够了
+    @media (max-width: 768px) {
+      html:not(.force-pc) &:active {
+        transform: scale(0.9);
+        transition-duration: var(--press-in);
+      }
+    }
+    html.force-mobile &:active {
+      transform: scale(0.9);
+      transition-duration: var(--press-in);
     }
   }
 }

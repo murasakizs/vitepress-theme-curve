@@ -23,6 +23,7 @@ const checkboxClick = () => {
   align-items: center;
   margin: 1rem 0;
   cursor: pointer;
+  transition: transform var(--press-out) var(--press-ease);
   .checkbox-box {
     position: relative;
     display: flex;
@@ -61,6 +62,10 @@ const checkboxClick = () => {
     .checkbox-box {
       border-color: var(--main-color);
     }
+  }
+  &:active {
+    transform: scale(0.98);
+    transition-duration: var(--press-in);
   }
 }
 </style>

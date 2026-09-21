@@ -473,6 +473,7 @@ onUnmounted(() => {
   width: 100vw;
   background-color: var(--main-color);
   z-index: 3000;
+  transition: opacity var(--press-out) var(--press-ease);
   .message-content {
     display: flex;
     flex-direction: row;
@@ -547,6 +548,11 @@ onUnmounted(() => {
   }
   &.disabled::after {
     display: none;
+  }
+  // 点击反馈：元素自身为 position: fixed，无法使用 transform
+  &:active {
+    opacity: 0.85;
+    transition-duration: var(--press-in);
   }
   &.bar-bottom {
     top: auto;

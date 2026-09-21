@@ -13,7 +13,7 @@
         <div v-if="channelMode >= 2 && channelMode <= 3 && store.devMode !== 2" class="set-warn set-warn-channel">
           <span class="warn-text">当前处于测试分支（{{ channelMode === 2 ? 'beta' : 'dev' }}分支）</span>
         </div>
-        <div v-if="store.devMode === 2" class="set-warn">
+        <div v-if="store.devMode === 2" class="set-warn set-warn-static">
           <span class="warn-text">当前处于开发模式，提交代码时应退出开发模式</span>
         </div>
         <!-- 开发模式选项 -->
@@ -988,7 +988,7 @@
                   <span class="warn-text">success</span>
                   <span class="options">ok</span>
                 </div>
-                <div v-else-if="devModeEntryError" class="set-warn">
+                <div v-else-if="devModeEntryError" class="set-warn set-warn-static">
                   <span class="warn-text">error</span>
                   <span class="options" @click="devModeEntryClose">ok</span>
                 </div>
@@ -1280,23 +1280,6 @@
                     </div>
                   </div>
                   <div class="set-item">
-                    <span class="set-label">图片懒加载</span>
-                    <div class="set-options">
-                      <span
-                        :class="['options', { choose: !imageLazyEnabled }]"
-                        @click="imageLazyEnabled = false"
-                      >
-                        关闭
-                      </span>
-                      <span
-                        :class="['options', { choose: imageLazyEnabled }]"
-                        @click="imageLazyEnabled = true"
-                      >
-                        开启
-                      </span>
-                    </div>
-                  </div>
-                  <div class="set-item">
                     <span class="set-label">WebP 自动转换</span>
                     <div class="set-options">
                       <span
@@ -1476,7 +1459,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageLazyEnabled, imageWebpEnabled, imageLightboxEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageWebpEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
 
 // 有效分支模式（响应式）
@@ -2287,7 +2270,6 @@ onMounted(() => {
   }
   if (mode !== 5) {
     pwaCacheEnabled.value = false;
-    imageLazyEnabled.value = false;
     imageWebpEnabled.value = false;
   }
   // 根据分支模式设置展开状态
@@ -2437,15 +2419,28 @@ watch(
         background-color: var(--main-card-border);
         transition:
           color 0.3s,
-          background-color 0.3s;
+          background-color 0.3s,
+          box-shadow var(--press-out) var(--press-ease),
+          transform var(--press-out) var(--press-ease);
         &.choose,
         &:hover {
           color: var(--main-card-background);
           background-color: var(--main-color);
           box-shadow: 0 8px 16px -4px var(--main-border-shadow);
         }
+        &:active {
+          color: var(--main-card-background);
+          background-color: var(--main-color);
+          box-shadow: 0 8px 16px -4px var(--main-border-shadow);
+          transform: scale(0.95);
+          transition-duration: var(--press-in);
+        }
         &.reset-btn:hover {
           background-color: var(--main-error-color);
+        }
+        &.reset-btn:active {
+          background-color: var(--main-error-color);
+          transition-duration: var(--press-in);
         }
         &:last-child {
           margin-right: 0;
@@ -2469,18 +2464,6 @@ watch(
     &:last-child {
       margin-bottom: 0;
     }
-    @media (max-width: 512px) {
-      flex-direction: column;
-      align-items: flex-start;
-      .set-options {
-        margin-top: 8px;
-        .options {
-          &:first-child {
-            margin-left: 0;
-          }
-        }
-      }
-    }
   }
   .set-expand-box {
     border: none;
@@ -2497,22 +2480,6 @@ watch(
       min-height: 40px;
       &:last-child {
         margin-bottom: 0;
-      }
-      @media (max-width: 512px) {
-        flex-direction: column;
-        align-items: flex-start;
-        .set-options {
-          margin-top: 8px;
-          margin-bottom: 8px;
-          height: auto;
-          flex-wrap: wrap;
-          align-items: flex-start;
-          .options {
-            &:first-child {
-              margin-left: 0;
-            }
-          }
-        }
       }
     }
     .set-item-channel {
@@ -2537,6 +2504,12 @@ watch(
     border-radius: 8px;
     background-color: #fef2f2;
     border: 1px solid #fecaca;
+    transition: transform var(--press-out) var(--press-ease);
+    // 只有整块可点的警告面板给按下反馈，纯提示类的排除掉
+    &:not(.set-warn-channel):not(.set-warn-red):not(.set-warn-static):active {
+      transform: scale(0.98);
+      transition-duration: var(--press-in);
+    }
     .warn-text {
       font-size: 14px;
       color: #dc2626;
@@ -2545,10 +2518,22 @@ watch(
       flex-shrink: 0;
       color: #dc2626;
       background-color: transparent;
+      transition:
+        color var(--press-out) var(--press-ease),
+        background-color var(--press-out) var(--press-ease),
+        box-shadow var(--press-out) var(--press-ease),
+        transform var(--press-out) var(--press-ease);
       &:hover {
         color: #b91c1c;
         background-color: transparent;
         box-shadow: none;
+      }
+      &:active {
+        color: #b91c1c;
+        background-color: transparent;
+        box-shadow: none;
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
   }
@@ -2569,8 +2554,13 @@ watch(
   .devmode-yes-btn {
     background-color: var(--main-error-color) !important;
     color: #fff !important;
+    transition: background-color var(--press-out) var(--press-ease);
     &:hover {
       background-color: color-mix(in srgb, var(--main-error-color) 80%, #000) !important;
+    }
+    &:active {
+      background-color: color-mix(in srgb, var(--main-error-color) 80%, #000) !important;
+      transition-duration: var(--press-in);
     }
   }
   .set-warn-channel {
@@ -2587,6 +2577,11 @@ watch(
     background-color: #f5f3ff;
     border-color: #c4b5fd;
     cursor: pointer;
+    transition: transform var(--press-out) var(--press-ease);
+    &:active {
+      transform: scale(0.98);
+      transition-duration: var(--press-in);
+    }
     .warn-text {
       color: #7c3aed;
       font-size: 18px;
@@ -2612,11 +2607,25 @@ watch(
       border-radius: 8px;
       padding: 6px 12px;
       background-color: transparent;
+      transition:
+        color var(--press-out) var(--press-ease),
+        border-color var(--press-out) var(--press-ease),
+        background-color var(--press-out) var(--press-ease),
+        box-shadow var(--press-out) var(--press-ease),
+        transform var(--press-out) var(--press-ease);
       &:hover {
         color: #6d28d9;
         border-color: #6d28d9;
         background-color: transparent;
         box-shadow: none;
+      }
+      &:active {
+        color: #6d28d9;
+        border-color: #6d28d9;
+        background-color: transparent;
+        box-shadow: none;
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
     .warn-yes {
@@ -2624,8 +2633,16 @@ watch(
       background-color: #7c3aed !important;
       border-radius: 8px;
       padding: 6px 12px;
+      transition:
+        background-color var(--press-out) var(--press-ease),
+        transform var(--press-out) var(--press-ease);
       &:hover {
         background-color: #6d28d9 !important;
+      }
+      &:active {
+        background-color: #6d28d9 !important;
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
   }
@@ -2656,12 +2673,25 @@ watch(
       padding: 6px 8px;
       min-width: 30px;
       background-color: transparent;
-      transition: color 0.3s, background-color 0.3s;
+      transition:
+        color 0.3s,
+        background-color 0.3s,
+        border-color var(--press-out) var(--press-ease),
+        box-shadow var(--press-out) var(--press-ease),
+        transform var(--press-out) var(--press-ease);
       &:hover {
         color: #b91c1c;
         border-color: #b91c1c;
         background-color: transparent;
         box-shadow: none;
+      }
+      &:active {
+        color: #b91c1c;
+        border-color: #b91c1c;
+        background-color: transparent;
+        box-shadow: none;
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
     .warn-yes {
@@ -2674,9 +2704,14 @@ watch(
       border-radius: 8px;
       padding: 6px 8px;
       min-width: 30px;
-      transition: color 0.3s, background-color 0.3s;
+      transition: color 0.3s, background-color 0.3s, transform var(--press-out) var(--press-ease);
       &:hover {
         background-color: #b91c1c !important;
+      }
+      &:active {
+        background-color: #b91c1c !important;
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
   }
@@ -2690,6 +2725,11 @@ watch(
     border-radius: 8px;
     background-color: #f5f3ff;
     border: 1px solid #c4b5fd;
+    transition: transform var(--press-out) var(--press-ease);
+    &:active {
+      transform: scale(0.98);
+      transition-duration: var(--press-in);
+    }
     .warn-text {
       font-size: 14px;
       color: #7c3aed;
@@ -2698,10 +2738,22 @@ watch(
       flex-shrink: 0;
       color: #7c3aed;
       background-color: transparent;
+      transition:
+        color var(--press-out) var(--press-ease),
+        background-color var(--press-out) var(--press-ease),
+        box-shadow var(--press-out) var(--press-ease),
+        transform var(--press-out) var(--press-ease);
       &:hover {
         color: #6d28d9;
         background-color: transparent;
         box-shadow: none;
+      }
+      &:active {
+        color: #6d28d9;
+        background-color: transparent;
+        box-shadow: none;
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
   }
@@ -2721,9 +2773,13 @@ watch(
     border-radius: 6px;
     cursor: pointer;
     flex-shrink: 0;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, transform var(--press-out) var(--press-ease);
     &:hover {
       border-color: var(--main-color);
+    }
+    &:active {
+      transform: scale(0.98);
+      transition-duration: var(--press-in);
     }
   }
   .text-input {

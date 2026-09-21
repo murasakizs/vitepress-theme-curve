@@ -104,6 +104,7 @@ onMounted(() => {
       white-space: nowrap;
       height: 30px;
       cursor: pointer;
+      transition: transform var(--press-out) var(--press-ease);
       .num {
         margin-left: 4px;
         font-weight: normal;
@@ -127,6 +128,10 @@ onMounted(() => {
         color: var(--main-card-background);
         background-color: var(--main-color);
       }
+      &:active {
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
+      }
     }
   }
   .more-type {
@@ -136,6 +141,7 @@ onMounted(() => {
     white-space: nowrap;
     margin-right: 4px;
     margin-left: 8px;
+    transition: transform var(--press-out) var(--press-ease);
     .iconfont {
       font-size: 0.9375rem;
       margin-right: 8px;
@@ -144,6 +150,10 @@ onMounted(() => {
       .iconfont {
         color: var(--main-color);
       }
+    }
+    &:active {
+      transform: scale(0.95);
+      transition-duration: var(--press-in);
     }
   }
 }

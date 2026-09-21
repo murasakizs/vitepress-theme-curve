@@ -408,7 +408,11 @@ onBeforeUnmount(() => {
   min-width: 60px;
   border-radius: 8px;
   cursor: pointer;
-  transition: color 0.3s, background-color 0.3s;
+  transition: color 0.3s, background-color 0.3s, transform var(--press-out) var(--press-ease);
+  &:active {
+    transform: scale(0.95);
+    transition-duration: var(--press-in);
+  }
 }
 .import-check-no {
   color: #7c3aed;

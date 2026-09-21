@@ -220,6 +220,7 @@ const handleRefresh = () => {
   &:active {
     background: var(--main-border-shadow);
     transform: translateY(0);
+    transition-duration: var(--press-in);
   }
 
   // 服务正常 - 绿色

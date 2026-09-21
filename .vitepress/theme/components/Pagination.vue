@@ -214,7 +214,8 @@ watch(
     box-shadow: 0 8px 16px -4px var(--main-border-shadow);
     transition:
       border-color 0.3s,
-      box-shadow 0.3s;
+      box-shadow 0.3s,
+      transform var(--press-out) var(--press-ease);
     cursor: pointer;
     &.prev,
     &.next {
@@ -267,6 +268,10 @@ watch(
           margin-left: 0;
         }
       }
+    }
+    &:active {
+      transform: scale(0.9);
+      transition-duration: var(--press-in);
     }
   }
   .page-number {
@@ -321,11 +326,16 @@ watch(
         transition:
           color 0.3s,
           opacity 0.3s,
-          background-color 0.3s;
+          background-color 0.3s,
+          transform var(--press-out) var(--press-ease);
         cursor: pointer;
         &:hover {
           color: var(--main-card-background);
           background-color: var(--main-color);
+        }
+        &:active {
+          transform: scale(0.9);
+          transition-duration: var(--press-in);
         }
       }
       &.focus,

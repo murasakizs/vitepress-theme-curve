@@ -117,6 +117,7 @@ onBeforeUnmount(() => {
       color: var(--main-color);
       font-weight: bold;
       cursor: pointer;
+      transition: transform var(--press-out) var(--press-ease);
       .icon-robot {
         display: flex;
         align-items: center;
@@ -137,6 +138,10 @@ onBeforeUnmount(() => {
         opacity: 0.6;
         color: var(--main-color);
         transform: rotate(90deg);
+      }
+      &:active {
+        transform: scale(0.98);
+        transition-duration: var(--press-in);
       }
     }
     .logo {

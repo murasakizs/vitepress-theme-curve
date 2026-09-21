@@ -38,7 +38,6 @@ const Theme = {
       setTimeout(() => {
         const store = mainStore();
         initImageLazy({
-          lazyEnabled: store.imageLazyEnabled,
           webpEnabled: store.imageWebpEnabled,
         });
       }, 100);

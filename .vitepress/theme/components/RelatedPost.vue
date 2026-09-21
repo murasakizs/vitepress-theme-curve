@@ -87,6 +87,11 @@ onMounted(() => {
         opacity: 1;
         color: var(--main-color);
       }
+      // 标题行已用 opacity 0.6 弱化，按下时再压暗一档
+      &:active {
+        opacity: 0.4;
+        transition-duration: var(--press-in);
+      }
     }
   }
 }

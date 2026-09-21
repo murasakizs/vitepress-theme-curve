@@ -144,14 +144,9 @@ import { ensureCodeFontLoaded } from "@/utils/fontLoader.mjs";
 import { useDesktopAside } from "@/utils/useDesktopAside.mjs";
 import { usePostData } from "@/utils/usePostData.mjs";
 import PasswordProtect from "@/components/PasswordProtect.vue";
-import { storeToRefs } from "pinia";
-import { mainStore } from "@/store";
-
 const { page, theme, frontmatter } = useData();
 const { isDesktopAsideVisible } = useDesktopAside();
 const { postData, loadPostData } = usePostData();
-const store = mainStore();
-const { imageLightboxEnabled } = storeToRefs(store);
 
 // 标签/分类归一化：字符串转数组
 const asArray = (val) => {
@@ -214,7 +209,7 @@ const loadCodeFontIfNeeded = async () => {
 
 onMounted(() => {
   loadPostData();
-  initFancybox(theme.value, { lightboxEnabled: imageLightboxEnabled.value });
+  initFancybox(theme.value);
   loadCodeFontIfNeeded();
   // 检查是否已解锁
   if (hasPassword.value && checkUnlocked()) {
@@ -270,6 +265,10 @@ onMounted(() => {
               color: var(--main-color);
             }
           }
+          &:active {
+            transform: scale(0.95);
+            transition-duration: var(--press-in);
+          }
         }
       }
       .tags {
@@ -296,6 +295,10 @@ onMounted(() => {
             .iconfont {
               color: var(--main-color);
             }
+          }
+          &:active {
+            transform: scale(0.95);
+            transition-duration: var(--press-in);
           }
         }
       }
@@ -437,6 +440,10 @@ onMounted(() => {
               .iconfont {
                 color: var(--main-color);
               }
+            }
+            &:active {
+              transform: scale(0.95);
+              transition-duration: var(--press-in);
             }
           }
         }

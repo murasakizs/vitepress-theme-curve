@@ -322,7 +322,7 @@ onMounted(() => {
             background: var(--main-site-background);
             border: 1px solid var(--main-card-border);
             box-shadow: 0 8px 12px -4px var(--main-border-shadow);
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform var(--press-out) var(--press-ease);
             cursor: pointer;
             .skills-logo {
               display: flex;
@@ -343,6 +343,10 @@ onMounted(() => {
             }
             &:hover {
               background-color: var(--main-card-background);
+            }
+            &:active {
+              transform: scale(0.95);
+              transition-duration: var(--press-in);
             }
           }
         }

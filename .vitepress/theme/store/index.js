@@ -4,7 +4,7 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 2;
+const PERSIST_VERSION = 3;
 // 分支模式（1 = 正式分支，2 = beta分支，3 = dev分支，5 = 开发模式）
 const DEFAULT_CHANNEL_MODE = 1;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
@@ -148,9 +148,7 @@ export const mainStore = defineStore("main", {
       // 阅读进度条
       readingProgressEnabled: true,
       // 图片功能开关
-      imageLazyEnabled: true,
       imageWebpEnabled: false,
-      imageLightboxEnabled: true,
       // 天气小组件开关
       weatherWidgetEnabled: true,
       // 天气小组件折叠状态
@@ -457,9 +455,7 @@ export const mainStore = defineStore("main", {
         "pwaCacheEnabled",
         "pwaCacheLimit",
         "readingProgressEnabled",
-        "imageLazyEnabled",
         "imageWebpEnabled",
-        "imageLightboxEnabled",
         "weatherProvider",
         "weatherLocationMode",
         "weatherManualCity",

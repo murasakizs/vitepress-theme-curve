@@ -103,17 +103,12 @@ const { nav } = theme.value;
 const { tagsData, loadPostData } = usePostData();
 
 // 网址显示（与超级岛第三个药丸一致）
-const effectiveChannelMode = computed(() => store.effectiveChannelMode);
 const pillChannel = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 2) return 'beta';
-  if (mode === 3) return 'dev';
+  if (store.channelMode === 2) return 'dev';
   return '';
 });
 const pillChannelClass = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 2) return 'info';
-  if (mode === 3) return 'warning';
+  if (store.channelMode === 2) return 'warning';
   return '';
 });
 

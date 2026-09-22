@@ -4,13 +4,11 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 3;
-// 分支模式（1 = 正式分支，2 = beta分支，3 = dev分支，5 = 开发模式）
+const PERSIST_VERSION = 6;
+// 分支模式（1 = 正式分支，2 = dev分支）
 const DEFAULT_CHANNEL_MODE = 1;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
 const DEFAULT_DEV_MODE = 1;
-// dev分支合并状态（1 = 未合并，2 = 已合并至beta）
-const DEFAULT_DEV_CHANNEL_MERGED = 0;
 
 // 模块加载时立即检查版本，确保在 pinia-persistedstate 水合之前清除旧缓存
 if (typeof localStorage !== 'undefined') {
@@ -19,6 +17,7 @@ if (typeof localStorage !== 'undefined') {
     const old = JSON.parse(localStorage.getItem('siteData') || '{}');
     const keep = {
       channelMode: old.channelMode,
+      devMode: old.devMode,
       siteVersion: old.siteVersion,
       siteVersionDate: old.siteVersionDate,
     };
@@ -103,12 +102,9 @@ export const mainStore = defineStore("main", {
       showMoreSettings: false,
       showMoreSettingsConfirmed: false,
       // 分支展开状态
-      betaChannelExpanded: false,
       devChannelExpanded: false,
       stableChannelExpanded: false,
-      // 分支合并标记（1 = 未合并，2 = 已合并至beta）
-      devChannelMerged: DEFAULT_DEV_CHANNEL_MERGED,
-      // 分支模式（1 = 正式分支，2 = beta分支，3 = dev分支，5 = 开发模式）
+      // 分支模式（1 = 正式分支，2 = dev分支）
       channelMode: DEFAULT_CHANNEL_MODE,
       // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
       devMode: DEFAULT_DEV_MODE,
@@ -156,7 +152,7 @@ export const mainStore = defineStore("main", {
       // 天气数据源（amap = 高德，wttr = wttr.in，openmeteo = Open-Meteo）
       weatherProvider: "amap",
       // 天气定位方式（satellite = 卫星定位，ip = IP定位，manual = 手动输入）
-      weatherLocationMode: "ip",
+      weatherLocationMode: "satellite",
       // 手动输入的城市名
       weatherManualCity: "",
       // 天气刷新触发器（手动输入确认时 +1）
@@ -169,13 +165,11 @@ export const mainStore = defineStore("main", {
       // 站点版本信息（运行时覆盖，用于关于本站页面）
       siteVersion: "V1.3",
       siteVersionDate: "2026.9.12",
+      // 分支版本（自动递增）
+      branchVersion: 105,
+      branchLastUpdated: "2026.9.22",
+      branchBuildTime: "2026.09.22 14:01:25",
     };
-  },
-  getters: {
-    // 有效分支模式：devMode 开启时强制返回5（开发模式），否则返回实际 channelMode
-    effectiveChannelMode(state) {
-      return state.devMode === 2 ? 5 : state.channelMode;
-    },
   },
   actions: {
     // 切换应用状态
@@ -432,7 +426,6 @@ export const mainStore = defineStore("main", {
         "channelMode",
         "devMode",
         "devModeOptionsExpanded",
-        "devChannelMerged",
         "highContrast",
         "siteLayout",
         "siteLayoutPending",
@@ -465,6 +458,9 @@ export const mainStore = defineStore("main", {
         "scheduledDarkTime",
         "siteVersion",
         "siteVersionDate",
+        "branchVersion",
+        "branchLastUpdated",
+        "branchBuildTime",
       ], 
     },
   ],

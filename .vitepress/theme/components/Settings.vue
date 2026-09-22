@@ -66,23 +66,6 @@
                 </div>
               </div>
               <div class="set-item">
-                <span class="set-label">dev no content</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: devChannelMerged !== 2 }]"
-                    @click="devChannelMerged = 0; saveStoreDefaults({ DEFAULT_DEV_CHANNEL_MERGED: 0, bumpVersion: true })"
-                  >
-                    off
-                  </span>
-                  <span
-                    :class="['options', { choose: devChannelMerged === 2 }]"
-                    @click="devChannelMerged = 2; saveStoreDefaults({ DEFAULT_DEV_CHANNEL_MERGED: 2, bumpVersion: true })"
-                  >
-                    on
-                  </span>
-                </div>
-              </div>
-              <div class="set-item">
                 <span class="set-label">clear all data</span>
                 <div class="set-options">
                   <span
@@ -139,7 +122,7 @@
                   <template v-else>
                     <div style="display: flex; align-items: center; justify-content: space-between">
                       <span class="warn-text">are you sure you want to turn off development mode</span>
-                      <span class="options" @click.stop="saveStoreDefaults({ DEFAULT_DEV_MODE: 1, resetVersion: 1 }); store.devMode = 1; closeDevModeConfirmVisible = false">confirm</span>
+                      <span class="options" @click.stop="confirmCloseDevMode">confirm</span>
                     </div>
                   </template>
                 </div>
@@ -1200,13 +1183,7 @@
               </div>
               <Transition name="fade-up">
                 <div v-if="devChannelExpanded && (channelMode === 2 || showAllGroups)" class="set-expand-box">
-                  <span class="set-desc">dev分支推送开发中的新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此分支的绝大部分内容后续都会合并至正式分支。该分支更新较为频繁。</span>
-                  <template v-if="devChannelMerged === 2">
-                    <div class="set-item">
-                      <span class="set-label">当前分支内容已全部合并至正式分支，稍后再看看吧</span>
-                    </div>
-                  </template>
-                  <template v-else>
+                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送导致存在严重缺陷。<br>该分支更新较为频繁。</span>
                   <div class="set-item">
                     <span class="set-label">背景模糊</span>
                     <div class="set-options">
@@ -1283,18 +1260,56 @@
                     </div>
                   </div>
 
-                  </template>
                 </div>
 
               </Transition>
             </template>
           <span class="title">关于</span>
           <div class="set-item">
-            <span class="set-label">关于本站</span>
+            <span class="set-label">本站信息</span>
             <div class="set-options">
-              <a href="/pages/about-website.html" class="options">前往</a>
+              <span
+                :class="['options', { choose: aboutWebsiteExpanded }]"
+                @click="aboutWebsiteExpanded = !aboutWebsiteExpanded"
+              >
+                {{ aboutWebsiteExpanded ? '收起' : '展开' }}
+              </span>
             </div>
           </div>
+          <Transition name="fade-up">
+            <div v-if="aboutWebsiteExpanded" class="set-expand-box">
+              <div class="set-item">
+                <span class="set-label">当前分支版本</span>
+                <div class="set-options">
+                  <span class="about-version-pill">{{ branchVersion }}</span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">当前分支最后更新日期</span>
+                <div class="set-options">
+                  <span class="about-version-pill">{{ branchLastUpdated || '暂无' }}</span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">构建时间</span>
+                <div class="set-options">
+                  <span class="about-version-pill">{{ branchBuildTime || '暂无' }}</span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">站点版本（release）</span>
+                <div class="set-options">
+                  <span class="about-version-pill">{{ siteVersion }} - {{ siteVersionDate }}</span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">关于本站</span>
+                <div class="set-options">
+                  <a href="/pages/about-website.html" class="options">前往</a>
+                </div>
+              </div>
+            </div>
+          </Transition>
           <div class="set-item">
             <span class="set-label">分支策略</span>
             <div class="set-options">
@@ -1322,11 +1337,11 @@
                 </div>
                 <div class="set-item set-item-channel">
                   <span class="set-label">dev分支</span>
-                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送，可能存在严重缺陷。<br>该分支更新较为频繁。</span>
+                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送导致存在严重缺陷。<br>该分支更新较为频繁。</span>
                 </div>
                 <div class="set-item set-item-channel">
                   <span class="set-label">beta/canary分支</span>
-                  <span class="set-desc">由于不再需要，已移除</span>
+                  <span class="set-desc">由于不再需要，已移除。</span>
                 </div>
                 <div class="set-item" style="margin-bottom: 4px;">
                   <span class="set-label">前往预览测试分支</span>
@@ -1334,7 +1349,6 @@
                     <a href="https://dev.sgexilq.com" target="_blank" class="options">dev分支</a>
                   </div>
                 </div>
-
               </template>
               <template v-if="channelMode >= 2">
                 <div class="set-item">
@@ -1350,7 +1364,7 @@
                 </div>
                 <div class="set-item set-item-channel">
                   <span class="set-label">dev分支</span>
-                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送，可能存在严重缺陷。<br>该分支更新较为频繁。</span>
+                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送导致存在严重缺陷。<br>该分支更新较为频繁。</span>
                 </div>
                 <div class="set-item set-item-channel">
                   <span class="set-label">beta/canary分支</span>
@@ -1455,7 +1469,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageWebpEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageWebpEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate, branchVersion, branchLastUpdated, branchBuildTime } =
   storeToRefs(store);
 
 // 切换分支模式并清除旧缓存
@@ -1602,6 +1616,7 @@ const confirmCustomIds = () => {
   }
 };
 // 展开所有设置分组
+const aboutWebsiteExpanded = ref(false);
 const expandAllGroups = ref(false);
 const handleExpandAllGroups = () => {
   expandAllGroups.value = true;
@@ -1680,7 +1695,7 @@ const devModeEntryVerify = () => {
 const devModeEntryClose = () => {
   if (devModeEntrySuccess.value) {
     store.devMode = 2;
-    saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 2, bumpVersion: true });
+    saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value, DEFAULT_DEV_MODE: 2, bumpVersion: true });
     if (typeof $message !== "undefined") {
       $message.success("开发模式已启用");
     }
@@ -1748,8 +1763,19 @@ const switchWeatherProvider = (provider) => {
 
 // 关闭开发模式（保存版本到 store/index.js）
 const confirmCloseDevMode = async () => {
-  await saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, DEFAULT_DEV_MODE: 1, resetVersion: 1 });
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  branchVersion.value = (branchVersion.value || 0) + 1;
+  branchLastUpdated.value = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
+  branchBuildTime.value = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
   store.devMode = 1;
+  await saveStoreDefaults({
+    branchVersion: branchVersion.value,
+    branchLastUpdated: branchLastUpdated.value,
+    branchBuildTime: branchBuildTime.value,
+    DEFAULT_DEV_MODE: 1,
+    bumpVersion: true,
+  });
   closeDevModeConfirmVisible.value = false;
   if (typeof $message !== "undefined") {
     $message.warning("已关闭开发模式");
@@ -1764,9 +1790,9 @@ const handleClearDataKeepChannel = async () => {
   const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
-  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value };
+  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value };
   const savedVersion = localStorage.getItem('siteDataVersion');
-  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value });
+  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value });
 
   // 清除 localStorage 和 sessionStorage
   localStorage.clear();
@@ -1820,9 +1846,9 @@ const handleResetConfig = async () => {
   const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
-  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value };
+  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value };
   const savedVersion = localStorage.getItem('siteDataVersion');
-  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value });
+  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value });
   // 清空 localStorage 和 sessionStorage
   localStorage.clear();
   sessionStorage.clear();
@@ -2376,6 +2402,17 @@ watch(
     color: var(--main-font-color);
     opacity: 0.6;
     margin: -4px 0 12px;
+  }
+  .about-version-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--main-color);
+    background-color: var(--main-color-bg);
+    border-radius: 8px;
+    padding: 6px 20px;
+    letter-spacing: 0.5px;
   }
   .set-label-channel {
     color: var(--main-color);

@@ -124,7 +124,6 @@ export default withPwa(
                   if (data.siteVersion != null) content = content.replace(/(siteVersion:\s*")[^"]*(")/, `$1${data.siteVersion}$2`);
                   if (data.siteVersionDate != null) content = content.replace(/(siteVersionDate:\s*")[^"]*(")/, `$1${data.siteVersionDate}$2`);
                   if (data.branchVersion != null) content = content.replace(/(branchVersion:\s*)\d+/, `$1${data.branchVersion}`);
-                  if (data.branchLastUpdated != null) content = content.replace(/(branchLastUpdated:\s*")[^"]*(")/, `$1${data.branchLastUpdated}$2`);
                   if (data.branchBuildTime != null) content = content.replace(/(branchBuildTime:\s*")[^"]*(")/, `$1${data.branchBuildTime}$2`);
                   if (data.DEFAULT_CHANNEL_MODE != null) content = content.replace(/(DEFAULT_CHANNEL_MODE\s*=\s*)\d+/, `$1${data.DEFAULT_CHANNEL_MODE}`);
                   if (data.DEFAULT_DEV_MODE != null) content = content.replace(/(DEFAULT_DEV_MODE\s*=\s*)\d+/, `$1${data.DEFAULT_DEV_MODE}`);

@@ -1659,8 +1659,8 @@ const handleMoreFontsClick = () => {
   moreFontsExpanded.value = !moreFontsExpanded.value;
   devModeEntryClickCount.value++;
 
-  // 10秒内按12下展示开发模式入口
-  if (devModeEntryClickCount.value >= 12 && store.devMode !== 2) {
+  // 5秒内按6下展示开发模式入口
+  if (devModeEntryClickCount.value >= 6 && store.devMode !== 2) {
     devModeEntryVisible.value = true;
     devModeEntryStep.value = 0;
     devModeEntryError.value = false;
@@ -1668,12 +1668,12 @@ const handleMoreFontsClick = () => {
     devModeEntryInput.value = '';
   }
 
-  // 10秒内没有继续点击则重置计数
+  // 5秒内没有继续点击则重置计数
   setTimeout(() => {
-    if (devModeEntryClickCount.value < 12) {
+    if (devModeEntryClickCount.value < 6) {
       devModeEntryClickCount.value = 0;
     }
-  }, 10000);
+  }, 5000);
 };
 
 const devModeEntryVerify = () => {

@@ -119,21 +119,20 @@ const status = computed(() => {
   return data.value?.status || "unknown";
 });
 
-// 分支模式下的标签（1 = release分支，2 = beta分支，3 = dev分支）
+// 分支模式下的标签（1 = release分支，2 = dev分支）
 const channelLabel = computed(() => {
   const mode = store.channelMode;
   let base = '';
   if (mode === 1) base = 'release';
-  else if (mode === 2) base = 'beta';
-  else if (mode === 3) base = 'dev';
+  else if (mode === 2) base = 'dev';
   if (!base) return '';
   if (store.devMode === 2) return `${base}分支（开发模式）`;
   return `${base}分支`;
 });
 
-// 是否处于分支模式（1+devMode 或 2/3/4）
+// 是否处于分支模式（2=dev 或 1+devMode）
 const isChannelMode = computed(() => {
-  if (store.channelMode >= 2 && store.channelMode <= 3) return true;
+  if (store.channelMode === 2) return true;
   if (store.channelMode === 1 && store.devMode === 2) return true;
   return false;
 });

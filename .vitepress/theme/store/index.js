@@ -5,11 +5,11 @@ let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
 const PERSIST_VERSION = 1;
-// 分支模式（1 = 正式分支，2 = beta分支，3 = dev分支，5 = 开发模式）
-const DEFAULT_CHANNEL_MODE = 3;
+// 分支模式（1 = 正式分支，2 = dev分支）
+const DEFAULT_CHANNEL_MODE = 2;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
 const DEFAULT_DEV_MODE = 1;
-// dev分支合并状态（1 = 未合并，2 = 已合并至beta）
+// dev分支合并状态（1 = 未合并，2 = 已合并至正式分支）
 const DEFAULT_DEV_CHANNEL_MERGED = 0;
 
 // 模块加载时立即检查版本，确保在 pinia-persistedstate 水合之前清除旧缓存
@@ -103,12 +103,11 @@ export const mainStore = defineStore("main", {
       showMoreSettings: false,
       showMoreSettingsConfirmed: false,
       // 分支展开状态
-      betaChannelExpanded: false,
       devChannelExpanded: false,
       stableChannelExpanded: false,
-      // 分支合并标记（1 = 未合并，2 = 已合并至beta）
+      // 分支合并标记（1 = 未合并，2 = 已合并至正式分支）
       devChannelMerged: DEFAULT_DEV_CHANNEL_MERGED,
-      // 分支模式（1 = 正式分支，2 = beta分支，3 = dev分支，5 = 开发模式）
+      // 分支模式（1 = 正式分支，3 = dev分支，5 = 开发模式）
       channelMode: DEFAULT_CHANNEL_MODE,
       // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
       devMode: DEFAULT_DEV_MODE,
@@ -170,12 +169,6 @@ export const mainStore = defineStore("main", {
       siteVersion: "V1.3",
       siteVersionDate: "2026.9.12",
     };
-  },
-  getters: {
-    // 有效分支模式：devMode 开启时强制返回5（开发模式），否则返回实际 channelMode
-    effectiveChannelMode(state) {
-      return state.devMode === 2 ? 5 : state.channelMode;
-    },
   },
   actions: {
     // 切换应用状态

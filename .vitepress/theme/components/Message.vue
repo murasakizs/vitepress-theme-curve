@@ -98,7 +98,7 @@
         </div>
         <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
           <span class="pill-text">
-            <template v-if="effectiveChannelMode === 5">
+            <template v-if="store.devMode === 2">
               <span class="pill-prefix error">{{ pillText }}</span>
             </template>
             <template v-else-if="pillChannel">
@@ -120,9 +120,6 @@ import { mainStore } from "@/store";
 import { useIsMobileLayout } from "@/utils/layout.js";
 
 const store = mainStore();
-
-// 有效分支模式（响应式）
-const effectiveChannelMode = computed(() => store.effectiveChannelMode);
 
 // 根据页面布局决定默认消息样式
 const isMobileLayout = useIsMobileLayout();
@@ -157,39 +154,30 @@ let progressInterval = null;
 
 // 根据分支模式显示不同的药丸文本
 const pillChannel = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 2) return 'beta';
-  if (mode === 3) return 'dev';
+  if (store.channelMode === 2) return 'dev';
   return '';
 });
 const pillChannelClass = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 2) return 'info';
-  if (mode === 3) return 'warning';
+  if (store.channelMode === 2) return 'warning';
   return '';
 });
 const pillText = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 5) return '开发模式';
+  if (store.devMode === 2) return '开发模式';
   const channel = pillChannel.value;
   return channel ? `${channel}.sgexilq.com` : 'sgexilq.com';
 });
 
 // 灵动模式消息末尾的分支文本
 const islandChannelText = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 5) return '开发模式';
-  if (mode === 2) return 'beta分支';
-  if (mode === 3) return 'dev分支';
+  if (store.devMode === 2) return '开发模式';
+  if (store.channelMode === 2) return 'dev分支';
   return '';
 });
 
 // 灵动模式分支文本颜色类
 const islandChannelClass = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 5) return 'channel-devmode';
-  if (mode === 2) return 'channel-beta';
-  if (mode === 3) return 'channel-dev';
+  if (store.devMode === 2) return 'channel-devmode';
+  if (store.channelMode === 2) return 'channel-dev';
   return '';
 });
 
@@ -642,9 +630,6 @@ onUnmounted(() => {
         color: #ffffff;
       }
       .message-content .island-channel {
-        &.channel-beta {
-          color: rgba(144, 147, 153, 0.8);
-        }
         &.channel-dev {
           color: rgba(230, 162, 60, 0.8);
         }
@@ -683,9 +668,6 @@ onUnmounted(() => {
       .island-channel {
         font-size: 14px;
         margin-left: -6px;
-        &.channel-beta {
-          color: var(--main-info-color);
-        }
         &.channel-dev {
           color: var(--main-warning-color);
         }

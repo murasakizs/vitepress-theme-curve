@@ -10,8 +10,8 @@
       @modal-close="store.changeShowStatus('showSettings')"
     >
       <div class="set-list">
-        <div v-if="channelMode >= 2 && channelMode <= 3 && store.devMode !== 2" class="set-warn set-warn-channel">
-          <span class="warn-text">当前处于测试分支（{{ channelMode === 2 ? 'beta' : 'dev' }}分支）</span>
+        <div v-if="channelMode === 2 && store.devMode !== 2" class="set-warn set-warn-channel">
+          <span class="warn-text">当前处于测试分支（dev分支）</span>
         </div>
         <div v-if="store.devMode === 2" class="set-warn set-warn-static">
           <span class="warn-text">当前处于开发模式，提交代码时应退出开发模式</span>
@@ -43,12 +43,6 @@
                   <span
                     :class="['options', { choose: channelMode === 2 }]"
                     @click="switchChannelMode(2)"
-                  >
-                    beta
-                  </span>
-                  <span
-                    :class="['options', { choose: channelMode === 3 }]"
-                    @click="switchChannelMode(3)"
                   >
                     dev
                   </span>
@@ -1194,14 +1188,6 @@
             <!-- 测试分支（开发环境） -->
             <template v-if="channelMode >= 2">
               <div class="set-item">
-                <span class="set-label set-label-channel">来自beta分支的新内容</span>
-              </div>
-              <div class="set-expand-box">
-                <span class="set-desc">beta分支推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该分支同样包含对主线的问题修复。</span>
-              </div>
-            </template>
-            <template v-if="channelMode >= 3">
-              <div class="set-item">
                 <span class="set-label set-label-channel">来自dev分支的新内容</span>
                 <div class="set-options">
                   <span
@@ -1213,11 +1199,11 @@
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="devChannelExpanded && (channelMode === 3 || showAllGroups)" class="set-expand-box">
-                  <span class="set-desc">dev分支推送开发中的新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此分支的绝大部分内容后续都会合并入beta分支。该分支更新较为频繁。<br>不建议下游开发者跟进此分支。<s>（如果你愿意当然是可以的）</s></span>
+                <div v-if="devChannelExpanded && (channelMode === 2 || showAllGroups)" class="set-expand-box">
+                  <span class="set-desc">dev分支推送开发中的新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此分支的绝大部分内容后续都会合并至正式分支。该分支更新较为频繁。</span>
                   <template v-if="devChannelMerged === 2">
                     <div class="set-item">
-                      <span class="set-label">当前分支内容已全部合并至beta分支，稍后再看看吧</span>
+                      <span class="set-label">当前分支内容已全部合并至正式分支，稍后再看看吧</span>
                     </div>
                   </template>
                   <template v-else>
@@ -1299,91 +1285,101 @@
 
                   </template>
                 </div>
-                <div v-else-if="devChannelExpanded && channelMode === 2 && !showAllGroups" class="set-expand-box">
-                  <span class="set-desc">dev分支推送开发中的新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此分支的绝大部分内容后续都会合并入beta分支。该分支更新较为频繁。<br>不建议下游开发者跟进此分支。<s>（如果你愿意当然是可以的）</s></span>
-                  <div class="set-item">
-                    <span class="set-label">显示选项需要先切换到dev分支</span>
-                  </div>
-                </div>
+
               </Transition>
             </template>
-            <template v-if="channelMode >= 2">
-              <div class="set-item">
-                <span class="set-label">查看源码</span>
-                <div class="set-options">
-                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/beta" target="_blank" class="options">beta分支</a>
-                  <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/dev" target="_blank" class="options">dev分支</a>
+          <span class="title">关于</span>
+          <div class="set-item">
+            <span class="set-label">关于本站</span>
+            <div class="set-options">
+              <a href="/pages/about-website.html" class="options">前往</a>
+            </div>
+          </div>
+          <div class="set-item">
+            <span class="set-label">分支策略</span>
+            <div class="set-options">
+              <span
+                :class="['options', { choose: stableChannelExpanded }]"
+                @click="stableChannelExpanded = !stableChannelExpanded"
+              >
+                {{ stableChannelExpanded ? '收起' : '展开' }}
+              </span>
+            </div>
+          </div>
+          <Transition name="fade-up">
+            <div v-if="stableChannelExpanded" class="set-expand-box">
+              <template v-if="channelMode === 1">
+                <div class="set-item">
+                  <span class="set-label" style="color: var(--main-color)">当前处于正式分支（selfuse分支）</span>
                 </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">反馈与建议</span>
-                <div class="set-options">
-                  <a href="mailto:sgexilq.com" target="_blank" class="options">EMail</a>
-                  <a href="https://myat-q.sgexilq.com" target="_blank" class="options">QQ</a>
-                  <a href="https://github.com/murasakizs/vitepress-theme-curve/issues" target="_blank" class="options">Github</a>
+                <div class="set-item set-item-channel">
+                  <span class="set-label">master分支（release）</span>
+                  <span class="set-desc">定期收拢各分支进度，更新版本。<br>建议下游开发者跟进此分支。</span>
                 </div>
-              </div>
-              <div v-if="channelMode >= 2 && channelMode <= 3" class="set-item">
-                <span class="set-label">前往预览测试分支</span>
-                <div class="set-options">
-                  <a href="https://beta.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 2 }]">beta分支{{ channelMode === 2 ? '（当前分支）' : '' }}</a>
-                  <a href="https://dev.sgexilq.com" target="_blank" :class="['options', { choose: channelMode === 3 }]">dev分支{{ channelMode === 3 ? '（当前分支）' : '' }}</a>
+                <div class="set-item set-item-channel">
+                  <span class="set-label">selfuse分支</span>
+                  <span class="set-desc">用于作者日常更新，本站的部署跟随该分支。</span>
                 </div>
-              </div>
-              <div v-else-if="effectiveChannelMode === 5" class="set-item">
-                <span class="set-label">预览测试分支</span>
-                <div class="set-options">
-                  <a href="https://beta.sgexilq.com" target="_blank" class="options">beta分支</a>
-                  <a href="https://dev.sgexilq.com" target="_blank" class="options">dev分支</a>
+                <div class="set-item set-item-channel">
+                  <span class="set-label">dev分支</span>
+                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送，可能存在严重缺陷。<br>该分支更新较为频繁。</span>
                 </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">返回正式分支</span>
-                <div class="set-options">
-                  <a href="https://sgexilq.com" target="_blank" class="options">前往</a>
+                <div class="set-item set-item-channel">
+                  <span class="set-label">beta/canary分支</span>
+                  <span class="set-desc">由于不再需要，已移除</span>
                 </div>
-              </div>
-            </template>
-            <!-- 正式分支（生产环境） -->
-            <template v-else-if="channelMode === 1">
-              <div class="set-item">
-                <span class="set-label">分支策略</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: stableChannelExpanded }]"
-                    @click="stableChannelExpanded = !stableChannelExpanded"
-                  >
-                    {{ stableChannelExpanded ? '收起' : '展开' }}
-                  </span>
-                </div>
-              </div>
-              <Transition name="fade-up">
-                <div v-if="stableChannelExpanded" class="set-expand-box">
-                  <div class="set-item">
-                    <span class="set-label" style="color: var(--main-color)">当前处于正式分支（master/selfuse分支）</span>
-                  </div>
-                  <div class="set-item set-item-channel">
-                    <span class="set-label">beta分支</span>
-                    <span class="set-desc">beta分支推送开发完成的功能，已经通过初步测试与功能验证，主要用于推送至主线前的稳定性观察与潜在问题修复。该分支同样包含对主线的问题修复。</span>
-                  </div>
-                  <div class="set-item set-item-channel">
-                    <span class="set-label">dev分支</span>
-                    <span class="set-desc">dev分支推送开发中的新功能，代码可能未编写完成，并未经任何验证与测试即直接推送，极易包含未完成的半成品，甚至存在严重缺陷。此分支的绝大部分内容后续都会合并入beta分支。该分支更新较为频繁。<br>不建议下游开发者跟进此分支。<s>（如果你愿意当然是可以的）</s></span>
-                  </div>
-                  <div class="set-item" style="margin-bottom: 4px;">
-                    <span class="set-label">前往预览测试分支</span>
-                    <div class="set-options">
-                      <a href="https://beta.sgexilq.com" target="_blank" class="options">beta分支</a>
-                      <a href="https://dev.sgexilq.com" target="_blank" class="options">dev分支</a>
-                    </div>
-                  </div>
-                  <div class="set-item" style="min-height: 36px;">
-                    <span class="set-desc">预览页面由 泠诗尘 提供</span>
+                <div class="set-item" style="margin-bottom: 4px;">
+                  <span class="set-label">前往预览测试分支</span>
+                  <div class="set-options">
+                    <a href="https://dev.sgexilq.com" target="_blank" class="options">dev分支</a>
                   </div>
                 </div>
-              </Transition>
-            </template>
-          <span class="title">个性化配置数据</span>
+
+              </template>
+              <template v-if="channelMode >= 2">
+                <div class="set-item">
+                  <span class="set-label" style="color: var(--main-color)">当前处于测试分支（dev分支）</span>
+                </div>
+                <div class="set-item set-item-channel">
+                  <span class="set-label">master分支（release）</span>
+                  <span class="set-desc">定期收拢各分支进度，更新版本。<br>建议下游开发者跟进此分支。</span>
+                </div>
+                <div class="set-item set-item-channel">
+                  <span class="set-label">selfuse分支</span>
+                  <span class="set-desc">用于作者日常更新，本站的部署跟随该分支。</span>
+                </div>
+                <div class="set-item set-item-channel">
+                  <span class="set-label">dev分支</span>
+                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送，可能存在严重缺陷。<br>该分支更新较为频繁。</span>
+                </div>
+                <div class="set-item set-item-channel">
+                  <span class="set-label">beta/canary分支</span>
+                  <span class="set-desc">由于不再需要，已移除。</span>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">返回正式分支</span>
+                  <div class="set-options">
+                    <a href="https://sgexilq.com" target="_blank" class="options">selfuse分支</a>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </Transition>
+          <div class="set-item">
+            <span class="set-label">查看源码</span>
+            <div class="set-options">
+              <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/master" target="_blank" class="options">master分支</a>
+              <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/dev" target="_blank" class="options">dev分支</a>
+            </div>
+          </div>
+          <div class="set-item">
+            <span class="set-label">反馈与建议</span>
+            <div class="set-options">
+              <a href="mailto:sgexilq.com" target="_blank" class="options">EMail</a>
+              <a href="https://myat-q.sgexilq.com" target="_blank" class="options">QQ</a>
+              <a href="https://github.com/murasakizs/vitepress-theme-curve/issues" target="_blank" class="options">Github</a>
+            </div>
+          </div>
           <div class="set-item">
             <span class="set-label">导入/导出配置</span>
             <div class="set-options">
@@ -1459,11 +1455,8 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, betaChannelExpanded, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageWebpEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, devChannelMerged, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageWebpEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate } =
   storeToRefs(store);
-
-// 有效分支模式（响应式）
-const effectiveChannelMode = computed(() => store.effectiveChannelMode);
 
 // 切换分支模式并清除旧缓存
 const switchChannelMode = (mode) => {
@@ -1617,7 +1610,6 @@ const handleExpandAllGroups = () => {
   moreFontsExpanded.value = true;
   messageSettingsExpanded.value = true;
   islandSettingsExpanded.value = true;
-  betaChannelExpanded.value = true;
   devChannelExpanded.value = true;
 };
 const handleCollapseAllGroups = () => {
@@ -1629,7 +1621,6 @@ const handleCollapseAllGroups = () => {
   islandSettingsExpanded.value = false;
   // 分支展开状态恢复为默认：当前分支展开，其他关闭
   const mode = channelMode.value;
-  betaChannelExpanded.value = mode === 2;
   devChannelExpanded.value = mode === 3;
 };
 // 主题颜色设置展开状态
@@ -2258,27 +2249,21 @@ onMounted(() => {
   }
   // 初始化时强制关闭不属于当前分支的功能选项
   const mode = channelMode.value;
-  if (mode !== 2 && mode !== 5) {
+  if (mode !== 5) {
     removeAnimations.value = false;
-  }
-  if (mode !== 3 && mode !== 5) {
     backgroundBlur.value = false;
+    pwaCacheEnabled.value = false;
+    imageWebpEnabled.value = false;
     if (scheduledThemeEnabled.value) {
       scheduledThemeEnabled.value = false;
       store.stopScheduledTheme();
     }
   }
-  if (mode !== 5) {
-    pwaCacheEnabled.value = false;
-    imageWebpEnabled.value = false;
-  }
   // 根据分支模式设置展开状态
   if (showAllGroups.value) {
-    betaChannelExpanded.value = true;
     devChannelExpanded.value = true;
-  } else if (channelMode.value >= 2 && channelMode.value <= 4) {
-    betaChannelExpanded.value = channelMode.value === 2;
-    devChannelExpanded.value = channelMode.value === 3;
+  } else if (channelMode.value >= 2) {
+    devChannelExpanded.value = channelMode.value === 2;
   }
 });
 

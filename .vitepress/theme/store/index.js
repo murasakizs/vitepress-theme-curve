@@ -4,7 +4,7 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 6;
+const PERSIST_VERSION = 10;
 // 分支模式（1 = 正式分支，2 = dev分支）
 const DEFAULT_CHANNEL_MODE = 1;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
@@ -166,9 +166,8 @@ export const mainStore = defineStore("main", {
       siteVersion: "V1.3",
       siteVersionDate: "2026.9.12",
       // 分支版本（自动递增）
-      branchVersion: 105,
-      branchLastUpdated: "2026.9.22",
-      branchBuildTime: "2026.09.22 14:01:25",
+      branchVersion: 106,
+      branchBuildTime: "2026.09.22 15:24:38",
     };
   },
   actions: {
@@ -459,7 +458,6 @@ export const mainStore = defineStore("main", {
         "siteVersion",
         "siteVersionDate",
         "branchVersion",
-        "branchLastUpdated",
         "branchBuildTime",
       ], 
     },

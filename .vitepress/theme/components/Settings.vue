@@ -1279,25 +1279,19 @@
           <Transition name="fade-up">
             <div v-if="aboutWebsiteExpanded" class="set-expand-box">
               <div class="set-item">
-                <span class="set-label">当前分支版本</span>
+                <span class="set-label">当前分支内部版本</span>
                 <div class="set-options">
                   <span class="about-version-pill">{{ branchVersion }}</span>
                 </div>
               </div>
               <div class="set-item">
-                <span class="set-label">当前分支最后更新日期</span>
-                <div class="set-options">
-                  <span class="about-version-pill">{{ branchLastUpdated || '暂无' }}</span>
-                </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">构建时间</span>
+                <span class="set-label">内部版本构建时间</span>
                 <div class="set-options">
                   <span class="about-version-pill">{{ branchBuildTime || '暂无' }}</span>
                 </div>
               </div>
               <div class="set-item">
-                <span class="set-label">站点版本（release）</span>
+                <span class="set-label">基础版本（release）</span>
                 <div class="set-options">
                   <span class="about-version-pill">{{ siteVersion }} - {{ siteVersionDate }}</span>
                 </div>
@@ -1305,7 +1299,7 @@
               <div class="set-item">
                 <span class="set-label">关于本站</span>
                 <div class="set-options">
-                  <a href="/pages/about-website.html" class="options">前往</a>
+                  <a href="/pages/about-website.html" class="options" @click="store.changeShowStatus('showSettings')">前往</a>
                 </div>
               </div>
             </div>
@@ -1469,7 +1463,7 @@ const {
   handleExportConfig, handleImportConfig, handleFileImport,
   confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageWebpEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate, branchVersion, branchLastUpdated, branchBuildTime } =
+const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageWebpEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate, branchVersion, branchBuildTime } =
   storeToRefs(store);
 
 // 切换分支模式并清除旧缓存
@@ -1665,8 +1659,8 @@ const handleMoreFontsClick = () => {
   moreFontsExpanded.value = !moreFontsExpanded.value;
   devModeEntryClickCount.value++;
 
-  // 10秒内按12下展示开发模式入口
-  if (devModeEntryClickCount.value >= 12 && store.devMode !== 2) {
+  // 5秒内按6下展示开发模式入口
+  if (devModeEntryClickCount.value >= 6 && store.devMode !== 2) {
     devModeEntryVisible.value = true;
     devModeEntryStep.value = 0;
     devModeEntryError.value = false;
@@ -1674,12 +1668,12 @@ const handleMoreFontsClick = () => {
     devModeEntryInput.value = '';
   }
 
-  // 10秒内没有继续点击则重置计数
+  // 5秒内没有继续点击则重置计数
   setTimeout(() => {
-    if (devModeEntryClickCount.value < 12) {
+    if (devModeEntryClickCount.value < 6) {
       devModeEntryClickCount.value = 0;
     }
-  }, 10000);
+  }, 5000);
 };
 
 const devModeEntryVerify = () => {
@@ -1695,7 +1689,7 @@ const devModeEntryVerify = () => {
 const devModeEntryClose = () => {
   if (devModeEntrySuccess.value) {
     store.devMode = 2;
-    saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value, DEFAULT_DEV_MODE: 2, bumpVersion: true });
+    saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value, DEFAULT_DEV_MODE: 2, bumpVersion: true });
     if (typeof $message !== "undefined") {
       $message.success("开发模式已启用");
     }
@@ -1766,12 +1760,10 @@ const confirmCloseDevMode = async () => {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
   branchVersion.value = (branchVersion.value || 0) + 1;
-  branchLastUpdated.value = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
   branchBuildTime.value = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
   store.devMode = 1;
   await saveStoreDefaults({
     branchVersion: branchVersion.value,
-    branchLastUpdated: branchLastUpdated.value,
     branchBuildTime: branchBuildTime.value,
     DEFAULT_DEV_MODE: 1,
     bumpVersion: true,
@@ -1790,9 +1782,9 @@ const handleClearDataKeepChannel = async () => {
   const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
-  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value };
+  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value };
   const savedVersion = localStorage.getItem('siteDataVersion');
-  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value });
+  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value });
 
   // 清除 localStorage 和 sessionStorage
   localStorage.clear();
@@ -1846,9 +1838,9 @@ const handleResetConfig = async () => {
   const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
-  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value };
+  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value };
   const savedVersion = localStorage.getItem('siteDataVersion');
-  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchLastUpdated: branchLastUpdated.value, branchBuildTime: branchBuildTime.value });
+  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value });
   // 清空 localStorage 和 sessionStorage
   localStorage.clear();
   sessionStorage.clear();

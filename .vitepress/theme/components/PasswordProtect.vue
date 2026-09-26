@@ -14,10 +14,7 @@
         placeholder="请输入密码"
         @keyup.enter="verifyPassword"
       />
-      <button class="protect-btn" :disabled="verifying" @click="verifyPassword">
-        <span class="unlock-emoji">🔓</span>
-        解锁
-      </button>
+      <button class="protect-btn" :disabled="verifying" @click="verifyPassword">解锁</button>
     </div>
     <p v-if="errorMessage" class="protect-error">{{ errorMessage }}</p>
   </div>
@@ -208,10 +205,6 @@ onMounted(async () => {
       transition:
         opacity 0.3s,
         transform 0.2s;
-
-      .unlock-emoji {
-        font-size: 16px;
-      }
 
       &:hover {
         opacity: 0.9;

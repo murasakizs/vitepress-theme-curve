@@ -1,6 +1,7 @@
 import { tabsMarkdownPlugin } from "vitepress-plugin-tabs";
 import markdownItAttrs from "markdown-it-attrs";
 import container from "markdown-it-container";
+import { encryptPostHtml } from "./mdEncrypt.mjs";
 
 // markdown-it
 const markdownConfig = (md, themeConfig) => {
@@ -84,7 +85,7 @@ const markdownConfig = (md, themeConfig) => {
                 <span class="post-img-tip">${alt}</span>
               </a>`;
   };
-  
+
   // obsidian admonition
   const fence = md.renderer.rules.fence;
   md.renderer.rules.fence = (...args) => {
@@ -93,24 +94,24 @@ const markdownConfig = (md, themeConfig) => {
     const lang = token.info.trim();
 
     // 处理 Obsidian admonition
-    if (lang.startsWith('ad-')) {
+    if (lang.startsWith("ad-")) {
       const type = lang.substring(3); // 取ad-之后的内容，获取类型
       const content = token.content;
 
       const admonitionTypes = {
-        'note': 'info',
-        'question': 'info',
-        'warning': 'warning',
-        'tip': 'tip',
-        'summary': 'info',
-        'hint': 'tip',
-        'important': 'warning',
-        'caution': 'warning',
-        'error': 'danger',
-        'danger': 'danger'
+        note: "info",
+        question: "info",
+        warning: "warning",
+        tip: "tip",
+        summary: "info",
+        hint: "tip",
+        important: "warning",
+        caution: "warning",
+        error: "danger",
+        danger: "danger",
       };
 
-      const className = admonitionTypes[type] || 'info';
+      const className = admonitionTypes[type] || "info";
       const title = type.toUpperCase();
 
       return `<div class="${className} custom-block">
@@ -121,7 +122,28 @@ const markdownConfig = (md, themeConfig) => {
     </div>`;
     }
     return fence(...args);
-  };  
+  };
+
+  // 构建期正文加密：posts 下带 password 的文章，渲染后的 HTML 转为密文写入 frontmatter.enc
+  const originalRender = md.renderer.render.bind(md.renderer);
+  md.renderer.render = (tokens, options, env) => {
+    const fm = env.frontmatter;
+    const isPost = (env.relativePath || "").startsWith("posts/");
+    if (!isPost || !fm?.password) return originalRender(tokens, options, env);
+    // 先完整渲染一次：title/headers/links 等副作用在渲染过程中收集，密文只替换最终输出
+    const html = originalRender(tokens, options, env);
+    env.frontmatter = { ...fm, enc: encryptPostHtml(html, String(fm.password)) };
+    delete env.frontmatter.password;
+    // 正文里的 <script>/<style>/自定义块不进构建产物，避免绕过加密
+    if (env.sfcBlocks) {
+      env.sfcBlocks.scripts = [];
+      env.sfcBlocks.script = null;
+      env.sfcBlocks.scriptSetup = null;
+      env.sfcBlocks.styles = [];
+      env.sfcBlocks.customBlocks = [];
+    }
+    return '<p class="post-encrypted">🔒 此文章已加密</p>';
+  };
 };
 
 export default markdownConfig;

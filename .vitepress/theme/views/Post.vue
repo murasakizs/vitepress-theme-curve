@@ -68,6 +68,7 @@
     <div v-if="hasPassword && !isUnlocked" class="password-protect-wrapper">
       <PasswordProtect
         :password="frontmatter.password"
+        :enc="frontmatter.enc"
         :postId="postId"
         @unlocked="handleUnlocked"
       />
@@ -92,8 +93,14 @@
         </div>
         <!-- AI 摘要 -->
         <ArticleGPT />
-        <!-- 文章内容 -->
-        <Content id="page-content" class="markdown-main-style" />
+        <!-- 文章内容：加密文章解锁后用解密 HTML 渲染，其余走 VitePress 渲染产物 -->
+        <div
+          v-if="decryptedHtml !== null"
+          id="page-content"
+          class="markdown-main-style"
+          v-html="decryptedHtml"
+        />
+        <Content v-else id="page-content" class="markdown-main-style" />
         <!-- 参考资料 -->
         <References />
         <!-- 版权 -->
@@ -120,21 +127,19 @@
             <i class="iconfont icon-report" />
             反馈与投诉
           </a>
-        -->
-        </div>
+        --></div>
         <RewardBtn />
         <!-- 下一篇 -->
         <NextPost />
         <!-- 相关文章 -->
         <RelatedPost />
-                <!-- 评论 -->
+        <!-- 评论 -->
         <Comments ref="commentRef" />
       </article>
       <Aside v-if="isDesktopAsideVisible" showToc />
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { formatTimestamp } from "@/utils/helper";
@@ -152,7 +157,11 @@ const { postData, loadPostData } = usePostData();
 const asArray = (val) => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
-  if (typeof val === "string") return val.split(",").map(s => s.trim()).filter(Boolean);
+  if (typeof val === "string")
+    return val
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   return [];
 };
 
@@ -168,7 +177,9 @@ const postMetaData = computed(() => {
   const loadedPost = postData.value.find((item) => item.id === postId.value);
   if (loadedPost) return loadedPost;
 
-  const date = frontmatter.value.date ? new Date(frontmatter.value.date).getTime() : page.value.lastUpdated;
+  const date = frontmatter.value.date
+    ? new Date(frontmatter.value.date).getTime()
+    : page.value.lastUpdated;
   return {
     id: postId.value,
     title: frontmatter.value.title || page.value.title,
@@ -178,26 +189,27 @@ const postMetaData = computed(() => {
     tags: frontmatter.value.tags || [],
     categories: frontmatter.value.categories || [],
     description: frontmatter.value.description,
-    regularPath: page.value.relativePath ? `/${page.value.relativePath.replace(".md", ".html")}` : "",
+    regularPath: page.value.relativePath
+      ? `/${page.value.relativePath.replace(".md", ".html")}`
+      : "",
     top: frontmatter.value.top,
     cover: frontmatter.value.cover,
   };
 });
 
 // 密码保护相关
-const hasPassword = computed(() => !!frontmatter.value.password);
+const hasPassword = computed(() => !!(frontmatter.value.password || frontmatter.value.enc));
 const isUnlocked = ref(false);
+// 加密文章解密后的正文 HTML
+const decryptedHtml = ref(null);
 
-// 检查是否已解锁
-const checkUnlocked = () => {
-  if (typeof window === "undefined") return false;
-  const unlockedPosts = JSON.parse(localStorage.getItem("unlockedPosts") || "{}");
-  return unlockedPosts[postId.value] === true;
-};
-
-// 处理解锁事件
-const handleUnlocked = () => {
+// 处理解锁事件（加密文章传入解密 HTML，旧版明文密码无参数）
+const handleUnlocked = async (html) => {
+  if (html) decryptedHtml.value = html;
   isUnlocked.value = true;
+  // 解密内容晚于首次挂载插入，代码高亮需要补一次
+  await nextTick();
+  loadCodeFontIfNeeded();
 };
 
 const loadCodeFontIfNeeded = async () => {
@@ -211,16 +223,12 @@ onMounted(() => {
   loadPostData();
   initFancybox(theme.value);
   loadCodeFontIfNeeded();
-  // 检查是否已解锁
-  if (hasPassword.value && checkUnlocked()) {
-    isUnlocked.value = true;
-  }
+  // 解锁状态由 PasswordProtect 自行检查（加密文章需先解密出内容）
 });
 </script>
 
 <style lang="scss" scoped>
 @use "../style/post.scss";
-
 
 .password-protect-wrapper {
   width: 100%;
@@ -406,7 +414,6 @@ onMounted(() => {
         strong {
           color: var(--main-warning-color);
         }
-    
       }
       .other-meta {
         display: flex;

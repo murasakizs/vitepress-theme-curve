@@ -14,7 +14,7 @@
         placeholder="请输入密码"
         @keyup.enter="verifyPassword"
       />
-      <button class="protect-btn" @click="verifyPassword">
+      <button class="protect-btn" :disabled="verifying" @click="verifyPassword">
         <span class="unlock-emoji">🔓</span>
         解锁
       </button>
@@ -24,13 +24,21 @@
 </template>
 
 <script setup>
+import { unlockPost, decryptWithKey } from "@/utils/decryptPost.mjs";
+
 const props = defineProps({
+  // 旧版明文密码（未走构建期加密时的兜底）
   password: {
-    type: String,
-    required: true,
+    type: [String, Number],
+    default: "",
+  },
+  // 构建期加密的密文
+  enc: {
+    type: Object,
+    default: null,
   },
   postId: {
-    type: String,
+    type: [String, Number],
     required: true,
   },
 });
@@ -39,23 +47,66 @@ const emit = defineEmits(["unlocked"]);
 
 const inputPassword = ref("");
 const errorMessage = ref("");
+const verifying = ref(false);
 
-// 检查是否已解锁
-const checkUnlocked = () => {
-  if (typeof window === "undefined") return false;
-  const unlockedPosts = JSON.parse(localStorage.getItem("unlockedPosts") || "{}");
-  return unlockedPosts[props.postId] === true;
+// localStorage 读写（损坏时降级为空对象，不抛异常）
+const readStore = () => {
+  try {
+    return JSON.parse(localStorage.getItem("unlockedPosts") || "{}");
+  } catch {
+    return {};
+  }
+};
+const writeStore = (store) => {
+  try {
+    localStorage.setItem("unlockedPosts", JSON.stringify(store));
+  } catch {
+    // 存储不可用时仅本次会话有效
+  }
 };
 
-// 验证密码
-const verifyPassword = () => {
+// 已保存的密钥匹配当前密文时直接解密（跳过 PBKDF2）
+const tryStoredKey = async () => {
+  const entry = readStore()[props.postId];
+  if (!entry || typeof entry !== "object" || entry.salt !== props.enc.salt || !entry.key)
+    return false;
+  try {
+    emit("unlocked", await decryptWithKey(entry.key, props.enc));
+    return true;
+  } catch {
+    // 密钥失效（内容已更新等），清除后要求重新输入
+    const store = readStore();
+    delete store[props.postId];
+    writeStore(store);
+    return false;
+  }
+};
+
+// 验证密码：加密文章以 AES-GCM 解密成功与否作为校验，失败即密码错误
+const verifyPassword = async () => {
+  if (verifying.value) return;
   errorMessage.value = "";
-  // 将密码转为字符串比较，因为 frontmatter 中的数字密码会被解析为 Number 类型
+  if (props.enc) {
+    verifying.value = true;
+    try {
+      const { html, key } = await unlockPost(inputPassword.value, props.enc);
+      const store = readStore();
+      store[props.postId] = { salt: props.enc.salt, key };
+      writeStore(store);
+      emit("unlocked", html);
+    } catch {
+      errorMessage.value = "密码错误，请重试";
+      inputPassword.value = "";
+    } finally {
+      verifying.value = false;
+    }
+    return;
+  }
+  // 旧版明文密码
   if (inputPassword.value === String(props.password)) {
-    // 保存解锁状态到 localStorage
-    const unlockedPosts = JSON.parse(localStorage.getItem("unlockedPosts") || "{}");
-    unlockedPosts[props.postId] = true;
-    localStorage.setItem("unlockedPosts", JSON.stringify(unlockedPosts));
+    const store = readStore();
+    store[props.postId] = true;
+    writeStore(store);
     emit("unlocked");
   } else {
     errorMessage.value = "密码错误，请重试";
@@ -64,8 +115,10 @@ const verifyPassword = () => {
 };
 
 // 组件挂载时检查是否已解锁
-onMounted(() => {
-  if (checkUnlocked()) {
+onMounted(async () => {
+  if (props.enc) {
+    await tryStoredKey();
+  } else if (readStore()[props.postId] === true) {
     emit("unlocked");
   }
 });
@@ -152,7 +205,9 @@ onMounted(() => {
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      transition: opacity 0.3s, transform 0.2s;
+      transition:
+        opacity 0.3s,
+        transform 0.2s;
 
       .unlock-emoji {
         font-size: 16px;
@@ -160,6 +215,11 @@ onMounted(() => {
 
       &:hover {
         opacity: 0.9;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: wait;
       }
 
       &:active {

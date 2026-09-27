@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { mainStore } from "@/store/index.js";
+import { mainStore } from "@/store";
 
 const store = mainStore();
 

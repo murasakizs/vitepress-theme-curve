@@ -76,7 +76,7 @@
       <div class="about-item" style="grid-column: 1 / 4; grid-row: 5">
         <span class="title2">二次元扩列卡</span>
         <div class="intro-content">
-          <p>cn 泠诗尘，称呼随意，唯一标识<span style="color: #f472b6">SGeXiLQ</span></p>
+          <p>cn泠诗尘，称呼随意，唯一标识<span style="color: #f472b6">SGeXiLQ</span></p>
           <p>IN<span style="color: #f472b6">F</span>P-T，生男心女，性取向<span style="color: #a855f7">双</span></p>
           <p>生日2009.10.10，坐标重庆合川/江苏苏州</p>
           <p>术力口/日番/漫画，<span style="color: #f472b6">百合</span>赛高</p>
@@ -86,7 +86,7 @@
           <p>除了上学基本都在，不熟每句话会花费大量时间组织，熟了说话比较直接</p>
           <p>空间会点，没有秒赞，不补扩前动态</p>
           <p>不是男娘，反刻板印象，雷大众雷</p>
-          <p>猜你会雷：生心不一/空间多转发&碎碎念/微负(yyz/ptsd)</p>
+          <p>猜你会雷：空间多转发&碎碎念/生心不一/Pride:Trans.MtF/adhd/微负(yyz)</p>
         </div>
         <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.8.19</p>
       </div>

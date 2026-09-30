@@ -33,11 +33,11 @@
         <div class="meta-row">
           <span class="meta date">
             <i class="iconfont icon-date" />
-            {{ formatTimestamp(postMetaData.date) }}
+            {{ formatTimestampAt(postMetaData.date, now) }}
           </span>
           <span class="update meta">
             <i class="iconfont icon-time" />
-            {{ formatTimestamp(page?.lastUpdated || postMetaData.lastModified) }}
+            {{ formatTimestampAt(page?.lastUpdated || postMetaData.lastModified, now) }}
           </span>
           <!-- 热度 -->
           <span class="hot meta">
@@ -88,8 +88,8 @@
           </span>
         </div>
         <!-- 过期提醒 -->
-        <div class="expired s-card" v-if="postMetaData?.expired >= 180">
-          本文发表于 <strong>{{ postMetaData?.expired }}</strong> 天前，其中的信息可能已经事过境迁
+        <div class="expired s-card" v-if="expiredDays !== null && expiredDays >= 180">
+          本文发表于 <strong>{{ expiredDays }}</strong> 天前，其中的信息可能已经事过境迁
         </div>
         <!-- AI 摘要 -->
         <ArticleGPT />
@@ -142,12 +142,19 @@
 </template>
 
 <script setup>
-import { formatTimestamp } from "@/utils/helper";
 import { generateId } from "@/utils/commonTools";
+import { daysPassedAt, formatTimestampAt, useClientNow } from "@/utils/useClientNow.mjs";
 import initFancybox from "@/utils/initFancybox";
 import { ensureCodeFontLoaded } from "@/utils/fontLoader.mjs";
 import { useDesktopAside } from "@/utils/useDesktopAside.mjs";
 import { usePostData } from "@/utils/usePostData.mjs";
+// 注意：必须从零依赖的 dateAnchor.mjs 引入，不能用 getPostData.mjs ——
+// 后者顶部 import 了 globby / fs-extra（Node-only），引入会把它们打进浏览器
+// 产物（globby@14 → @sindresorhus/merge-streams → node:stream），导致构建失败：
+//   "PassThrough" is not exported by "__vite-browser-external"
+import { toLocalDayTimestamp } from "@/utils/dateAnchor.mjs";
+// 同样必须从零依赖模块引入，理由同 dateAnchor.mjs
+import { normalizeList } from "@/utils/normalizeList.mjs";
 import PasswordProtect from "@/components/PasswordProtect.vue";
 const { page, theme, frontmatter } = useData();
 const { isDesktopAsideVisible } = useDesktopAside();
@@ -168,6 +175,9 @@ const asArray = (val) => {
 // 评论元素
 const commentRef = ref(null);
 
+// 相对时间统一基于浏览器本地时钟实时计算，避免静态缓存固化构建时间
+const { now } = useClientNow();
+
 // 文章 ID
 
 const postId = computed(() => generateId(page.value.relativePath));
@@ -177,17 +187,19 @@ const postMetaData = computed(() => {
   const loadedPost = postData.value.find((item) => item.id === postId.value);
   if (loadedPost) return loadedPost;
 
+  // 兜底路径：postData 尚未加载或查不到该文章时，直接由 frontmatter 构造。
+  // date 必须与 getPostData.mjs 用同一口径（本地零点），否则同一篇文章
+  // 在两条路径下会得到不同的 epoch，负时区访客会错一天。
   const date = frontmatter.value.date
-    ? new Date(frontmatter.value.date).getTime()
+    ? toLocalDayTimestamp(frontmatter.value.date)
     : page.value.lastUpdated;
   return {
     id: postId.value,
     title: frontmatter.value.title || page.value.title,
     date,
     lastModified: page.value.lastUpdated,
-    expired: date ? Math.floor((Date.now() - date) / (1000 * 60 * 60 * 24)) : 0,
-    tags: frontmatter.value.tags || [],
-    categories: frontmatter.value.categories || [],
+    tags: normalizeList(frontmatter.value.tags),
+    categories: normalizeList(frontmatter.value.categories),
     description: frontmatter.value.description,
     regularPath: page.value.relativePath
       ? `/${page.value.relativePath.replace(".md", ".html")}`
@@ -196,6 +208,9 @@ const postMetaData = computed(() => {
     cover: frontmatter.value.cover,
   };
 });
+
+// 文章发表至今的天数（仅客户端计算）
+const expiredDays = computed(() => daysPassedAt(postMetaData.value?.date, now.value));
 
 // 密码保护相关
 const hasPassword = computed(() => !!(frontmatter.value.password || frontmatter.value.enc));

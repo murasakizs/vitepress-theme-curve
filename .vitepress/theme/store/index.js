@@ -4,9 +4,9 @@ import cursorInit from '@/utils/cursor.js';
 let appCursorInstance;
 const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 10;
+const PERSIST_VERSION = 1;
 // 分支模式（1 = 正式分支，2 = dev分支）
-const DEFAULT_CHANNEL_MODE = 1;
+const DEFAULT_CHANNEL_MODE = 2;
 // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
 const DEFAULT_DEV_MODE = 1;
 

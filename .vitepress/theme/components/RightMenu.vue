@@ -234,9 +234,15 @@ const isMobileLayout = useIsMobileLayout();
 const router = useRouter();
 const store = mainStore();
 const { theme } = useData();
+// 文章索引（异步加载，不再是 theme.postData）
 const { loadPostData } = usePostData();
 const { useRightMenu, themeType, playerShow, playerVolume, playState, playerData } =
   storeToRefs(store);
+
+onMounted(() => {
+  // 挂载时预加载，避免首次右键点击才发起请求
+  loadPostData();
+});
 
 // 右键菜单数据
 const rightMenuX = ref(0);

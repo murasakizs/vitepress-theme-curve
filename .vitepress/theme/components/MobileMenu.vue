@@ -99,8 +99,17 @@ const router = useRouter();
 const { theme } = useData();
 
 // 菜单数据
+// nav 来自主题配置；tagsData **不在** themeConfig 里（config.mjs 只注入了 postCount），
+// 必须走文章索引。原实现 `const { nav, tagsData } = theme.value` 解构的是不存在的字段，
+// 于是移动端「标签」区块恒为空（标题与分隔线照常渲染）。改用与 Aside/Widgets/Tags.vue
+// 相同的 usePostData() 数据源。
 const { nav } = theme.value;
 const { tagsData, loadPostData } = usePostData();
+
+onMounted(() => {
+  // 移动端菜单只在用户点击后可见，这里提前取索引，避免展开时空白
+  loadPostData();
+});
 
 // 网址显示（与超级岛第三个药丸一致）
 const pillChannel = computed(() => {

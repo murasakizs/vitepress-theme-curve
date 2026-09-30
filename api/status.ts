@@ -53,6 +53,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers: {
         Authorization: `Bearer ${apiToken}`,
       },
+      // 上游挂死时不要拖到平台超时（那样客户端拿到的是 504 HTML 而不是 JSON）：
+      // 主动中止，让下面的 catch 返回 {"status":"error"} 的优雅降级。
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!response.ok) {
@@ -99,11 +102,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       statusType = "maintenance";
     } else if (validatingCount > 0) {
       statusType = "degraded";
-    } else if (upCount === totalCount || downCount === 0) {
-      // 如果所有状态都是 up/paused/pending，或者根本没有任何 down 的情况，则都视为正常
-      statusType = "operational";
     } else {
-      statusType = "partial";
+      // 走到这里已隐含 downCount === 0（上面 `downCount > 0` 已排除），
+      // 因此原来的 `upCount === totalCount || downCount === 0` 中 downCount 子句恒真、
+      // upCount 子句被短路，原 `else { partial }` 分支不可达。
+      // 剩余状态（up / paused / pending 的任意组合）均视为正常。
+      statusType = "operational";
     }
 
     const statusInfo = STATUS_MAP[statusType];

@@ -65,30 +65,32 @@
         <div class="intro-content">
           <p>MtF｜小证2026.6｜家长党｜持证含糖（还在等待生育力保存）</p>
           <p>DIY HRT 26.5.10-6.22｜诞生日2009.10.10</p>
-          <p>高一｜175cm/60kg｜重庆&苏州</p>
-          <p>天残党QAQ｜想要变可爱｜友所有人｜同类贴贴｜缺爱</p>
+          <p>高一休学｜175cm/62kg｜重庆&苏州</p>
+          <p>想要变可爱｜友所有人｜同类贴贴｜缺爱</p>
           <p>INFP-T｜双｜二次元｜音游｜百合｜术力口</p>
         </div>
-        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.9.17</p>
+        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.9.30</p>
       </div>
 
       <!-- Row 5 -->
       <div class="about-item" style="grid-column: 1 / 4; grid-row: 5">
         <span class="title2">二次元扩列卡</span>
         <div class="intro-content">
-          <p>cn泠诗尘，称呼随意，唯一标识<span style="color: #f472b6">SGeXiLQ</span></p>
-          <p>IN<span style="color: #f472b6">F</span>P-T，生男心女，性取向<span style="color: #a855f7">双</span></p>
+          <p>cn泠诗尘，称呼随意，标识<span style="color: #f472b6">SGeXiLQ</span></p>
+          <p>IN<span style="color: #f472b6">F</span>P-T，生男心女，性取向<span style="color: #a855f7">双</span>，高一休学</p>
           <p>生日2009.10.10，坐标重庆合川/江苏苏州</p>
-          <p>术力口/日番/漫画，<span style="color: #f472b6">百合</span>赛高</p>
-          <p>游戏PJSK(fc24)/MC/EndField等，maimai萌新</p>
+          <p>术力口/番剧/漫画，喜爱<span style="color: #f472b6">百合</span>向作品</p>
+          <p>游戏PJSK/Minecraft/EndField/maimai等，STEAM独立游戏，也会接触一些乙游（？</p>
           <p>推<span style="color: #39c5bb">Miku</span>/<span style="color: #66ccff">天依</span>/<span style="color: #ffaad5">mzk</span>，喜欢<span style="color: #586294">烤25团</span>，磕<span style="color: #ffaad5">糖</span><span style="color: #ccaa88">画</span>/<span style="color: #66ccff">南</span><span style="color: #ee0000">北</span>组</p>
           <p>自家OC小女孩一只～</p>
-          <p>除了上学基本都在，不熟每句话会花费大量时间组织，熟了说话比较直接</p>
-          <p>空间会点，没有秒赞，不补扩前动态</p>
-          <p>不是男娘，反刻板印象，雷大众雷</p>
-          <p>猜你会雷：空间多转发&碎碎念/生心不一/Pride:Trans.MtF/adhd/微负(yyz)</p>
+          <p>喜欢甜甜的、软软的、可爱的、亮晶晶的东西</p>
+          <p>有些社恐…但是熟了会非常非常黏人（x</p>
+          <p>喜欢疯狂分享一堆没什么意义但自己觉得很可爱的东西</p>
+          <p>回复速度与态度取决于你和当时的精神状态（偶尔会消失去自己的小世界贴贴</p>
+          <p>不是男娘，讨厌刻板印象，雷大众雷</p>
+          <p>猜你会雷：空间多转发&碎碎念/生心不一/Trans.MtF/adhd/微负(yyz)/女性主义(非极端)</p>
         </div>
-        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.8.19</p>
+        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.9.30</p>
       </div>
     </div>
     <!-- 记忆卡片 -->

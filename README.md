@@ -71,3 +71,57 @@ pnpm build
 > Powered by VitePress
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/31ebe949-6ce7-46b7-a5fb-a73da20412d6/deploy-status)](https://app.netlify.com/sites/imsyy-blog/deploys)
+
+| 命令                 | 说明                                                                                |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| `pnpm dev`           | 启动开发服务器（`vitepress dev --host`）                                            |
+| `pnpm build`         | 构建静态站点（产出 `sitemap.xml`、`rss.xml` 与 PWA 资源）                           |
+| `pnpm preview`       | 预览构建产物                                                                        |
+| `pnpm lint`          | ESLint 检查并自动修复（`.js/.jsx/.cjs/.mjs/.vue`，**不含点目录**）                  |
+| `pnpm format`        | Prettier 格式化当前目录（`.prettierignore` 已排除 `dist`、锁文件与生成的 `*.d.ts`） |
+| `pnpm deploy:vercel` | 通过 Vercel CLI 部署                                                                |
+| `npx tsc --noEmit`   | TypeScript 类型检查（**不覆盖 `.vue`**，见下）                                      |
+
+## 已知问题
+
+这些问题在仓库中**真实存在**，在此如实记录，避免使用者踩坑：
+
+- **质量链覆盖不全**：裸 `tsc` 不解析 `.vue` 单文件组件，实际参与类型检查的只有 2 个 `.ts` 与 2 个生成的 `.d.ts`，57 个 `.vue` 全部未被覆盖（完整覆盖需要 `vue-tsc`，本项目未安装也没有 `typecheck` 脚本）；同时 ESLint 8 **默认忽略点目录**，`.vitepress/` 下的 83 个文件一个都没被 lint（实测 `pnpm lint` 的检查集合只有 4 个根目录外的普通文件），`.ts` 也不在 `--ext` 列表中。因此 `lint`/`tsc` 绿灯不等于全量通过。
+- **仓库没有测试套件**：`package.json` 中没有 test 脚本，也没有任何单测框架；`timeTools`、`getPostData`、分页数学等纯函数建议后续补齐单元测试。
+- **密钥仍在版本控制中**：`.env` 至今仍被 Git 跟踪，其内容与 `HEAD` 完全一致，且 `.gitignore` **没有**忽略它（见下方[安全提示](#安全提示)）。
+- **`.eslintignore` 残留**：其中仍列有已删除的临时目录（`_fix2`、`_fix3`、`.dsh_baseline`、`_fix_t1`、`_t4_*`）等历史条目。
+- **跳转壳的重复内容**：`page.md`、`page/index.md`、`page/1.md`、`pages/index.md` 内容逐字节相同。`gray-matter` 以文件内容为键缓存解析结果，相同内容的文件会共享同一个 `frontmatter` 对象，历史上曾导致 canonical 标签跨页累积。构建配置现已在 `transformPageData` 中改为白名单重建（每条 canonical 都挂到本页自己的新数组上），但**共享 frontmatter 的根因仍在**，日后若在 `transformPageData` 里就地 `push` 新的 head 字段，同类问题会复现。
+- **构建期会写入工作区（且目标文件仍被 Git 跟踪）**：加载 `.vitepress/config.mjs` 时会重新生成 `public/data/postData.json`，因此运行 `dev`/`build` 后 `git status` 必然出现该文件的变动。注意 `.gitignore` 里虽然写了 `public/data/postData.json`，但**该文件已被 Git 跟踪，ignore 规则对它不生效**（`git ls-files --error-unmatch public/data/postData.json` 可复现）；而产物里含 `lastModified`（`mtimeMs`，见 `getPostData.mjs`）这类机器相关字段，所以每次本地构建都会产生无法复现的 diff，`git add -A` 会把本机 mtime 提交进去。要真正忽略它需要 `git rm --cached` 并提交（属动被跟踪产物，需自行决定）。
+- **`jumpRedirect` 未启用，且开启前必须先修两处**：相关实现与 `/redirect.html` 已就位但默认关闭（`themeConfig.mjs` 的 `jumpRedirect.enable: false`）。实测该改写函数有两个已确认缺陷：① 用 `$(el).text()` 当 innerText，会**丢掉链接内部的元素**（如 `<i class="iconfont">`、`<img>`），带图标的站外链接会变成纯文本；② 不做同源判断，站内外全靠 `exclude` 类名名单区分，**新增的站内新窗口链接若忘了加类名就会被送去中转页**。开启前请先修这两处，否则会改坏既有的新窗口链接。
+- **`public/` 会被原样拷进产物**：`public/` 是**源目录**，其中的文件在构建时被逐份拷贝到 `.vitepress/dist` 根下（`postData.json` 就是这么进去的），因此不要在里面放需要手工维护的产物——下一次构建会用同名的源文件覆盖它。
+- **`robots.txt` 是静态文件**：`public/robots.txt` 会被原样拷贝到产物根目录，**不是**构建期生成；修改收录规则请直接改该文件。
+- **`themeConfig.mjs` 与「当前其实跑的是默认配置」**：根目录的覆盖文件已加入 `.gitignore`，不会被提交；如果丢失，构建会静默回退到 `.vitepress/theme/assets/themeConfig.mjs` 的默认值（仅打印一条 `console.warn`）。
+- **`package-lock.json` 是上游残留**：它只描述了一个 `vitepress ^1.0.0-rc.40`，与当前 `package.json` 不同步，请以 `pnpm-lock.yaml` 为准。
+- **第三方 CDN 依赖**：iconfont、Fancybox、Twikoo 等资源默认走公共 CDN，网络受限环境下相关样式或功能可能不可用。
+
+## 安全提示
+
+- **`.env` 仍在版本控制中**：该文件已被提交，内容与 `HEAD` 一致，且 `.gitignore` 未忽略它（`git ls-files .env` 可复现）。处理顺序应当是：**先吊销/轮换其中所有凭据**，再把它移出跟踪（`git rm --cached .env` 并补进 `.gitignore`），最后按需用 `git filter-repo` 重写历史——顺序颠倒会让旧密钥在历史中继续有效。注意 `git rm --cached .env` **并不会**清掉仓库里其它位置的同一凭据。
+- **同一个高德 Key 还有第二处明文**：除了 `.env:1`，`.vitepress/theme/assets/themeConfig.mjs` 的 `weatherkey` 注释块里也留了一份明文（`git grep -n "1d65cc630df1f212e1d2e928643e3974"` 可复现两处）。该字段已废弃（天气挂件现在读 `import.meta.env.VITE_WEATHER_KEY`），但注释里的明文会随仓库公开。轮换 Key 时两处都要处理，且因为 `VITE_` 变量会被打包进前端产物、天气请求由**访客浏览器**直连 `restapi.amap.com`，这个 Key 本质上是公开的、无法用域名/IP 白名单保护——实际风险是**当日 5000 次配额被烧掉导致天气挂件失效**，不涉及账户接管。
+- 站点内含个人化配置与统计、评论等服务凭据，公开部署前请逐项检查 `themeConfig.mjs`、`.env` 与 `api/`、`functions/` 下的环境变量读取。
+- 所有 `VITE_` 前缀的变量都会被**打包进前端产物**，对其调用方可见，只应放可公开的值；`BETTER_STACK_API_TOKEN` 只在服务端使用，切勿加 `VITE_` 前缀或写入前端代码。
+
+## 来源声明
+
+本项目的站点内容与主题改造基于**另一条独立的创作谱系**，其中包括对多位作者文章的**转载**（见 `posts/archives/`、`posts/2025/1229.md` 等，正文中标注了原作者），以及涉及个人经历、医疗与调查性质的原创写作。
+
+- 站点文章版权归**各自作者**所有，不因收录在本仓库而改变。
+- 若你是某篇文章的权利人并希望其被移除，请通过 [GitHub Issues](https://github.com/imsyy/vitepress-theme-curve/issues) 联系维护者。
+- 代码部分以仓库根的 [MIT License](LICENSE) 授权，**该授权不适用于站点文章内容**。
+
+## 致谢与许可
+
+- 主题源自 [imsyy/vitepress-theme-curve](https://github.com/imsyy/vitepress-theme-curve)，感谢上游作者 [imsyy](https://imsyy.top) 的开源工作。
+- 基于 [VitePress](https://vitepress.dev/zh/) 与 [Vue 3](https://vuejs.org/) 构建。
+- 代码以 [MIT License](LICENSE) 授权。
+
+<div align="center">
+
+**Powered by VitePress**
+
+</div>

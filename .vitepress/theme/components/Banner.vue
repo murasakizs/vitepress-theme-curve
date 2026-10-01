@@ -41,23 +41,23 @@
 </template>
 
 <script setup>
-import { mainStore } from '@/store';
-import { getHitokoto } from '@/api';
+import { mainStore } from "@/store";
+import { getHitokoto } from "@/api";
 
 const store = mainStore();
 const { theme } = useData();
 
 const props = defineProps({
-  type: { type: String, default: 'text' },
-  height: { type: String, default: 'half' },
-  title: { type: String, default: '这里是标题' },
-  desc: { type: String, default: '这里是简介' },
-  footer: { type: String, default: '' },
-  image: { type: String, default: '' },
+  type: { type: String, default: "text" },
+  height: { type: String, default: "half" },
+  title: { type: String, default: "这里是标题" },
+  desc: { type: String, default: "这里是简介" },
+  footer: { type: String, default: "" },
+  image: { type: String, default: "" },
 });
 
 // 存储一言数据和状态
-const hitokotoData = ref({ hitokoto: '', from: '', from_who: '' });
+const hitokotoData = ref({ hitokoto: "", from: "", from_who: "" });
 const isHitokotoDisplayed = ref(false);
 const isManualSloganDisplayed = ref(false);
 
@@ -72,7 +72,7 @@ const disableAuto = ref(false);
 
 // 默认标语
 const defaultSlogan = theme.value.siteMeta.description;
-const manualSlogan = '所以，回去吧，回到我们，所有「奇迹」开始的地方';
+const manualSlogan = "所以，回去吧，回到我们，所有「奇迹」开始的地方";
 
 // 计算展示的文字：若当前为“一言”状态则显示一言，否则显示默认标语
 const displayText = computed(() =>
@@ -80,7 +80,7 @@ const displayText = computed(() =>
     ? hitokotoData.value.hitokoto
     : isManualSloganDisplayed.value
       ? manualSlogan
-      : defaultSlogan
+      : defaultSlogan,
 );
 
 // 点击处理：
@@ -110,12 +110,12 @@ async function fetchAndShowHitokoto() {
     hitokotoData.value = {
       hitokoto: result.hitokoto,
       from: result.from,
-      from_who: result.from_who
+      from_who: result.from_who,
     };
     isHitokotoDisplayed.value = true;
     isManualSloganDisplayed.value = false;
   } catch (err) {
-    console.error('一言获取失败：', err);
+    console.error("一言获取失败：", err);
   }
 }
 
@@ -177,25 +177,28 @@ function handleVisibilityChange() {
 
 // 滚动至首页
 function scrollToHome() {
-  const bannerDom = document.getElementById('main-banner');
+  const bannerDom = document.getElementById("main-banner");
   if (!bannerDom) return;
-  scrollTo({ top: bannerDom.offsetHeight, behavior: 'smooth' });
+  scrollTo({ top: bannerDom.offsetHeight, behavior: "smooth" });
 }
 
 // 同步外部 store 的 bannerType
 const bannerType = ref(store.bannerType);
-watch(() => store.bannerType, val => (bannerType.value = val));
+watch(
+  () => store.bannerType,
+  (val) => (bannerType.value = val),
+);
 
 onMounted(() => {
-  if (props.type === 'text') {
+  if (props.type === "text") {
     startHitokotoCycle();
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
   }
 });
 
 onBeforeUnmount(() => {
   pauseHitokotoCycle();
-  document.removeEventListener('visibilitychange', handleVisibilityChange);
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
 });
 </script>
 
@@ -230,23 +233,23 @@ onBeforeUnmount(() => {
     opacity: 0.8;
     animation: fade-up-opacity 0.6s 0.1s backwards;
     font-family: "xiaolai", var(--main-font-family);
-  .text {
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; // WebKit 引擎兼容性
-    -webkit-box-orient: vertical; // WebKit 引擎兼容性
+    .text {
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; // WebKit 引擎兼容性
+      -webkit-box-orient: vertical; // WebKit 引擎兼容性
 
-    line-clamp: 2; // 标准的 line-clamp 属性，提高兼容性
-    transition: opacity var(--press-out) var(--press-ease);
-    // 点击反馈：文本行整体缩放观感较差，使用透明度
-    &:active {
-      opacity: 0.6;
-      transition-duration: var(--press-in);
+      line-clamp: 2; // 标准的 line-clamp 属性，提高兼容性
+      transition: opacity var(--press-out) var(--press-ease);
+      // 点击反馈：文本行整体缩放观感较差，使用透明度
+      &:active {
+        opacity: 0.6;
+        transition-duration: var(--press-in);
+      }
     }
   }
-}
   .icon-up {
     font-size: 20px;
     position: absolute;

@@ -13,7 +13,5 @@
       ]
     }
   ],
-  "rewrites": [
-    { "source": "/redirect", "destination": "/redirect.html" }
-  ]
+  "rewrites": [{ "source": "/redirect", "destination": "/redirect.html" }]
 }

@@ -8,11 +8,16 @@
         <LiveDate mode="days-until" :date="theme.aside.countDown.data.date" yearly />
       </span>
       <span class="date">
-        <LiveDate mode="format" :date="theme.aside.countDown.data.date" format="YYYY-MM-DD" yearly />
+        <LiveDate
+          mode="format"
+          :date="theme.aside.countDown.data.date"
+          format="YYYY-MM-DD"
+          yearly
+        />
       </span>
     </div>
     <div v-if="remainData" class="count-right">
-      <div v-for="(item, tag, index) in remainData" :key="index" class="count-item">
+      <div v-for="(item, index) in remainData" :key="index" class="count-item">
         <div class="item-name">{{ item.name }}</div>
         <div class="item-progress">
           <div
@@ -25,7 +30,7 @@
           <span :class="['remaining', { many: item.percentage >= 60 }]">
             <span class="tip">还剩</span>
             {{ item.remaining }}
-            <span class="tip">{{ tag === "day" ? "小时" : "天" }}</span>
+            <span class="tip">天</span>
           </span>
         </div>
       </div>
@@ -35,28 +40,15 @@
 
 <script setup>
 import { getTimeRemaining } from "@/utils/timeTools";
+import { useClientNow } from "@/utils/useClientNow.mjs";
 
 const { theme } = useData();
 
-// 倒计时数据
-const remainData = ref(null);
-const remainInterval = ref(null);
-
-// 获取倒计时数据
-const getRemainData = () => {
-  remainData.value = getTimeRemaining();
-  remainInterval.value = setInterval(() => {
-    remainData.value = getTimeRemaining();
-  }, 1000);
-};
-
-onMounted(() => {
-  getRemainData();
-});
-
-onBeforeUnmount(() => {
-  clearInterval(remainInterval.value);
-});
+// 倒计时数据：基于浏览器本地时钟实时计算，SSR 阶段不输出。
+// 四行的「还剩」统一按天显示；当日行的百分比按分钟推进，
+// 所以 60s 刷新能让它每分钟都动（改前是整点才跳），同时不必每秒重算。
+const { now } = useClientNow({ interval: 60 * 1000 });
+const remainData = computed(() => (now.value ? getTimeRemaining(now.value) : null));
 </script>
 
 <style lang="scss" scoped>
@@ -175,13 +167,25 @@ onBeforeUnmount(() => {
 // 最高对比度模式 - 倒计时组件
 html.high-contrast-max {
   .count-down .count-left {
-    .time { color: #000000 !important; }
-    .text, .name { color: #000000 !important; }
-    .date { color: #000000 !important; opacity: 1 !important; }
-    &::after { background-color: #000000 !important; }
+    .time {
+      color: #000000 !important;
+    }
+    .text,
+    .name {
+      color: #000000 !important;
+    }
+    .date {
+      color: #000000 !important;
+      opacity: 1 !important;
+    }
+    &::after {
+      background-color: #000000 !important;
+    }
   }
   .count-down .count-right .count-item {
-    .item-name { color: #000000 !important; }
+    .item-name {
+      color: #000000 !important;
+    }
     .item-progress {
       background-color: transparent !important;
       border: 1px solid #000000 !important;
@@ -190,27 +194,47 @@ html.high-contrast-max {
         opacity: 1 !important;
         width: 2px !important;
       }
-      .percentage { color: #000000 !important; }
+      .percentage {
+        color: #000000 !important;
+      }
       .remaining {
         color: #000000 !important;
-        .tip { opacity: 1 !important; }
+        .tip {
+          opacity: 1 !important;
+        }
       }
     }
   }
   .count-down:hover .count-right .count-item .item-progress {
-    .remaining { opacity: 1 !important; }
-    .percentage { opacity: 0 !important; }
+    .remaining {
+      opacity: 1 !important;
+    }
+    .percentage {
+      opacity: 0 !important;
+    }
   }
 }
 html.dark.high-contrast-max {
   .count-down .count-left {
-    .time { color: #ffffff !important; }
-    .text, .name { color: #ffffff !important; }
-    .date { color: #ffffff !important; opacity: 1 !important; }
-    &::after { background-color: #ffffff !important; }
+    .time {
+      color: #ffffff !important;
+    }
+    .text,
+    .name {
+      color: #ffffff !important;
+    }
+    .date {
+      color: #ffffff !important;
+      opacity: 1 !important;
+    }
+    &::after {
+      background-color: #ffffff !important;
+    }
   }
   .count-down .count-right .count-item {
-    .item-name { color: #ffffff !important; }
+    .item-name {
+      color: #ffffff !important;
+    }
     .item-progress {
       background-color: transparent !important;
       border: 1px solid #ffffff !important;
@@ -219,16 +243,24 @@ html.dark.high-contrast-max {
         opacity: 1 !important;
         width: 2px !important;
       }
-      .percentage { color: #ffffff !important; }
+      .percentage {
+        color: #ffffff !important;
+      }
       .remaining {
         color: #ffffff !important;
-        .tip { opacity: 1 !important; }
+        .tip {
+          opacity: 1 !important;
+        }
       }
     }
   }
   .count-down:hover .count-right .count-item .item-progress {
-    .remaining { opacity: 1 !important; }
-    .percentage { opacity: 0 !important; }
+    .remaining {
+      opacity: 1 !important;
+    }
+    .percentage {
+      opacity: 0 !important;
+    }
   }
 }
 </style>

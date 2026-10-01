@@ -11,12 +11,7 @@
             <div class="menu-top-control">
               <!-- 网址 -->
               <span class="site-url">
-                <template v-if="pillChannel">
-                  <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}.</span><span>sgexilq</span><span class="pill-domain">.com</span>
-                </template>
-                <template v-else>
-                  <span>sgexilq</span><span class="pill-domain">.com</span>
-                </template>
+                <span>sgexilq</span><span class="pill-domain">.com</span>
               </span>
               <!-- 关闭按钮 -->
               <div class="close-control" @click="store.changeShowStatus('mobileMenuShow')">
@@ -28,20 +23,15 @@
             <hr />
             <!-- 个性化配置 + 主题切换 -->
             <div class="menu-top-control settings-row">
-              <div
-                class="settings-btn"
-                title="个性化配置"
-                @click="openSettings"
-              >
+              <div class="settings-btn" title="个性化配置" @click="openSettings">
                 <i class="iconfont icon-style"></i>
                 <span class="capsule-text">个性化配置</span>
               </div>
-              <div
-                class="theme-toggle-btn"
-                title="显示模式切换"
-                @click.stop="toggleTheme"
-              >
-                <i :key="store.themeType" :class="`iconfont icon-${store.themeType} theme-icon-animated`"></i>
+              <div class="theme-toggle-btn" title="显示模式切换" @click.stop="toggleTheme">
+                <i
+                  :key="store.themeType"
+                  :class="`iconfont icon-${store.themeType} theme-icon-animated`"
+                ></i>
               </div>
             </div>
             <!-- 菜单 -->
@@ -99,17 +89,16 @@ const router = useRouter();
 const { theme } = useData();
 
 // 菜单数据
+// nav 来自主题配置；tagsData **不在** themeConfig 里（config.mjs 只注入了 postCount），
+// 必须走文章索引。原实现 `const { nav, tagsData } = theme.value` 解构的是不存在的字段，
+// 于是移动端「标签」区块恒为空（标题与分隔线照常渲染）。改用与 Aside/Widgets/Tags.vue
+// 相同的 usePostData() 数据源。
 const { nav } = theme.value;
 const { tagsData, loadPostData } = usePostData();
 
-// 网址显示（与超级岛第三个药丸一致）
-const pillChannel = computed(() => {
-  if (store.channelMode === 2) return 'dev';
-  return '';
-});
-const pillChannelClass = computed(() => {
-  if (store.channelMode === 2) return 'warning';
-  return '';
+onMounted(() => {
+  // 移动端菜单只在用户点击后可见，这里提前取索引，避免展开时空白
+  loadPostData();
 });
 
 // 页面跳转
@@ -157,8 +146,14 @@ onMounted(() => {
   transform-origin: center center;
 }
 @keyframes themeIconSwitch {
-  0% { opacity: 0; transform: rotate(180deg) scale(0.5); }
-  100% { opacity: 1; transform: rotate(0deg) scale(1); }
+  0% {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
 }
 .mobile-menu {
   position: fixed;
@@ -231,9 +226,15 @@ onMounted(() => {
       color: var(--main-font-color);
       line-height: 35px;
       .pill-prefix {
-        &.info { color: #3498db; }
-        &.warning { color: #e67e22; }
-        &.error { color: #e74c3c; }
+        &.info {
+          color: #3498db;
+        }
+        &.warning {
+          color: #e67e22;
+        }
+        &.error {
+          color: #e74c3c;
+        }
       }
       .pill-domain {
         color: var(--main-color);
@@ -255,7 +256,9 @@ onMounted(() => {
       padding: 0 16px 0 10px;
       border-radius: 12px;
       background-color: var(--main-color);
-      transition: opacity 0.3s, transform var(--press-out) var(--press-ease);
+      transition:
+        opacity 0.3s,
+        transform var(--press-out) var(--press-ease);
       cursor: pointer;
       .iconfont {
         font-size: 22px;

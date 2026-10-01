@@ -27,7 +27,15 @@ export const themeConfig = {
     header: [
       ["link", { rel: "icon", type: "image/png", href: "/images/logo/favicon-32.png" }],
       ["script", {}, "document.documentElement.classList.add('js-enabled');"],
-      ["link", { rel: "alternate", type: "application/rss+xml", title: "RSS", href: "/rss.xml" }],
+      [
+        "link",
+        {
+          rel: "alternate",
+          type: "application/rss+xml",
+          title: "RSS",
+          href: "/rss.xml",
+        },
+      ],
       ["link", { rel: "stylesheet", href: "/fonts/iconfont/iconfont.css" }],
     ],
   },
@@ -49,12 +57,22 @@ export const themeConfig = {
     {
       text: "我的",
       items: [
-          { text: "关于泠酱", link: "/pages/about-me", icon: "contacts" },
-          { text: "关于本站", link: "/pages/about-website", icon: "code" },
-          // mobileOnly：只在移动端侧栏显示，不进桌面导航下拉
-          { text: "回到主页", link: "/", icon: "home", mobileOnly: true },
-          { text: "服务状态", link: "https://status.sgexilq.com", icon: "chart", mobileOnly: true },
-        ],
+        { text: "关于泠酱", link: "/pages/about-me", icon: "contacts" },
+        { text: "关于本站", link: "/pages/about-website", icon: "code" },
+        // mobileOnly：只在移动端侧栏显示，不进桌面导航下拉
+        {
+          text: "回到主页",
+          link: "/",
+          icon: "home",
+          mobileOnly: true,
+        },
+        {
+          text: "服务状态",
+          link: "https://status.sgexilq.com",
+          icon: "chart",
+          mobileOnly: true,
+        },
+      ],
     },
   ],
   navMore: [
@@ -62,7 +80,11 @@ export const themeConfig = {
       name: "项目",
       list: [
         { icon: "/images/logo/favicon-256.png", name: "泠の小站", url: "/" },
-        { icon: "/images/logo/favicon-256.png", name: "精神状态", url: "https://whendie.sgexilq.com" },
+        {
+          icon: "/images/logo/favicon-256.png",
+          name: "精神状态",
+          url: "https://whendie.sgexilq.com",
+        },
       ],
     },
   ],
@@ -90,7 +112,11 @@ export const themeConfig = {
       {
         text: "项目",
         items: [
-          { text: "本站源码", link: "https://github.com/murasakizs/vitepress-theme-curve", newTab: true },
+          {
+            text: "本站源码",
+            link: "https://github.com/murasakizs/vitepress-theme-curve",
+            newTab: true,
+          },
           { text: "精神状态", link: "https://whendie.sgexilq.com", newTab: true },
         ],
       },
@@ -139,7 +165,13 @@ export const themeConfig = {
     timing: {
       enable: true,
       items: [
-        { icon: "💌", name: "泠诗尘", event: "活着", date: "2009-10-10", includeStart: true },
+        {
+          icon: "💌",
+          name: "泠诗尘",
+          event: "活着",
+          date: "2009-10-10",
+          includeStart: true,
+        },
       ],
     },
   },
@@ -161,3 +193,7 @@ export const themeConfig = {
     css: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/fancyapps-ui/5.0.36/fancybox/fancybox.min.css",
   },
 };
+
+// 命名导出供 init.mjs 按 userConfig.themeConfig 读取；default 导出
+// 满足 import/prefer-default-export，也方便动态导入时按默认值兜底
+export default themeConfig;

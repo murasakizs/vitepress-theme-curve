@@ -25,32 +25,58 @@
           </ul>
         </div>
         <div v-show="panelTab === 'lrc'" class="lyrics-panel" ref="lyricsPanelRef">
-          <div v-if="currentLyrics.length" class="lyrics-scroll" ref="lyricsScrollRef" @wheel.passive="pauseLyricFollow" @touchmove.passive="pauseLyricFollow">
+          <div
+            v-if="currentLyrics.length"
+            class="lyrics-scroll"
+            ref="lyricsScrollRef"
+            @wheel.passive="pauseLyricFollow"
+            @touchmove.passive="pauseLyricFollow"
+          >
             <div
               v-for="(line, idx) in currentLyrics"
               :key="idx"
               :class="['lyric-line', { active: idx === activeLyricIndex }]"
               @click="seekToLine(idx)"
-            >{{ line.text }}</div>
+            >
+              {{ line.text }}
+            </div>
           </div>
           <div v-else class="lyrics-empty">暂无歌词</div>
         </div>
       </div>
     </Transition>
     <!-- 控制栏 -->
-    <div :class="['player', { playing: playState, folded: isFolded, 'suppress-hover': suppressHover, [`rotate-${rotatePhase}`]: rotatePhase }]">
+    <div
+      :class="[
+        'player',
+        {
+          playing: playState,
+          folded: isFolded,
+          'suppress-hover': suppressHover,
+          [`rotate-${rotatePhase}`]: rotatePhase,
+        },
+      ]"
+    >
       <div class="player-capsule" @click="toggleFold">
         <div ref="playerDom" class="player-content" />
       </div>
       <button v-show="!isFolded" class="ctrl-btn" @click.stop="player?.skipBack()">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
+        </svg>
       </button>
       <button v-show="!isFolded" class="ctrl-btn" @click.stop="player?.toggle()">
-        <svg v-if="!playState" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        <svg v-if="!playState" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+        </svg>
       </button>
       <button v-show="!isFolded" class="ctrl-btn" @click.stop="player?.skipForward()">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18 14.5 12 6 6v12zM16 6v12h2V6h-2z"/></svg>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M6 18 14.5 12 6 6v12zM16 6v12h2V6h-2z" />
+        </svg>
       </button>
     </div>
   </div>
@@ -65,7 +91,19 @@ import "aplayer/dist/APlayer.min.css";
 const store = mainStore();
 const { theme } = useData();
 const { enable, url, id, server, type } = theme.value.music;
-const { playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, playerVolume, playState, playerData, playerLyric, playerFolded, playerPanelTab } = storeToRefs(store);
+const {
+  playerShow,
+  playerAutoPlay,
+  playerPlayMode,
+  playerMusicSource,
+  playerCustomIds,
+  playerVolume,
+  playState,
+  playerData,
+  playerLyric,
+  playerFolded,
+  playerPanelTab,
+} = storeToRefs(store);
 
 // APlayer
 const player = ref(null);
@@ -154,9 +192,13 @@ const getMusicListData = async () => {
 
   try {
     // 根据歌单来源决定使用哪个 ID
-    const activeId = playerMusicSource.value === "custom" && playerCustomIds.value
-      ? playerCustomIds.value.split(",").map((s) => s.trim()).filter(Boolean)
-      : id;
+    const activeId =
+      playerMusicSource.value === "custom" && playerCustomIds.value
+        ? playerCustomIds.value
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : id;
     const musicList = await getMusicList(url, activeId, server, type);
     const apiOrigin = new URL(url).origin;
     const fullList = musicList.map((song) => ({
@@ -544,7 +586,10 @@ onBeforeUnmount(() => {
     cursor: pointer;
     padding-bottom: 2px;
     border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s, transform var(--press-out) var(--press-ease);
+    transition:
+      color 0.2s,
+      border-color 0.2s,
+      transform var(--press-out) var(--press-ease);
     &.active {
       color: var(--main-color);
       border-bottom-color: var(--main-color);
@@ -589,7 +634,11 @@ onBeforeUnmount(() => {
   color: var(--main-font-second-color);
   text-align: center;
   cursor: pointer;
-  transition: color 0.3s, font-size 0.3s, font-weight 0.3s, transform var(--press-out) var(--press-ease);
+  transition:
+    color 0.3s,
+    font-size 0.3s,
+    font-weight 0.3s,
+    transform var(--press-out) var(--press-ease);
   white-space: pre-wrap;
   word-break: break-word;
   &:hover {
@@ -619,7 +668,9 @@ onBeforeUnmount(() => {
   padding: 8px 12px;
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s, transform var(--press-out) var(--press-ease);
+  transition:
+    background-color 0.2s,
+    transform var(--press-out) var(--press-ease);
   &:hover {
     background-color: var(--main-color-light);
   }
@@ -720,7 +771,9 @@ onBeforeUnmount(() => {
         animation-iteration-count: infinite;
         animation-play-state: paused;
         z-index: 2;
-        transition: margin 0.3s, opacity 0.3s;
+        transition:
+          margin 0.3s,
+          opacity 0.3s;
         .aplayer-button {
           display: none;
         }

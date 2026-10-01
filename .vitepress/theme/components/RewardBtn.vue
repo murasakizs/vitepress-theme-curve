@@ -45,24 +45,24 @@
 </template>
 
 <script setup>
- const router = useRouter();
- const { theme } = useData();
- const { rewardData } = theme.value;
+const router = useRouter();
+const { theme } = useData();
+const { rewardData } = theme.value;
 
- const props = defineProps({
-   showJump: {
-     type: Boolean,
-     default: true,
-   },
- });
+const props = defineProps({
+  showJump: {
+    type: Boolean,
+    default: true,
+  },
+});
 // 赞赏显示
- const rewardShow = ref(false);
+const rewardShow = ref(false);
 
-  //跳转至赞赏名单
-  const toRewardList = () => {
-   rewardShow.value = false;
-   // router.go("/pages/thanks");
- };
+//跳转至赞赏名单
+const toRewardList = () => {
+  rewardShow.value = false;
+  // router.go("/pages/thanks");
+};
 </script>
 
 <style lang="scss" scoped>
@@ -84,7 +84,9 @@
     border-radius: 8px;
     color: #fff;
     background-color: var(--main-color-red);
-    transition: box-shadow 0.5s, transform var(--press-out) var(--press-ease);
+    transition:
+      box-shadow 0.5s,
+      transform var(--press-out) var(--press-ease);
     .iconfont {
       color: #fff;
       font-weight: normal;

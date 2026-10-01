@@ -32,11 +32,7 @@
             </div>
           </div>
           <div class="all-menu">
-            <div
-              v-if="clickedType === 'normal'"
-              class="btn"
-              @click="shuffleGo"
-            >
+            <div v-if="clickedType === 'normal'" class="btn" @click="shuffleGo">
               <i class="iconfont icon-shuffle"></i>
               <span class="name">随便逛逛</span>
             </div>
@@ -174,7 +170,10 @@
             </div>
           </div>
           <!-- 播放器控制 -->
-          <div v-if="playerShow && playerData && playerData.name !== '未知曲目'" class="all-menu general player">
+          <div
+            v-if="playerShow && playerData && playerData.name !== '未知曲目'"
+            class="all-menu general player"
+          >
             <div class="data">
               <span class="name">{{ playerData.name }}</span>
               <span class="artist">{{ playerData.artist }}</span>
@@ -234,9 +233,15 @@ const isMobileLayout = useIsMobileLayout();
 const router = useRouter();
 const store = mainStore();
 const { theme } = useData();
+// 文章索引（异步加载，不再是 theme.postData）
 const { loadPostData } = usePostData();
 const { useRightMenu, themeType, playerShow, playerVolume, playState, playerData } =
   storeToRefs(store);
+
+onMounted(() => {
+  // 挂载时预加载，避免首次右键点击才发起请求
+  loadPostData();
+});
 
 // 右键菜单数据
 const rightMenuX = ref(0);
@@ -367,17 +372,17 @@ const rightMenuFunc = async (type) => {
       case "copy-link":
         const pageLink = theme.value?.siteMeta?.site + router.route.path;
         if (!pageLink) {
-            $message.error("复制失败：无法获取页面地址");
-            return;
+          $message.error("复制失败：无法获取页面地址");
+          return;
         }
         copyText(pageLink);
         break;
-        // 以下为源代码 2025.06.10修改
-        // 修复内容：右键复制本页地址信息undefined
-        // 问题原因：pageLink赋值错误
-//        const pageLink = theme.value.site + router.route.path;
-//        if (pageLink) copyText(pageLink);
-//        break;
+      // 以下为源代码 2025.06.10修改
+      // 修复内容：右键复制本页地址信息undefined
+      // 问题原因：pageLink赋值错误
+      //        const pageLink = theme.value.site + router.route.path;
+      //        if (pageLink) copyText(pageLink);
+      //        break;
       case "input-paste":
         const text = await navigator.clipboard.readText();
         if (clickedTypeData.value && typeof clickedTypeData.value === "object") {
@@ -535,7 +540,9 @@ defineExpose({ openRightMenu });
         .iconfont {
           color: var(--main-font-second-color);
           font-size: 20px;
-          transition: color 0.3s, opacity 0.2s;
+          transition:
+            color 0.3s,
+            opacity 0.2s;
           cursor: pointer;
           &:first-child {
             margin-right: 6px;

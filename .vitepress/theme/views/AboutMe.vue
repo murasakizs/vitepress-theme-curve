@@ -12,7 +12,10 @@
       <div class="about-item skills" style="grid-column: 3; grid-row: 1">
         <span class="tip">成分</span>
         <div class="skills-list">
-          <span class="skills-item"><span class="tag-blue">Transgender</span><span class="tag-pink-text tag-bold">·MtF</span></span>
+          <span class="skills-item"
+            ><span class="tag-blue">Transgender</span
+            ><span class="tag-pink-text tag-bold">·MtF</span></span
+          >
           <span class="skills-item tag-pink">二次元</span>
           <span class="skills-item tag-pink">百合</span>
           <span class="skills-item">VOCALOID</span>
@@ -32,7 +35,12 @@
 
       <div class="about-item card-3" style="grid-column: 2; grid-row: 2">
         <span class="tip">我在</span>
-        <span class="title2"><strong style="color: var(--about-blue)">重庆合川</strong>&<strong style="color: var(--about-accent)">江苏苏州</strong></span>
+        <span class="title2"
+          ><strong style="color: var(--about-blue)">重庆合川</strong>&<strong
+            style="color: var(--about-accent)"
+            >江苏苏州</strong
+          ></span
+        >
       </div>
 
       <div class="about-item card-5" style="grid-column: 3; grid-row: 2">
@@ -56,7 +64,10 @@
 
       <!-- Row 3 -->
       <div class="about-item card-4" style="grid-column: 1 / 4; grid-row: 3">
-        <span class="tip">确定自己的性别认同<br/>已经 <span class="tag-pink-text">{{ daysSinceCard }}</span> 天</span>
+        <span class="tip"
+          >确定自己的性别认同<br />已经
+          <span class="tag-pink-text">{{ daysSinceCard }}</span> 天</span
+        >
       </div>
 
       <!-- Row 4 -->
@@ -69,19 +80,32 @@
           <p>想要变可爱｜友所有人｜同类贴贴｜缺爱</p>
           <p>INFP-T｜双｜二次元｜音游｜百合｜术力口</p>
         </div>
-        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.9.30</p>
+        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">
+          最后更新于 2026.9.17
+        </p>
       </div>
 
       <!-- Row 5 -->
       <div class="about-item" style="grid-column: 1 / 4; grid-row: 5">
         <span class="title2">二次元扩列卡</span>
         <div class="intro-content">
-          <p>cn泠诗尘，称呼随意，标识<span style="color: #f472b6">SGeXiLQ</span></p>
-          <p>IN<span style="color: #f472b6">F</span>P-T，生男心女，性取向<span style="color: #a855f7">双</span>，高一休学</p>
+          <p>cn 泠诗尘，称呼随意，唯一标识<span style="color: #f472b6">SGeXiLQ</span></p>
+          <p>
+            IN<span style="color: #f472b6">F</span>P-T，生男心女，性取向<span style="color: #a855f7"
+              >双</span
+            >
+          </p>
           <p>生日2009.10.10，坐标重庆合川/江苏苏州</p>
-          <p>术力口/番剧/漫画，喜爱<span style="color: #f472b6">百合</span>向作品</p>
-          <p>游戏PJSK/Minecraft/EndField/maimai等，STEAM独立游戏，也会接触一些乙游（？</p>
-          <p>推<span style="color: #39c5bb">Miku</span>/<span style="color: #66ccff">天依</span>/<span style="color: #ffaad5">mzk</span>，喜欢<span style="color: #586294">烤25团</span>，磕<span style="color: #ffaad5">糖</span><span style="color: #ccaa88">画</span>/<span style="color: #66ccff">南</span><span style="color: #ee0000">北</span>组</p>
+          <p>术力口/日番/漫画，<span style="color: #f472b6">百合</span>赛高</p>
+          <p>游戏PJSK(fc24)/MC/EndField等，maimai萌新</p>
+          <p>
+            推<span style="color: #39c5bb">Miku</span>/<span style="color: #66ccff">天依</span
+            >/<span style="color: #ffaad5">mzk</span>，喜欢<span style="color: #586294">烤25团</span
+            >，磕<span style="color: #ffaad5">糖</span><span style="color: #ccaa88">画</span>/<span
+              style="color: #66ccff"
+              >南</span
+            ><span style="color: #ee0000">北</span>组
+          </p>
           <p>自家OC小女孩一只～</p>
           <p>喜欢甜甜的、软软的、可爱的、亮晶晶的东西</p>
           <p>有些社恐…但是熟了会非常非常黏人（x</p>
@@ -90,7 +114,9 @@
           <p>不是男娘，讨厌刻板印象，雷大众雷</p>
           <p>猜你会雷：空间多转发&碎碎念/生心不一/Trans.MtF/adhd/微负(yyz)/女性主义(非极端)</p>
         </div>
-        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">最后更新于 2026.9.30</p>
+        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">
+          最后更新于 2026.8.19
+        </p>
       </div>
     </div>
     <!-- 记忆卡片 -->
@@ -106,15 +132,15 @@
     <div class="about-content" style="display: flex">
       <div class="about-item">
         <p class="text">陷之死地而后生，置之亡地而后存。</p>
-        <p class="text" style="color: var(--about-accent)">失败的人生同样是人生，她们有权品尝至最后</p>
+        <p class="text" style="color: var(--about-accent)">
+          失败的人生同样是人生，她们有权品尝至最后
+        </p>
       </div>
     </div>
     <!-- 关于这个站 -->
     <div class="about-content" style="display: flex">
       <div class="about-item">
-        <p class="text">
-          愿每个人都被世界温柔以待~
-        </p>
+        <p class="text">愿每个人都被世界温柔以待~</p>
         <p class="text" style="color: var(--about-blue); opacity: 0.8">
           年年岁岁花相似，岁岁年年人不同
         </p>
@@ -139,7 +165,6 @@
 </template>
 
 <script setup>
-
 const birthDate = "2009-10-10";
 
 // 获得小证天数
@@ -148,7 +173,6 @@ const daysSinceCard = computed(() => {
   const now = new Date();
   return Math.floor((now - start) / (1000 * 60 * 60 * 24));
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -722,5 +746,3 @@ html.dark.high-contrast-max .about {
   }
 }
 </style>
-
-

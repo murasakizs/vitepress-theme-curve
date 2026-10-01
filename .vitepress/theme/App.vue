@@ -28,7 +28,7 @@
   <Teleport to="body">
     <!-- 左侧菜单 -->
     <div :class="['left-menu', { hidden: footerIsShow }]">
-            <!-- 全局播放器（拓展模式下隐藏但保留挂载） -->
+      <!-- 全局播放器（拓展模式下隐藏但保留挂载） -->
       <ClientOnly>
         <div v-show="store.islandStyle !== 'extended'">
           <Player />
@@ -71,8 +71,22 @@ import { ensureGlobalFontsLoaded } from "@/utils/fontLoader.mjs";
 const route = useRoute();
 const store = mainStore();
 const { frontmatter, page, theme } = useData();
-const { loadingStatus, footerIsShow, themeValue, themeType, themeColor, highContrast, backgroundType, fontFamily, fontSize, fontSizePending, siteLayout, siteLayoutPending, messagePosition, removeAnimations } =
-  storeToRefs(store);
+const {
+  loadingStatus,
+  footerIsShow,
+  themeValue,
+  themeType,
+  themeColor,
+  highContrast,
+  backgroundType,
+  fontFamily,
+  fontSize,
+  fontSizePending,
+  siteLayout,
+  siteLayoutPending,
+  messagePosition,
+  removeAnimations,
+} = storeToRefs(store);
 let fontSwitchTaskId = 0;
 
 // 导入后检查
@@ -81,19 +95,19 @@ const importCheckCountdown = ref(10);
 let importCheckTimer = null;
 
 //2025.06.12更新：在 Next.js 的服务端渲染过程中，应用会在服务器端先进行渲染
-  //而在服务器端的 JavaScript 环境中，并没有浏览器提供的 window 对象。
-  //最简单的解决方法是确保在客户端代码中访问 window
-  //可以通过判断代码是否在浏览器环境中运行来避免在服务器端渲染时执行涉及 window 的代码
-  //onMounted 钩子： 在 setup 或 data 中避免直接访问 window。
-  //将依赖 window 对象的代码放入 onMounted 钩子中，因为 onMounted 只会在组件挂载到DOM后执行。
-  // onMounted(() => {
-  // 只有在浏览器环境才会执行
-  // if (typeof window !== 'undefined') {
-  //   console.log(window.innerWidth);
-  // }
+//而在服务器端的 JavaScript 环境中，并没有浏览器提供的 window 对象。
+//最简单的解决方法是确保在客户端代码中访问 window
+//可以通过判断代码是否在浏览器环境中运行来避免在服务器端渲染时执行涉及 window 的代码
+//onMounted 钩子： 在 setup 或 data 中避免直接访问 window。
+//将依赖 window 对象的代码放入 onMounted 钩子中，因为 onMounted 只会在组件挂载到DOM后执行。
+// onMounted(() => {
+// 只有在浏览器环境才会执行
+// if (typeof window !== 'undefined') {
+//   console.log(window.innerWidth);
+// }
 // })
 // onMounted(() => {
-  // 这里的代码只会在浏览器环境中执行
+// 这里的代码只会在浏览器环境中执行
 //   screenWidth.value = window.screen.width;
 // });
 // 右键菜单
@@ -179,9 +193,9 @@ const changeSiteThemeType = () => {
     htmlElement.classList.remove("image");
   }
   // 应用主题色
-  const themeColors = ['theme-purple', 'theme-blue', 'theme-red', 'theme-green', 'theme-gray'];
-  themeColors.forEach(cls => htmlElement.classList.remove(cls));
-  if (themeColor.value !== 'pink') {
+  const themeColors = ["theme-purple", "theme-blue", "theme-red", "theme-green", "theme-gray"];
+  themeColors.forEach((cls) => htmlElement.classList.remove(cls));
+  if (themeColor.value !== "pink") {
     htmlElement.classList.add(`theme-${themeColor.value}`);
   }
 };
@@ -231,37 +245,23 @@ watch(
 onMounted(() => {
   initializeCursor();
   console.log(frontmatter.value, page.value, theme.value);
-  // 测试分支提示（加载遮罩消失后显示）
-  if (store.channelMode === 2 && typeof $message !== "undefined") {
-    const unwatch = watch(
-      () => loadingStatus.value,
-      (newVal, oldVal) => {
-        if (oldVal === true && newVal === false) {
-          setTimeout(() => {
-            $message.warning('当前处于测试分支（dev分支）', { duration: 5000 });
-          }, 500);
-          unwatch();
-        }
-      }
-    );
-  }
   // 全站置灰
   specialDayGray();
   // 更改主题类别
   changeSiteThemeType();
   // 高对比度模式
-  if (highContrast.value === 'max') {
-    document.documentElement.classList.add('high-contrast', 'high-contrast-max');
+  if (highContrast.value === "max") {
+    document.documentElement.classList.add("high-contrast", "high-contrast-max");
   } else if (highContrast.value) {
-    document.documentElement.classList.add('high-contrast');
+    document.documentElement.classList.add("high-contrast");
   }
   // 自定义主题色
   if (store.customThemeEnabled) {
     const html = document.documentElement;
-    html.style.setProperty('--main-color', store.customPrimaryColor);
-    html.style.setProperty('--main-color-bg', store.customPrimaryColor + '0d');
-    html.style.setProperty('--main-accent', store.customSecondaryColor);
-    html.style.setProperty('--main-accent-bg', store.customSecondaryColor + '1a');
+    html.style.setProperty("--main-color", store.customPrimaryColor);
+    html.style.setProperty("--main-color-bg", store.customPrimaryColor + "0d");
+    html.style.setProperty("--main-accent", store.customSecondaryColor);
+    html.style.setProperty("--main-accent-bg", store.customSecondaryColor + "1a");
   }
   // 切换系统字体样式
   changeSiteFont();
@@ -407,7 +407,10 @@ onBeforeUnmount(() => {
   min-width: 60px;
   border-radius: 8px;
   cursor: pointer;
-  transition: color 0.3s, background-color 0.3s, transform var(--press-out) var(--press-ease);
+  transition:
+    color 0.3s,
+    background-color 0.3s,
+    transform var(--press-out) var(--press-ease);
   &:active {
     transform: scale(0.95);
     transition-duration: var(--press-in);

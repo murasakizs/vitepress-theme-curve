@@ -6,9 +6,7 @@
       <span v-if="type === 'categories'" class="title-num">
         共有 {{ Object.keys(categoriesData)?.length || 0 }} 个分类
       </span>
-      <span v-else class="title-num">
-        共有 {{ Object.keys(tagsData)?.length || 0 }} 个标签
-      </span>
+      <span v-else class="title-num"> 共有 {{ Object.keys(tagsData)?.length || 0 }} 个标签 </span>
     </div>
     <div v-if="type === 'categories'" class="type-lists">
       <a

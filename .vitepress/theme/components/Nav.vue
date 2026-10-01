@@ -57,7 +57,7 @@
         </div>
         <div class="right-nav">
           <!-- 开往 -->
-           <!--
+          <!--
           <a
             class="menu-btn nav-btn travellings"
             title="开往-友链接力"
@@ -68,11 +68,7 @@
           </a>
         -->
           <!-- 随机文章（桌面端） -->
-          <div
-            class="menu-btn nav-btn pc"
-            title="随机前往一篇文章"
-            @click="shuffleGo"
-          >
+          <div class="menu-btn nav-btn pc" title="随机前往一篇文章" @click="shuffleGo">
             <i class="iconfont icon-shuffle"></i>
           </div>
           <!-- 搜索 -->
@@ -236,7 +232,11 @@ const rightMenuSwitch = () => {
       width: 100%;
       left: 0;
       bottom: -80px;
-      background: linear-gradient(to bottom, color-mix(in srgb, var(--main-card-background) 30%, transparent), transparent);
+      background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--main-card-background) 30%, transparent),
+        transparent
+      );
       pointer-events: none;
       transition: opacity 0.3s;
     }
@@ -264,13 +264,17 @@ const rightMenuSwitch = () => {
             visibility: visible;
             opacity: 1;
             pointer-events: auto;
-            transition: opacity 0.3s, visibility 0s;
+            transition:
+              opacity 0.3s,
+              visibility 0s;
           }
           .nav-center {
             visibility: hidden;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s, visibility 0s 0.3s;
+            transition:
+              opacity 0.3s,
+              visibility 0s 0.3s;
           }
         }
         .force-mobile & {
@@ -279,13 +283,17 @@ const rightMenuSwitch = () => {
             visibility: visible;
             opacity: 1;
             pointer-events: auto;
-            transition: opacity 0.3s, visibility 0s;
+            transition:
+              opacity 0.3s,
+              visibility 0s;
           }
           .nav-center {
             visibility: hidden;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s, visibility 0s 0.3s;
+            transition:
+              opacity 0.3s,
+              visibility 0s 0.3s;
           }
         }
       }
@@ -298,13 +306,17 @@ const rightMenuSwitch = () => {
             visibility: hidden;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s, visibility 0s 0.3s;
+            transition:
+              opacity 0.3s,
+              visibility 0s 0.3s;
           }
           .nav-center {
             visibility: visible;
             opacity: 1;
             pointer-events: auto;
-            transition: opacity 0.3s, visibility 0s;
+            transition:
+              opacity 0.3s,
+              visibility 0s;
           }
         }
       }
@@ -316,13 +328,17 @@ const rightMenuSwitch = () => {
           visibility: hidden;
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.3s, visibility 0s 0.3s;
+          transition:
+            opacity 0.3s,
+            visibility 0s 0.3s;
         }
         .nav-center {
           visibility: visible;
           opacity: 1;
           pointer-events: auto;
-          transition: opacity 0.3s, visibility 0s;
+          transition:
+            opacity 0.3s,
+            visibility 0s;
         }
       }
     }
@@ -377,7 +393,7 @@ const rightMenuSwitch = () => {
                 align-items: center;
                 height: 42px;
                 line-height: 50px;
-                padding: 0 1.8rem 0 2.0rem;
+                padding: 0 1.8rem 0 2rem;
                 border-radius: 100px;
                 white-space: nowrap;
                 margin: 0 4px;
@@ -704,8 +720,7 @@ const rightMenuSwitch = () => {
             border: none;
             background-color: transparent;
             white-space: nowrap;
-            transition:
-              background-color 0.3s;
+            transition: background-color 0.3s;
             cursor: pointer;
             .iconfont {
               font-size: 18px;
@@ -820,7 +835,9 @@ const rightMenuSwitch = () => {
         visibility: visible;
         opacity: 1;
         pointer-events: auto;
-        transition: opacity 0.3s, visibility 0s;
+        transition:
+          opacity 0.3s,
+          visibility 0s;
         .back-btn {
           display: flex;
         }
@@ -839,7 +856,9 @@ const rightMenuSwitch = () => {
         visibility: hidden;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s, visibility 0s 0.3s;
+        transition:
+          opacity 0.3s,
+          visibility 0s 0.3s;
         .site-menu {
           display: none;
         }
@@ -855,7 +874,6 @@ const rightMenuSwitch = () => {
     .force-mobile & {
       @include mobile-nav-styles;
     }
-
   }
   .nav-btn {
     display: flex;
@@ -864,7 +882,9 @@ const rightMenuSwitch = () => {
     width: 35px;
     height: 35px;
     padding: 0;
-    transition: background-color 0.3s, transform var(--press-out) var(--press-ease);
+    transition:
+      background-color 0.3s,
+      transform var(--press-out) var(--press-ease);
     border-radius: 50%;
     cursor: pointer;
     .iconfont {

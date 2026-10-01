@@ -55,9 +55,8 @@ onMounted(() => {
 });
 </script>
 
-
 <style>
 .el-textarea__inner {
-    font-family: var(--main-font-family);
+  font-family: var(--main-font-family);
 }
 </style>

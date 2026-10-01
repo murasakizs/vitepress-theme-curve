@@ -5,8 +5,8 @@
       <div class="about-item hello">
         <span class="title2">一个莫名其妙的小站(?)</span>
         <span class="text4">
-          欢迎来到泠の小站w<br/>
-          这里会有很多奇奇怪怪的东西哦（x<br/>
+          欢迎来到泠の小站w<br />
+          这里会有很多奇奇怪怪的东西哦（x<br />
           那就，请多指教啦
         </span>
       </div>
@@ -30,10 +30,7 @@
       </div>
     </div>
     <div class="about-content" style="grid-template-columns: 2fr 3fr">
-      <div
-        class="about-item static image"
-        style="--color: #3c3c4380"
-      >
+      <div class="about-item static image" style="--color: #3c3c4380">
         <div class="image-content">
           <span class="tip">数据</span>
           <span class="title2">站点数据</span>
@@ -56,12 +53,24 @@
       </div>
 
       <div class="about-item child">
-        <div class="about-item" style="padding: 1.2rem 1.2rem 1.2rem 1.8rem; justify-content: center">
-          <span class="title2"><strong>sgexilq</strong><strong style="color: var(--main-color)">.</strong><strong style="color: var(--main-color)">com</strong></span>
+        <div
+          class="about-item"
+          style="padding: 1.2rem 1.2rem 1.2rem 1.8rem; justify-content: center"
+        >
+          <span class="title2"
+            ><strong>sgexilq</strong><strong style="color: var(--main-color)">.</strong
+            ><strong style="color: var(--main-color)">com</strong></span
+          >
         </div>
-        <div class="about-item info" style="align-items: center; justify-content: center; padding-left: 1.7rem">
+        <div
+          class="about-item info"
+          style="align-items: center; justify-content: center; padding-left: 1.7rem"
+        >
           <span class="title2" style="white-space: nowrap">
-            <span>本站上线了</span>&nbsp;&nbsp;<span style="color: var(--main-accent)">{{ daysOnline }}</span>&nbsp;&nbsp;<span>天</span>
+            <span>本站上线了</span>&nbsp;&nbsp;<span style="color: var(--main-accent)">{{
+              daysOnline
+            }}</span
+            >&nbsp;&nbsp;<span>天</span>
           </span>
         </div>
       </div>
@@ -69,11 +78,28 @@
     <!-- 站点状态 -->
     <div class="about-content" style="display: flex">
       <div class="about-item" style="padding: 1.2rem 2rem">
-        <p class="text" style="margin: 0.2rem 0; font-size: 1.6em"><strong style="color: var(--main-color)">本站仍在建设中</strong></p>
-        <p class="text" style="margin: 0.2rem 0">最近一次功能性或质量性更新于 <strong style="color: var(--main-accent)">{{ displaySiteVersionDate }}</strong></p>
-        <p class="text" style="margin: 0.2rem 0">定义版本为 <strong style="color: var(--main-accent)">{{ displaySiteVersion }}</strong></p>
-        <p class="text" style="margin: 0.2rem 0">定义版本随 <strong style="color: var(--main-color)">release</strong> 推送更新</p>
-        <p class="text" style="margin: 0.2rem 0">详见本站 <a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank" style="color: var(--main-color)"><strong>源码 </strong></a></p>
+        <p class="text" style="margin: 0.2rem 0; font-size: 1.6em">
+          <strong style="color: var(--main-color)">本站仍在建设中</strong>
+        </p>
+        <p class="text" style="margin: 0.2rem 0">
+          最近一次功能性或质量性更新于
+          <strong style="color: var(--main-accent)">{{ displaySiteVersionDate }}</strong>
+        </p>
+        <p class="text" style="margin: 0.2rem 0">
+          定义版本为 <strong style="color: var(--main-accent)">{{ displaySiteVersion }}</strong>
+        </p>
+        <p class="text" style="margin: 0.2rem 0">
+          定义版本随 <strong style="color: var(--main-color)">release</strong> 推送更新
+        </p>
+        <p class="text" style="margin: 0.2rem 0">
+          详见本站
+          <a
+            href="https://github.com/murasakizs/vitepress-theme-curve"
+            target="_blank"
+            style="color: var(--main-color)"
+            ><strong>源码 </strong></a
+          >
+        </p>
       </div>
     </div>
     <!-- 下方卡片 -->
@@ -82,13 +108,27 @@
         <span class="tip">上游致谢</span>
         <span class="title2" style="margin-bottom: 0.8rem">vitepress-theme-curve</span>
         <p class="text">
-          本站基于开源项目 <a href="https://github.com/kazukokawagawa/vitepress-theme-curve" target="_blank"><strong>vitepress-theme-curve</strong></a> 构建，感谢原作者 <a href="https://chiyu.it/" target="_blank"><strong>池鱼</strong></a> 的开源贡献
+          本站基于开源项目
+          <a href="https://github.com/kazukokawagawa/vitepress-theme-curve" target="_blank"
+            ><strong>vitepress-theme-curve</strong></a
+          >
+          构建，感谢原作者
+          <a href="https://chiyu.it/" target="_blank"><strong>池鱼</strong></a> 的开源贡献
         </p>
         <p class="text">
-          本站遵循 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"><strong>AGPL v3</strong></a> 协议<a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank"><strong>开源</strong></a>
+          本站遵循
+          <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"
+            ><strong>AGPL v3</strong></a
+          >
+          协议<a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank"
+            ><strong>开源</strong></a
+          >
         </p>
         <p class="text" style="opacity: 0.4">
-          技术栈：<a href="https://vitepress.dev/" target="_blank">VitePress</a> · <a href="https://vuejs.org/" target="_blank">Vue 3</a> · <a href="https://pinia.vuejs.org/" target="_blank">Pinia</a> · <a href="https://sass-lang.com/" target="_blank">SCSS</a>
+          技术栈：<a href="https://vitepress.dev/" target="_blank">VitePress</a> ·
+          <a href="https://vuejs.org/" target="_blank">Vue 3</a> ·
+          <a href="https://pinia.vuejs.org/" target="_blank">Pinia</a> ·
+          <a href="https://sass-lang.com/" target="_blank">SCSS</a>
         </p>
         <p class="text" style="color: var(--main-accent); margin-top: 0.4rem">
           本站的诞生离不开上游作者的开源贡献。
@@ -322,7 +362,9 @@ onMounted(() => {
             background: var(--main-site-background);
             border: 1px solid var(--main-card-border);
             box-shadow: 0 8px 12px -4px var(--main-border-shadow);
-            transition: background-color 0.3s, transform var(--press-out) var(--press-ease);
+            transition:
+              background-color 0.3s,
+              transform var(--press-out) var(--press-ease);
             cursor: pointer;
             .skills-logo {
               display: flex;
@@ -565,5 +607,3 @@ html.dark .about .about-item.hello {
   color: var(--main-font-color);
 }
 </style>
-
-

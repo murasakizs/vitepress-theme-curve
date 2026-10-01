@@ -2,7 +2,14 @@
 <template>
   <div
     ref="containerRef"
-    :class="['music-player', { playing: isPlaying, expanded: showPlaylist && playlist.length > 1, 'with-lyrics': hasLyrics }]"
+    :class="[
+      'music-player',
+      {
+        playing: isPlaying,
+        expanded: showPlaylist && playlist.length > 1,
+        'with-lyrics': hasLyrics,
+      },
+    ]"
   >
     <!-- 主播放器 -->
     <div class="player-main">
@@ -17,9 +24,9 @@
           />
           <div v-else class="cover-placeholder">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="6" cy="18" r="3"/>
-              <circle cx="18" cy="16" r="3"/>
+              <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
             </svg>
           </div>
         </div>
@@ -30,8 +37,8 @@
         <!-- 头部信息 -->
         <div class="info-header">
           <div class="track-info">
-            <span class="track-title">{{ currentTrack.title || '未知曲目' }}</span>
-            <span class="track-artist">{{ currentTrack.artist || '未知艺术家' }}</span>
+            <span class="track-title">{{ currentTrack.title || "未知曲目" }}</span>
+            <span class="track-artist">{{ currentTrack.artist || "未知艺术家" }}</span>
           </div>
         </div>
 
@@ -40,7 +47,9 @@
             <div v-if="showLyricsMode" key="lyrics" class="lyrics-display">
               <transition name="lyric-fade" mode="out-in">
                 <div :key="currentLyricKey" class="lyric-lines">
-                  <div v-for="(line, idx) in currentLyricLines" :key="idx" class="lyric-line">{{ line }}</div>
+                  <div v-for="(line, idx) in currentLyricLines" :key="idx" class="lyric-line">
+                    {{ line }}
+                  </div>
                 </div>
               </transition>
             </div>
@@ -90,36 +99,32 @@
           <div class="controls">
             <div class="controls-left">
               <!-- 上一首 -->
-              <button
-                v-if="playlist.length > 1"
-                class="ctrl-btn"
-                @click="prevTrack"
-                title="上一首"
-              >
+              <button v-if="playlist.length > 1" class="ctrl-btn" @click="prevTrack" title="上一首">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                  <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                  <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
                 </svg>
               </button>
 
               <!-- 播放/暂停 -->
               <button class="ctrl-btn play-btn" @click="togglePlay" title="播放/暂停">
-                <svg v-if="!isPlaying" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                  <path d="M8 5v14l11-7z"/>
+                <svg
+                  v-if="!isPlaying"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="20"
+                  height="20"
+                >
+                  <path d="M8 5v14l11-7z" />
                 </svg>
                 <svg v-else viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                  <path d="M6 4h4v16H6zM14 4h4v16h-4z"/>
+                  <path d="M6 4h4v16H6zM14 4h4v16h-4z" />
                 </svg>
               </button>
 
               <!-- 下一首 -->
-              <button
-                v-if="playlist.length > 1"
-                class="ctrl-btn"
-                @click="nextTrack"
-                title="下一首"
-              >
+              <button v-if="playlist.length > 1" class="ctrl-btn" @click="nextTrack" title="下一首">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                  <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                  <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
                 </svg>
               </button>
             </div>
@@ -147,14 +152,32 @@
               <!-- 音量 -->
               <div class="volume-wrapper">
                 <button class="ctrl-btn" @click="toggleMute" title="音量">
-                  <svg v-if="volume === 0" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                  <svg
+                    v-if="volume === 0"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"
+                    />
                   </svg>
-                  <svg v-else-if="volume < 0.5" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                    <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/>
+                  <svg
+                    v-else-if="volume < 0.5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"
+                    />
                   </svg>
                   <svg v-else viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    <path
+                      d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"
+                    />
                   </svg>
                 </button>
                 <div class="volume-slider-wrap">
@@ -179,7 +202,9 @@
                 title="播放列表"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                  <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/>
+                  <path
+                    d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"
+                  />
                 </svg>
               </button>
             </div>
@@ -204,13 +229,22 @@
           >
             <div class="playlist-item-index">
               <span v-if="currentIndex !== index">{{ index + 1 }}</span>
-              <svg v-else viewBox="0 0 24 24" fill="currentColor" width="14" height="14" class="playing-icon">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              <svg
+                v-else
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="14"
+                height="14"
+                class="playing-icon"
+              >
+                <path
+                  d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"
+                />
               </svg>
             </div>
             <div class="playlist-item-info">
-              <span class="playlist-item-title">{{ track.title || '未知曲目' }}</span>
-              <span class="playlist-item-artist">{{ track.artist || '未知艺术家' }}</span>
+              <span class="playlist-item-title">{{ track.title || "未知曲目" }}</span>
+              <span class="playlist-item-artist">{{ track.artist || "未知艺术家" }}</span>
             </div>
           </div>
         </div>
@@ -237,11 +271,11 @@
 // Props
 const props = defineProps({
   // 单曲模式
-  src: { type: String, default: '' },
-  title: { type: String, default: '' },
-  artist: { type: String, default: '' },
-  cover: { type: String, default: '' },
-  lrc: { type: String, default: '' },
+  src: { type: String, default: "" },
+  title: { type: String, default: "" },
+  artist: { type: String, default: "" },
+  cover: { type: String, default: "" },
+  lrc: { type: String, default: "" },
   // 列表模式
   list: {
     type: Array,
@@ -265,31 +299,31 @@ const bufferedPercent = ref(0);
 const currentIndex = ref(0);
 const showPlaylist = ref(false);
 const isDragging = ref(false);
-const embeddedCover = ref('');
+const embeddedCover = ref("");
 const parsedLyrics = ref([]);
 const currentLyricLines = ref([]);
-const currentLyricKey = ref('');
+const currentLyricKey = ref("");
 const hasStartedPlayback = ref(false);
 
 // 解析 LRC 文本
 const parseLrc = (text) => {
   if (!text) return [];
-  const lines = text.split('\n');
+  const lines = text.split("\n");
   const result = [];
   const timeMap = new Map();
   const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?\]/g;
-  
+
   for (const line of lines) {
     const matches = [...line.matchAll(timeExp)];
     if (matches.length > 0) {
-      const content = line.replace(timeExp, '').trim();
+      const content = line.replace(timeExp, "").trim();
       if (content) {
         for (const match of matches) {
           let time = 0;
           time += parseInt(match[1], 10) * 60;
           time += parseInt(match[2], 10);
           time += match[3] ? parseInt(match[3], 10) / (match[3].length === 3 ? 1000 : 100) : 0;
-          
+
           if (!timeMap.has(time)) {
             timeMap.set(time, []);
           }
@@ -309,10 +343,10 @@ const parseLrc = (text) => {
 const loadLyrics = async (lrc) => {
   parsedLyrics.value = [];
   currentLyricLines.value = [];
-  currentLyricKey.value = '';
+  currentLyricKey.value = "";
   if (!lrc) return;
-  
-  if (lrc.startsWith('http') || lrc.startsWith('/')) {
+
+  if (lrc.startsWith("http") || lrc.startsWith("/")) {
     try {
       const res = await fetch(lrc);
       if (res.ok) {
@@ -320,7 +354,7 @@ const loadLyrics = async (lrc) => {
         parsedLyrics.value = parseLrc(text);
       }
     } catch (e) {
-      console.warn('Failed to load lyrics', e);
+      console.warn("Failed to load lyrics", e);
     }
   } else {
     parsedLyrics.value = parseLrc(lrc);
@@ -329,14 +363,14 @@ const loadLyrics = async (lrc) => {
 
 // 加载音频内嵌封面
 const loadEmbeddedCover = async (src) => {
-  embeddedCover.value = '';
-  if (!src || typeof window === 'undefined') return;
-  
+  embeddedCover.value = "";
+  if (!src || typeof window === "undefined") return;
+
   try {
-    let jsmediatagsMod = await import('jsmediatags/dist/jsmediatags.min.js');
+    let jsmediatagsMod = await import("jsmediatags/dist/jsmediatags.min.js");
     const jsmediatags = jsmediatagsMod.default || jsmediatagsMod || window.jsmediatags;
     if (!jsmediatags || !jsmediatags.read) return;
-    
+
     jsmediatags.read(src, {
       onSuccess: (tag) => {
         const picture = tag.tags.picture;
@@ -350,7 +384,7 @@ const loadEmbeddedCover = async (src) => {
       },
       onError: (error) => {
         // ignore errors
-      }
+      },
     });
   } catch (err) {
     // ignore errors
@@ -363,38 +397,54 @@ const playlist = computed(() => {
     return props.list;
   }
   if (props.src) {
-    return [{ src: props.src, title: props.title, artist: props.artist, cover: props.cover, lrc: props.lrc }];
+    return [
+      {
+        src: props.src,
+        title: props.title,
+        artist: props.artist,
+        cover: props.cover,
+        lrc: props.lrc,
+      },
+    ];
   }
   return [];
 });
 
 // 当前曲目
 const currentTrack = computed(() => {
-  return playlist.value[currentIndex.value] || { src: '', title: '', artist: '', cover: '' };
+  return playlist.value[currentIndex.value] || { src: "", title: "", artist: "", cover: "" };
 });
 
 // 是否有歌词
 const hasLyrics = computed(() => parsedLyrics.value.length > 0);
 const showLyricsMode = computed(() => hasLyrics.value && hasStartedPlayback.value);
 
-watch(() => currentTrack.value.src, (newSrc) => {
-  hasStartedPlayback.value = false;
-  if (newSrc && !currentTrack.value.cover) {
-    loadEmbeddedCover(newSrc);
-  } else {
-    embeddedCover.value = '';
-  }
-}, { immediate: true });
+watch(
+  () => currentTrack.value.src,
+  (newSrc) => {
+    hasStartedPlayback.value = false;
+    if (newSrc && !currentTrack.value.cover) {
+      loadEmbeddedCover(newSrc);
+    } else {
+      embeddedCover.value = "";
+    }
+  },
+  { immediate: true },
+);
 
 // 单独监听歌词变化
-watch(() => currentTrack.value?.lrc, (newLrc) => {
-  loadLyrics(newLrc);
-}, { immediate: true });
+watch(
+  () => currentTrack.value?.lrc,
+  (newLrc) => {
+    loadLyrics(newLrc);
+  },
+  { immediate: true },
+);
 
 watch(currentTime, (newTime) => {
   if (parsedLyrics.value.length === 0) return;
   let activeLines = [];
-  let activeKey = '';
+  let activeKey = "";
   for (let i = 0; i < parsedLyrics.value.length; i++) {
     if (newTime >= parsedLyrics.value[i].time) {
       activeLines = parsedLyrics.value[i].lines;
@@ -417,10 +467,10 @@ const progressPercent = computed(() => {
 
 // 格式化时间
 const formatTime = (seconds) => {
-  if (!seconds || isNaN(seconds)) return '0:00';
+  if (!seconds || isNaN(seconds)) return "0:00";
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
 // 播放控制
@@ -429,8 +479,7 @@ const togglePlay = () => {
   if (isPlaying.value) {
     audioRef.value.pause();
   } else {
-    audioRef.value.play().catch(() => {
-    });
+    audioRef.value.play().catch(() => {});
   }
 };
 
@@ -497,11 +546,11 @@ const onProgressMouseDown = (e) => {
   const onMouseMove = (e) => seekTo(e.clientX);
   const onMouseUp = () => {
     isDragging.value = false;
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
   };
-  document.addEventListener('mousemove', onMouseMove);
-  document.addEventListener('mouseup', onMouseUp);
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
 };
 
 const onProgressTouchStart = (e) => {
@@ -510,18 +559,23 @@ const onProgressTouchStart = (e) => {
   const onTouchMove = (e) => seekTo(e.touches[0].clientX);
   const onTouchEnd = () => {
     isDragging.value = false;
-    document.removeEventListener('touchmove', onTouchMove);
-    document.removeEventListener('touchend', onTouchEnd);
+    document.removeEventListener("touchmove", onTouchMove);
+    document.removeEventListener("touchend", onTouchEnd);
   };
-  document.addEventListener('touchmove', onTouchMove);
-  document.addEventListener('touchend', onTouchEnd);
+  document.addEventListener("touchmove", onTouchMove);
+  document.addEventListener("touchend", onTouchEnd);
 };
 
 // Audio 事件
 const onTimeUpdate = () => {
   if (!isDragging.value && audioRef.value) {
     currentTime.value = audioRef.value.currentTime;
-    if (audioRef.value.duration && !isNaN(audioRef.value.duration) && audioRef.value.duration !== Infinity && audioRef.value.duration !== duration.value) {
+    if (
+      audioRef.value.duration &&
+      !isNaN(audioRef.value.duration) &&
+      audioRef.value.duration !== Infinity &&
+      audioRef.value.duration !== duration.value
+    ) {
       duration.value = audioRef.value.duration;
     }
   }
@@ -529,7 +583,11 @@ const onTimeUpdate = () => {
 
 const onLoadedMetadata = () => {
   if (audioRef.value) {
-    if (audioRef.value.duration && !isNaN(audioRef.value.duration) && audioRef.value.duration !== Infinity) {
+    if (
+      audioRef.value.duration &&
+      !isNaN(audioRef.value.duration) &&
+      audioRef.value.duration !== Infinity
+    ) {
       duration.value = audioRef.value.duration;
     }
     audioRef.value.volume = volume.value;
@@ -570,12 +628,12 @@ const onProgress = () => {
 // 懒加载：进入可视区域时才预加载
 let observer = null;
 onMounted(() => {
-  if (!('IntersectionObserver' in window)) return;
+  if (!("IntersectionObserver" in window)) return;
   observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting && audioRef.value) {
-          audioRef.value.preload = 'metadata';
+          audioRef.value.preload = "metadata";
           if (props.autoplay) {
             audioRef.value.play().catch(() => {});
           }
@@ -584,7 +642,7 @@ onMounted(() => {
         }
       }
     },
-    { rootMargin: '100px' }
+    { rootMargin: "100px" },
   );
   if (containerRef.value) observer.observe(containerRef.value);
 });
@@ -593,7 +651,7 @@ onBeforeUnmount(() => {
   if (observer) observer.disconnect();
   if (audioRef.value) {
     audioRef.value.pause();
-    audioRef.value.src = '';
+    audioRef.value.src = "";
   }
 });
 </script>
@@ -625,7 +683,9 @@ onBeforeUnmount(() => {
     align-items: center;
     padding: 24px;
     gap: 20px;
-    transition: gap 0.32s ease, padding 0.32s ease;
+    transition:
+      gap 0.32s ease,
+      padding 0.32s ease;
   }
 
   // 封面
@@ -807,7 +867,9 @@ onBeforeUnmount(() => {
         background-color: var(--main-color);
         box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
         opacity: 0;
-        transition: opacity 0.15s, transform 0.15s;
+        transition:
+          opacity 0.15s,
+          transform 0.15s;
       }
     }
   }
@@ -857,8 +919,6 @@ onBeforeUnmount(() => {
     }
   }
 
-
-
   .lyrics-display {
     position: relative;
     width: 100%;
@@ -888,7 +948,7 @@ onBeforeUnmount(() => {
       opacity: 0.95;
       line-height: 1.3;
       font-weight: 600;
-      
+
       &:nth-child(2) {
         font-size: 12px;
         opacity: 0.7;
@@ -902,12 +962,12 @@ onBeforeUnmount(() => {
   .lyric-fade-leave-active {
     transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
   }
-  
+
   .lyric-fade-enter-from {
     opacity: 0;
     transform: translateY(6px);
   }
-  
+
   .lyric-fade-leave-to {
     opacity: 0;
     transform: translateY(-6px);
@@ -1113,7 +1173,9 @@ onBeforeUnmount(() => {
       padding: 8px 16px;
       gap: 12px;
       cursor: pointer;
-      transition: background-color 0.2s, transform var(--press-out) var(--press-ease);
+      transition:
+        background-color 0.2s,
+        transform var(--press-out) var(--press-ease);
 
       &:hover {
         background-color: var(--main-mask-Inverse-background);
@@ -1209,7 +1271,8 @@ onBeforeUnmount(() => {
 
 // 播放图标脉冲
 @keyframes pulse-icon {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

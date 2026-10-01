@@ -1,38 +1,56 @@
 import { defineStore } from "pinia";
-import cursorInit from '@/utils/cursor.js';
+import cursorInit from "@/utils/cursor.js";
 
 let appCursorInstance;
-const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const isMobile =
+  typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 10;
-// 分支模式（1 = 正式分支，2 = dev分支）
-const DEFAULT_CHANNEL_MODE = 1;
-// 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
+const PERSIST_VERSION = 14;
+// 开发模式开关（1 = 未开启，2 = 开启）
 const DEFAULT_DEV_MODE = 1;
 
 // 模块加载时立即检查版本，确保在 pinia-persistedstate 水合之前清除旧缓存
-if (typeof localStorage !== 'undefined') {
-  const storedVersion = parseInt(localStorage.getItem('siteDataVersion') || '0', 10);
+if (typeof localStorage !== "undefined") {
+  const storedVersion = parseInt(localStorage.getItem("siteDataVersion") || "0", 10);
   if (storedVersion !== PERSIST_VERSION) {
-    const old = JSON.parse(localStorage.getItem('siteData') || '{}');
+    const old = JSON.parse(localStorage.getItem("siteData") || "{}");
     const keep = {
-      channelMode: old.channelMode,
       devMode: old.devMode,
       siteVersion: old.siteVersion,
       siteVersionDate: old.siteVersionDate,
     };
-    localStorage.removeItem('siteData');
-    localStorage.setItem('siteData', JSON.stringify(keep));
-    localStorage.setItem('siteDataVersion', String(PERSIST_VERSION));
+    localStorage.removeItem("siteData");
+    localStorage.setItem("siteData", JSON.stringify(keep));
+    localStorage.setItem("siteDataVersion", String(PERSIST_VERSION));
   }
 }
 
 // 主题色 class 列表（粉色为默认，不需要 class）
-const THEME_COLOR_CLASSES = ['theme-purple', 'theme-blue', 'theme-red', 'theme-green', 'theme-gray'];
+const THEME_COLOR_CLASSES = [
+  "theme-purple",
+  "theme-blue",
+  "theme-red",
+  "theme-green",
+  "theme-gray",
+];
 // 光标颜色映射
 const CURSOR_COLORS = {
-  light: { pink: '#e8558e', purple: '#8000ff', blue: '#4fc3f7', red: '#ef5350', green: '#66bb6a', gray: '#9e9e9e' },
-  dark:  { pink: '#f06292', purple: '#b388ff', blue: '#81d4fa', red: '#ef9a9a', green: '#a5d6a7', gray: '#757575' }
+  light: {
+    pink: "#e8558e",
+    purple: "#8000ff",
+    blue: "#4fc3f7",
+    red: "#ef5350",
+    green: "#66bb6a",
+    gray: "#9e9e9e",
+  },
+  dark: {
+    pink: "#f06292",
+    purple: "#b388ff",
+    blue: "#81d4fa",
+    red: "#ef9a9a",
+    green: "#a5d6a7",
+    gray: "#757575",
+  },
 };
 
 export const mainStore = defineStore("main", {
@@ -101,12 +119,11 @@ export const mainStore = defineStore("main", {
       // 显示更多设置
       showMoreSettings: false,
       showMoreSettingsConfirmed: false,
-      // 分支展开状态
-      devChannelExpanded: false,
-      stableChannelExpanded: false,
-      // 分支模式（1 = 正式分支，2 = dev分支）
-      channelMode: DEFAULT_CHANNEL_MODE,
-      // 开发模式开关（1 = 未开启，2 = 开启，开启时忽略channelMode，强制进入开发模式）
+      // 开发中的功能展开状态
+      devFeaturesExpanded: false,
+      // 分支策略展开状态
+      branchStrategyExpanded: false,
+      // 开发模式开关（1 = 未开启，2 = 开启）
       devMode: DEFAULT_DEV_MODE,
       // 开发模式选项展开状态
       devModeOptionsExpanded: DEFAULT_DEV_MODE === 2,
@@ -116,7 +133,7 @@ export const mainStore = defineStore("main", {
       siteLayout: "auto",
       siteLayoutPending: false,
       lastSiteLayout: "auto",
-      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 1024,
+      windowWidth: typeof window !== "undefined" ? window.innerWidth : 1024,
       // 主题颜色
       themeColor: "pink",
       // 消息样式
@@ -167,13 +184,13 @@ export const mainStore = defineStore("main", {
       siteVersionDate: "2026.9.12",
       // 分支版本（自动递增）
       branchVersion: 106,
-      branchBuildTime: "2026.09.22 15:24:38",
+      branchBuildTime: "2026.10.01 10:45:23",
     };
   },
   actions: {
     // 切换应用状态
     changeShowStatus(value, blur = true) {
-      if (typeof document === 'undefined') return; // 确保在客户端
+      if (typeof document === "undefined") return; // 确保在客户端
 
       this[value] = !this[value];
       // 阻止滚动
@@ -186,7 +203,7 @@ export const mainStore = defineStore("main", {
     },
     // 更改字体大小
     changeFontSize(isAdd = false) {
-      if (typeof document === 'undefined') return; // 确保在客户端
+      if (typeof document === "undefined") return; // 确保在客户端
 
       if (isAdd) {
         if (this.fontSize < 24) {
@@ -202,11 +219,11 @@ export const mainStore = defineStore("main", {
     },
     // 切换明暗模式
     changeThemeType() {
-      if (typeof window === 'undefined') return; // 确保在客户端
+      if (typeof window === "undefined") return; // 确保在客户端
 
       // 禁止壁纸模式切换
       if (this.backgroundType === "image") {
-        if (typeof $message !== "undefined") { 
+        if (typeof $message !== "undefined") {
           $message.error("无法在壁纸模式下切换明暗模式");
         }
         return false;
@@ -222,7 +239,7 @@ export const mainStore = defineStore("main", {
 
       // 弹窗提示
       if (typeof $message !== "undefined") {
-        const typeNames = { auto: '跟随系统', dark: '深色', light: '浅色' };
+        const typeNames = { auto: "跟随系统", dark: "深色", light: "浅色" };
         $message.success(`显示外观已切换为${typeNames[this.themeType]}`);
       }
 
@@ -238,20 +255,23 @@ export const mainStore = defineStore("main", {
 
     // 切换主题颜色
     changeThemeColor(color) {
-      if (typeof document === 'undefined') return;
+      if (typeof document === "undefined") return;
 
       this.themeColor = color;
       const html = document.documentElement;
       // 移除所有主题色 class
-      THEME_COLOR_CLASSES.forEach(cls => html.classList.remove(cls));
+      THEME_COLOR_CLASSES.forEach((cls) => html.classList.remove(cls));
       // 添加新的主题色 class（粉色为默认，不需要 class）
-      if (color !== 'pink') {
+      if (color !== "pink") {
         html.classList.add(`theme-${color}`);
       }
 
       // 更新光标颜色（CSS 变量 + SVG）
-      const actualTheme = this.themeValue || 'light';
-      html.style.setProperty('--cursor-bg-color', CURSOR_COLORS[actualTheme][color] || CURSOR_COLORS[actualTheme].pink);
+      const actualTheme = this.themeValue || "light";
+      html.style.setProperty(
+        "--cursor-bg-color",
+        CURSOR_COLORS[actualTheme][color] || CURSOR_COLORS[actualTheme].pink,
+      );
       if (appCursorInstance) {
         appCursorInstance.setThemeType(this.themeType, color);
       }
@@ -259,8 +279,12 @@ export const mainStore = defineStore("main", {
       // 弹窗提示
       if (typeof $message !== "undefined") {
         const colorNames = {
-          pink: '泠粉', purple: '幻紫', blue: '栈蓝',
-          red: '火红', green: '春绿', gray: '失灰'
+          pink: "泠粉",
+          purple: "幻紫",
+          blue: "栈蓝",
+          red: "火红",
+          green: "春绿",
+          gray: "失灰",
         };
         $message.success(`主题色已切换为${colorNames[color]}`);
       }
@@ -268,12 +292,12 @@ export const mainStore = defineStore("main", {
 
     // 新增方法：更新实际生效的主题值并设置CSS变量
     updateActualThemeValue() {
-      if (typeof window === 'undefined' || typeof document === 'undefined') return; // 确保在客户端
+      if (typeof window === "undefined" || typeof document === "undefined") return; // 确保在客户端
 
       let actualTheme;
-      if (this.themeType === 'auto') {
-        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        actualTheme = prefersDarkMode ? 'dark' : 'light';
+      if (this.themeType === "auto") {
+        const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        actualTheme = prefersDarkMode ? "dark" : "light";
       } else {
         actualTheme = this.themeType;
       }
@@ -281,36 +305,39 @@ export const mainStore = defineStore("main", {
 
       const root = document.documentElement;
       if (this.customThemeEnabled) {
-        root.style.setProperty('--cursor-bg-color', this.customPrimaryColor);
+        root.style.setProperty("--cursor-bg-color", this.customPrimaryColor);
       } else {
-        root.style.setProperty('--cursor-bg-color', CURSOR_COLORS[actualTheme][this.themeColor] || CURSOR_COLORS[actualTheme].pink);
+        root.style.setProperty(
+          "--cursor-bg-color",
+          CURSOR_COLORS[actualTheme][this.themeColor] || CURSOR_COLORS[actualTheme].pink,
+        );
       }
 
-      if (actualTheme === 'dark') {
-          root.classList.add('dark');
-          root.classList.remove('light');
+      if (actualTheme === "dark") {
+        root.classList.add("dark");
+        root.classList.remove("light");
       } else {
-          root.classList.add('light');
-          root.classList.remove('dark');
+        root.classList.add("light");
+        root.classList.remove("dark");
       }
     },
 
     // 新增action: 外部触发更新主题（用于系统主题变化）
     triggerThemeUpdate() {
-        if (typeof window === 'undefined') return; // 确保在客户端
-        this.updateActualThemeValue();
-        if (appCursorInstance) {
-            if (this.customThemeEnabled) {
-                appCursorInstance.setCursorColor(this.customPrimaryColor);
-            } else {
-                appCursorInstance.setThemeType(this.themeType, this.themeColor);
-            }
+      if (typeof window === "undefined") return; // 确保在客户端
+      this.updateActualThemeValue();
+      if (appCursorInstance) {
+        if (this.customThemeEnabled) {
+          appCursorInstance.setCursorColor(this.customPrimaryColor);
+        } else {
+          appCursorInstance.setThemeType(this.themeType, this.themeColor);
         }
+      }
     },
 
     // 切换自定义鼠标样式
     toggleCustomCursor() {
-      if (typeof window === 'undefined' || !appCursorInstance) return;
+      if (typeof window === "undefined" || !appCursorInstance) return;
       if (this.useCustomCursor) {
         appCursorInstance.enable();
       } else {
@@ -319,29 +346,29 @@ export const mainStore = defineStore("main", {
     },
     // 应用自定义主题色
     applyCustomThemeColor(primary, secondary) {
-      if (typeof document === 'undefined') return;
+      if (typeof document === "undefined") return;
       const html = document.documentElement;
       // 移除所有预设主题 class
-      THEME_COLOR_CLASSES.forEach(cls => html.classList.remove(cls));
+      THEME_COLOR_CLASSES.forEach((cls) => html.classList.remove(cls));
       // 设置 CSS 变量
-      html.style.setProperty('--main-color', primary);
-      html.style.setProperty('--main-color-bg', primary + '0d');
-      html.style.setProperty('--main-accent', secondary);
-      html.style.setProperty('--main-accent-bg', secondary + '1a');
+      html.style.setProperty("--main-color", primary);
+      html.style.setProperty("--main-color-bg", primary + "0d");
+      html.style.setProperty("--main-accent", secondary);
+      html.style.setProperty("--main-accent-bg", secondary + "1a");
       // 更新光标颜色
-      html.style.setProperty('--cursor-bg-color', primary);
+      html.style.setProperty("--cursor-bg-color", primary);
       if (appCursorInstance) {
         appCursorInstance.setCursorColor(primary);
       }
       // 弹窗提示
       if (typeof $message !== "undefined") {
-        $message.success('自定义主题色已应用', { duration: 3000 });
+        $message.success("自定义主题色已应用", { duration: 3000 });
       }
     },
 
     // 定时切换明暗显示外观
     startScheduledTheme() {
-      if (typeof window === 'undefined') return;
+      if (typeof window === "undefined") return;
       this.stopScheduledTheme();
 
       const checkAndSwitch = () => {
@@ -350,7 +377,7 @@ export const mainStore = defineStore("main", {
         const now = new Date();
         const currentHours = now.getHours();
         const currentMinutes = now.getMinutes();
-        const currentTime = `${String(currentHours).padStart(2, '0')}:${String(currentMinutes).padStart(2, '0')}`;
+        const currentTime = `${String(currentHours).padStart(2, "0")}:${String(currentMinutes).padStart(2, "0")}`;
 
         const lightTime = this.scheduledLightTime;
         const darkTime = this.scheduledDarkTime;
@@ -372,11 +399,11 @@ export const mainStore = defineStore("main", {
         // 切换主题（如果壁纸模式则跳过）
         if (this.backgroundType === "image") return;
 
-        if (shouldLight && this.themeType !== 'light') {
-          this.themeType = 'light';
+        if (shouldLight && this.themeType !== "light") {
+          this.themeType = "light";
           this.updateActualThemeValue();
-        } else if (shouldDark && this.themeType !== 'dark') {
-          this.themeType = 'dark';
+        } else if (shouldDark && this.themeType !== "dark") {
+          this.themeType = "dark";
           this.updateActualThemeValue();
         }
       };
@@ -422,7 +449,6 @@ export const mainStore = defineStore("main", {
         "backgroundUrl",
         "showMoreSettings",
         "showMoreSettingsConfirmed",
-        "channelMode",
         "devMode",
         "devModeOptionsExpanded",
         "highContrast",
@@ -459,7 +485,7 @@ export const mainStore = defineStore("main", {
         "siteVersionDate",
         "branchVersion",
         "branchBuildTime",
-      ], 
+      ],
     },
   ],
 });
@@ -467,7 +493,7 @@ export const mainStore = defineStore("main", {
 // 在 Pinia store 被创建后，初始化光标并处理主题设置
 export const initializeCursor = () => {
   // 确保只在客户端执行初始化
-  if (typeof window === 'undefined' || typeof document === 'undefined') {
+  if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
 
@@ -495,19 +521,19 @@ export const initializeCursor = () => {
   }
 
   // 新增：设置 html 元素的字体大小
-  document.documentElement.style.fontSize = store.fontSize + 'px';
+  document.documentElement.style.fontSize = store.fontSize + "px";
 
   if (window.matchMedia) {
-    const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleSystemThemeChange = (e) => {
-      if (store.themeType === 'auto') {
+      if (store.themeType === "auto") {
         store.triggerThemeUpdate();
       }
     };
 
     if (mediaQueryList.addEventListener) {
-      mediaQueryList.addEventListener('change', handleSystemThemeChange);
+      mediaQueryList.addEventListener("change", handleSystemThemeChange);
     } else {
       mediaQueryList.addListener(handleSystemThemeChange);
     }

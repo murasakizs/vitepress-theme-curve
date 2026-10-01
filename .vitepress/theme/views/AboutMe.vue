@@ -89,15 +89,16 @@
       <div class="about-item" style="grid-column: 1 / 4; grid-row: 5">
         <span class="title2">二次元扩列卡</span>
         <div class="intro-content">
-          <p>cn 泠诗尘，称呼随意，唯一标识<span style="color: #f472b6">SGeXiLQ</span></p>
+          <p>cn泠诗尘，称呼随意，标识<span style="color: #f472b6">SGeXiLQ</span></p>
           <p>
             IN<span style="color: #f472b6">F</span>P-T，生男心女，性取向<span style="color: #a855f7"
               >双</span
-            >
+            >，高一休学
           </p>
+          <p>希望能被作为女孩子对待，而不是生理性别</p>
           <p>生日2009.10.10，坐标重庆合川/江苏苏州</p>
-          <p>术力口/日番/漫画，<span style="color: #f472b6">百合</span>赛高</p>
-          <p>游戏PJSK(fc24)/MC/EndField等，maimai萌新</p>
+          <p>术力口/番剧/漫画，喜爱<span style="color: #f472b6">百合</span>向作品</p>
+          <p>游戏PJSK/Minecraft/EndField/maimai等，STEAM独立游戏，也会接触一些乙游（？</p>
           <p>
             推<span style="color: #39c5bb">Miku</span>/<span style="color: #66ccff">天依</span
             >/<span style="color: #ffaad5">mzk</span>，喜欢<span style="color: #586294">烤25团</span
@@ -115,7 +116,7 @@
           <p>猜你会雷：空间多转发&碎碎念/生心不一/Trans.MtF/adhd/微负(yyz)/女性主义(非极端)</p>
         </div>
         <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">
-          最后更新于 2026.9.30
+          最后更新于 2026.10.1
         </p>
       </div>
     </div>

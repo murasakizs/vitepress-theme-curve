@@ -5,7 +5,7 @@ let appCursorInstance;
 const isMobile =
   typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 14;
+const PERSIST_VERSION = 17;
 // 开发模式开关（1 = 未开启，2 = 开启）
 const DEFAULT_DEV_MODE = 1;
 
@@ -183,7 +183,7 @@ export const mainStore = defineStore("main", {
       siteVersion: "V1.3",
       siteVersionDate: "2026.9.12",
       // 分支版本（自动递增）
-      branchVersion: 106,
+      branchVersion: 107,
       branchBuildTime: "2026.10.01 10:45:23",
     };
   },

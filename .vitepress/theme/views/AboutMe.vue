@@ -81,7 +81,7 @@
           <p>INFP-T｜双｜二次元｜音游｜百合｜术力口</p>
         </div>
         <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">
-          最后更新于 2026.9.17
+          最后更新于 2026.9.30
         </p>
       </div>
 
@@ -115,7 +115,7 @@
           <p>猜你会雷：空间多转发&碎碎念/生心不一/Trans.MtF/adhd/微负(yyz)/女性主义(非极端)</p>
         </div>
         <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">
-          最后更新于 2026.8.19
+          最后更新于 2026.9.30
         </p>
       </div>
     </div>

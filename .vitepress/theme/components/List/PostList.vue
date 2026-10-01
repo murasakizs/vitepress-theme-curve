@@ -1,10 +1,19 @@
 <!-- 文章列表 -->
 <template>
-  <div class="post-lists" :class="{'layout-grid': layoutType === 'twoColumns'}" :style="gridStyle">
+  <div
+    class="post-lists"
+    :class="{ 'layout-grid': layoutType === 'twoColumns' }"
+    :style="gridStyle"
+  >
     <div
       v-for="(item, index) in listData"
       :key="index"
-      :class="['post-item', 's-card', 'hover',{ simple, cover: showCover(item),[`cover-${layoutType}`]: showCover(item) }]"
+      :class="[
+        'post-item',
+        's-card',
+        'hover',
+        { simple, cover: showCover(item), [`cover-${layoutType}`]: showCover(item) },
+      ]"
       :style="{ animationDelay: `${0.4 + index / 10}s` }"
     >
       <a
@@ -14,7 +23,7 @@
         @click="toPost($event, item.regularPath)"
       ></a>
       <div v-if="!simple && showCover(item)" class="post-cover">
-        <img :src="getCover(item)" :alt="item.title">
+        <img :src="getCover(item)" :alt="item.title" />
       </div>
       <div class="post-content">
         <div v-if="!simple && item?.categories" class="post-category">
@@ -82,43 +91,51 @@ const props = defineProps({
   },
 });
 
-const { theme: themeConfig } = useData()
+const { theme: themeConfig } = useData();
 
 // 标签/分类归一化：字符串转数组
 const asArray = (val) => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
-  if (typeof val === "string") return val.split(",").map(s => s.trim()).filter(Boolean);
+  if (typeof val === "string")
+    return val
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   return [];
 };
 
 // 计算布局类型
-const layoutType = computed(() => 
-  themeConfig.value?.cover?.twoColumns ? 'twoColumns' : themeConfig.value?.cover?.showCover?.coverLayout ?? 'left'
-)
+const layoutType = computed(() =>
+  themeConfig.value?.cover?.twoColumns
+    ? "twoColumns"
+    : (themeConfig.value?.cover?.showCover?.coverLayout ?? "left"),
+);
 
 // 计算网格样式
-const gridStyle = computed(() => 
-  layoutType.value === 'twoColumns' ? {
-    '--grid-columns': 2,
-    '--grid-gap': '1rem'
-  } : {}
-)
+const gridStyle = computed(() =>
+  layoutType.value === "twoColumns"
+    ? {
+        "--grid-columns": 2,
+        "--grid-gap": "1rem",
+      }
+    : {},
+);
 
 // 判断是否显示封面
-const showCover = () => themeConfig.value?.cover?.showCover?.enable
+const showCover = () => themeConfig.value?.cover?.showCover?.enable;
 
 // 获取封面图片 按优先级获取：cover > defaultCover > false
 const getCover = ({ cover: itemCover }) => {
-  const { cover } = themeConfig.value ?? {}
-  
-  if (!cover?.showCover?.enable) return false
-  if (itemCover) return itemCover
-  
-  return Array.isArray(cover.showCover.defaultCover) 
+  const { cover } = themeConfig.value ?? {};
+
+  if (!cover?.showCover?.enable) return false;
+  if (itemCover) return itemCover;
+
+  return Array.isArray(cover.showCover.defaultCover)
     ? cover.showCover.defaultCover[Math.floor(Math.random() * cover.showCover.defaultCover.length)]
-    : false
-}
+    : false;
+};
 
 // 前往文章
 const toPost = (event, path) => {
@@ -149,7 +166,7 @@ const toPost = (event, path) => {
 .post-lists {
   .post-item {
     position: relative;
-    padding: 0!important;
+    padding: 0 !important;
     display: flex;
     margin-bottom: 1rem;
     animation: fade-up 0.6s 0.4s backwards;
@@ -163,20 +180,22 @@ const toPost = (event, path) => {
       z-index: 2;
       border-radius: inherit;
     }
-    
+
     .post-cover {
       pointer-events: none;
       flex: 0 0 35%;
       overflow: hidden;
       transform: translateZ(0);
-      
+
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transform-origin: center center;
         will-change: transform, filter;
-        transition: transform 0.5s ease-out, filter 0.5s ease-out;
+        transition:
+          transform 0.5s ease-out,
+          filter 0.5s ease-out;
         backface-visibility: hidden;
       }
     }
@@ -190,7 +209,7 @@ const toPost = (event, path) => {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      
+
       .post-category {
         display: flex;
         flex-wrap: wrap;
@@ -269,7 +288,9 @@ const toPost = (event, path) => {
             align-items: center;
             margin-right: 12px;
             white-space: nowrap;
-            transition: color 0.3s, transform var(--press-out) var(--press-ease);
+            transition:
+              color 0.3s,
+              transform var(--press-out) var(--press-ease);
             .iconfont {
               font-weight: normal;
               opacity: 0.6;
@@ -333,7 +354,7 @@ const toPost = (event, path) => {
     }
     &:hover {
       .post-cover img {
-        filter: brightness(.8);
+        filter: brightness(0.8);
         transform: scale(1.05);
       }
       .post-content {
@@ -348,7 +369,7 @@ const toPost = (event, path) => {
     @media (max-width: 768px) {
       flex-direction: column;
       height: auto;
-      
+
       .post-cover {
         flex: none;
         width: 100%;

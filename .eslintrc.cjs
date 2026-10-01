@@ -29,7 +29,13 @@ module.exports = {
     },
     {
       // 服务端 / 构建期脚本运行在 Node 环境
-      files: ["api/**/*.ts", "functions/**/*.ts", ".vitepress/**/*.mjs", "page/**/*.mjs", "pages/**/*.mjs"],
+      files: [
+        "api/**/*.ts",
+        "functions/**/*.ts",
+        ".vitepress/**/*.mjs",
+        "page/**/*.mjs",
+        "pages/**/*.mjs",
+      ],
       env: {
         node: true,
       },

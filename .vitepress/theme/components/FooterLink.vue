@@ -14,7 +14,12 @@
         target="_blank"
         class="social-link"
       >
-        <img v-if="item.iconType === 'image'" :src="item.icon" :alt="item.icon" class="social-icon-img" />
+        <img
+          v-if="item.iconType === 'image'"
+          :src="item.icon"
+          :alt="item.icon"
+          class="social-icon-img"
+        />
         <i v-else :class="`iconfont icon-${item.icon}`"></i>
       </a>
       <div class="logo" title="返回顶部" @click="smoothScrolling">
@@ -27,7 +32,12 @@
         target="_blank"
         class="social-link"
       >
-        <img v-if="item.iconType === 'image'" :src="item.icon" :alt="item.icon" class="social-icon-img" />
+        <img
+          v-if="item.iconType === 'image'"
+          :src="item.icon"
+          :alt="item.icon"
+          class="social-icon-img"
+        />
         <i v-else :class="`iconfont icon-${item.icon}`"></i>
       </a>
     </div>
@@ -102,9 +112,7 @@ const badgeConfig = computed(() => footer.badges ?? {});
 
 // 技术徽标数据，优先读取配置，未配置时回退到默认值
 const techBadges = computed(() => {
-  const badgeItems = Array.isArray(badgeConfig.value)
-    ? badgeConfig.value
-    : badgeConfig.value.items;
+  const badgeItems = Array.isArray(badgeConfig.value) ? badgeConfig.value : badgeConfig.value.items;
 
   const normalizedBadges = (badgeItems ?? defaultTechBadges).filter((badge) => {
     return badge && badge.show !== false;
@@ -267,8 +275,8 @@ const toggleBadge = (index) => {
     margin: 1rem 0;
     .sitemap-item {
       display: flex;
-    flex-direction: column;
-    align-items: center;
+      flex-direction: column;
+      align-items: center;
       min-width: 120px;
       .title {
         display: inline-block;

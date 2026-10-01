@@ -33,13 +33,12 @@ const markdownConfig = (md, themeConfig) => {
         });
         // isChecked 是 markdown 渲染结果（可能含标签/属性），不能直接插进 class 属性。
         // 取纯文本再做 HTML 转义，并折叠空白，避免产出畸形 class。
-        const modifier = md.utils
-          .escapeHtml(
-            isChecked
-              .replace(/<[^>]*>/g, " ")
-              .replace(/\s+/g, " ")
-              .trim(),
-          );
+        const modifier = md.utils.escapeHtml(
+          isChecked
+            .replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim(),
+        );
         return `<div class="radio">
           <div class="radio-point${modifier ? ` ${modifier}` : ""}" />`;
       } else {

@@ -43,10 +43,10 @@ const limitedReferences = computed(() => {
   // 你需要根据你的字体大小和字体类型进行精确调整。
   const maxChars = Math.floor((screenWidth.value * 0.7) / 16); // 估算最大字符数
 
-  return references.value.map(item => {
+  return references.value.map((item) => {
     let title = item.title;
     if (title.length > maxChars) {
-      title = title.substring(0, maxChars) + '...';
+      title = title.substring(0, maxChars) + "...";
     }
     return { ...item, title: title };
   });
@@ -59,16 +59,16 @@ onMounted(() => {
   //最简单的解决方法是确保在客户端代码中访问 window
   //可以通过判断代码是否在浏览器环境中运行来避免在服务器端渲染时执行涉及 window 的代码
   //使用 typeof window !== 'undefined' 来判断
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     screenWidth.value = window.innerWidth;
   }
-  window.addEventListener('resize', updateReferences);
+  window.addEventListener("resize", updateReferences);
   updateReferences();
 });
 
 // 在组件卸载前移除事件监听器
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateReferences);
+  window.removeEventListener("resize", updateReferences);
 });
 
 // 更新 references 的函数，触发 computed 重新计算

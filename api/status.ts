@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 // Define Status Type
 type StatusType = "operational" | "degraded" | "partial" | "major" | "maintenance";
@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const apiToken = process.env.BETTER_STACK_API_TOKEN;
 
   // Use Vercel's caching
-  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
+  res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=30");
 
   if (!apiToken) {
     return res.status(200).json({
@@ -28,18 +28,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // 智能替换 URL 路径中的问号
   function encodePathQuestionMarks(url: string, forceEncode = false): string {
-    if (!url.includes('?')) return url;
-    const parts = url.split('?');
+    if (!url.includes("?")) return url;
+    const parts = url.split("?");
     // 如果只有一个问号且强制作为路径，则全部替换
-    if (parts.length === 2 && forceEncode) return parts.join('%3F');
+    if (parts.length === 2 && forceEncode) return parts.join("%3F");
     // 保留最后一段作为查询参数，其余问号替换为 %3F
     const query = parts.pop();
-    return `${parts.join('%3F')}?${query}`;
+    return `${parts.join("%3F")}?${query}`;
   }
 
   try {
     let fetchUrl = "https://uptime.betterstack.com/api/v2/monitors";
-    
+
     // 如果前端请求携带了 url 参数（比如用于获取特定监控项）
     const rawUrl = req.query.url as string;
     if (rawUrl) {
@@ -59,29 +59,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (!response.ok) {
-        throw new Error(`Better Stack API error: ${response.statusText}`);
+      throw new Error(`Better Stack API error: ${response.statusText}`);
     }
 
-    const data = await response.json() as {
-        data: Array<{
-            id: string;
-            attributes: {
-                url: string;
-                pronounceable_name: string;
-                status: "paused" | "pending" | "maintenance" | "up" | "validating" | "down";
-            };
-        }>;
+    const data = (await response.json()) as {
+      data: Array<{
+        id: string;
+        attributes: {
+          url: string;
+          pronounceable_name: string;
+          status: "paused" | "pending" | "maintenance" | "up" | "validating" | "down";
+        };
+      }>;
     };
 
     const monitors = data.data || [];
     const totalCount = monitors.length;
-    const downCount = monitors.filter(m => m.attributes.status === "down").length;
-    const maintenanceCount = monitors.filter(m => m.attributes.status === "maintenance").length;
-    const validatingCount = monitors.filter(m => m.attributes.status === "validating").length;
-    const upCount = monitors.filter(m => 
-      m.attributes.status === "up" || 
-      m.attributes.status === "paused" || 
-      m.attributes.status === "pending"
+    const downCount = monitors.filter((m) => m.attributes.status === "down").length;
+    const maintenanceCount = monitors.filter((m) => m.attributes.status === "maintenance").length;
+    const validatingCount = monitors.filter((m) => m.attributes.status === "validating").length;
+    const upCount = monitors.filter(
+      (m) =>
+        m.attributes.status === "up" ||
+        m.attributes.status === "paused" ||
+        m.attributes.status === "pending",
     ).length;
 
     let statusType: StatusType;
@@ -117,7 +118,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       label: statusInfo.label,
       updatedAt: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("Fetch status failed:", error);
     console.error("Token exists:", !!apiToken);

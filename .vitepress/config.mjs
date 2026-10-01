@@ -38,9 +38,7 @@ const normalizeSitemapUrl = (url) => {
   const trimmed = pathname.replace(/\/+$/, "");
   return trimmed === "" ? "/" : trimmed;
 };
-const REDIRECT_PAGE_URLS = new Set(
-  ["/page", "/page/1", "/pages"].map(normalizeSitemapUrl),
-);
+const REDIRECT_PAGE_URLS = new Set(["/page", "/page/1", "/pages"].map(normalizeSitemapUrl));
 
 // 确定性兜底：从产物 sitemap.xml 中按 <loc> 路径剔除跳转壳。
 // 幂等——若 URL 已不存在则原样返回。防 VitePress 版本行为变化。
@@ -69,7 +67,7 @@ export default withPwa(
     lang: themeConfig.siteMeta.lang,
     // 简洁的 URL
     cleanUrls: true,
-    base: '/',
+    base: "/",
     // 最后更新时间戳
     lastUpdated: true,
     // 主题
@@ -190,23 +188,46 @@ export default withPwa(
                 return;
               }
               let body = "";
-              req.on("data", (chunk) => { body += chunk; });
+              req.on("data", (chunk) => {
+                body += chunk;
+              });
               req.on("end", () => {
                 try {
                   const data = JSON.parse(body);
                   const storePath = path.resolve(__dirname, "./theme/store/index.js");
                   let content = fs.readFileSync(storePath, "utf-8");
-                  if (data.siteVersion != null) content = content.replace(/(siteVersion:\s*")[^"]*(")/, `$1${data.siteVersion}$2`);
-                  if (data.siteVersionDate != null) content = content.replace(/(siteVersionDate:\s*")[^"]*(")/, `$1${data.siteVersionDate}$2`);
-                  if (data.branchVersion != null) content = content.replace(/(branchVersion:\s*)\d+/, `$1${data.branchVersion}`);
-                  if (data.branchBuildTime != null) content = content.replace(/(branchBuildTime:\s*")[^"]*(")/, `$1${data.branchBuildTime}$2`);
-                  if (data.DEFAULT_CHANNEL_MODE != null) content = content.replace(/(DEFAULT_CHANNEL_MODE\s*=\s*)\d+/, `$1${data.DEFAULT_CHANNEL_MODE}`);
-                  if (data.DEFAULT_DEV_MODE != null) content = content.replace(/(DEFAULT_DEV_MODE\s*=\s*)\d+/, `$1${data.DEFAULT_DEV_MODE}`);
-                  if (data.DEFAULT_DEV_CHANNEL_MERGED != null) content = content.replace(/(DEFAULT_DEV_CHANNEL_MERGED\s*=\s*)\d+/, `$1${data.DEFAULT_DEV_CHANNEL_MERGED}`);
+                  if (data.siteVersion != null)
+                    content = content.replace(
+                      /(siteVersion:\s*")[^"]*(")/,
+                      `$1${data.siteVersion}$2`,
+                    );
+                  if (data.siteVersionDate != null)
+                    content = content.replace(
+                      /(siteVersionDate:\s*")[^"]*(")/,
+                      `$1${data.siteVersionDate}$2`,
+                    );
+                  if (data.branchVersion != null)
+                    content = content.replace(/(branchVersion:\s*)\d+/, `$1${data.branchVersion}`);
+                  if (data.branchBuildTime != null)
+                    content = content.replace(
+                      /(branchBuildTime:\s*")[^"]*(")/,
+                      `$1${data.branchBuildTime}$2`,
+                    );
+                  if (data.DEFAULT_DEV_MODE != null)
+                    content = content.replace(
+                      /(DEFAULT_DEV_MODE\s*=\s*)\d+/,
+                      `$1${data.DEFAULT_DEV_MODE}`,
+                    );
                   if (data.resetVersion) {
-                    content = content.replace(/(PERSIST_VERSION\s*=\s*)\d+/, `$1${data.resetVersion}`);
+                    content = content.replace(
+                      /(PERSIST_VERSION\s*=\s*)\d+/,
+                      `$1${data.resetVersion}`,
+                    );
                   } else if (data.bumpVersion) {
-                    content = content.replace(/(PERSIST_VERSION\s*=\s*)(\d+)/, (_, prefix, num) => `${prefix}${parseInt(num) + 1}`);
+                    content = content.replace(
+                      /(PERSIST_VERSION\s*=\s*)(\d+)/,
+                      (_, prefix, num) => `${prefix}${parseInt(num) + 1}`,
+                    );
                   }
                   fs.writeFileSync(storePath, content, "utf-8");
                   res.setHeader("Content-Type", "application/json");
@@ -251,7 +272,7 @@ export default withPwa(
     // PWA
     pwa: {
       registerType: "autoUpdate",
-      
+
       workbox: {
         clientsClaim: true,
         skipWaiting: true,
@@ -351,7 +372,12 @@ export default withPwa(
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,jpeg,gif,svg,woff2,ttf}"],
         globIgnores: ["**/vp-icons.css", "**/sitemap.xml", "**/rss.xml"],
         // 排除路径
-        navigateFallbackDenylist: [/^\/sitemap.xml$/, /^\/rss.xml$/, /^\/robots.txt$/, /^\/redirect(?:\.html)?(?:\/|$)/],
+        navigateFallbackDenylist: [
+          /^\/sitemap.xml$/,
+          /^\/rss.xml$/,
+          /^\/robots.txt$/,
+          /^\/redirect(?:\.html)?(?:\/|$)/,
+        ],
       },
       manifest: {
         name: themeConfig.siteMeta.title,

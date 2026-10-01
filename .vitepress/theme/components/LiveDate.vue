@@ -52,7 +52,11 @@ const parseLiveDate = (value) => {
     // 基准年只影响"今年之前"的部分，yearly 循环会把它加回到不早于今天，
     // 所以取当前年份可读性最好，也不影响最终结果。
     const base = now.value || dayjs();
-    const parsed = base.startOf("day").month(month - 1).date(day).startOf("day");
+    const parsed = base
+      .startOf("day")
+      .month(month - 1)
+      .date(day)
+      .startOf("day");
     return parsed.isValid() ? parsed : null;
   }
   const parsed = dayjs(str);

@@ -10,121 +10,203 @@
       @modal-close="store.changeShowStatus('showSettings')"
     >
       <div class="set-list">
-        <div v-if="channelMode === 2 && store.devMode !== 2" class="set-warn set-warn-channel">
-          <span class="warn-text">当前处于测试分支（dev分支）</span>
-        </div>
         <div v-if="store.devMode === 2" class="set-warn set-warn-static">
           <span class="warn-text">当前处于开发模式，提交代码时应退出开发模式</span>
         </div>
         <!-- 开发模式选项 -->
         <template v-if="store.devMode === 2">
           <div class="set-item">
-            <span class="set-label set-label-channel">development mode options</span>
+            <span class="set-label set-label-channel">开发模式选项</span>
             <div class="set-options">
               <span
                 :class="['options', { choose: devModeOptionsExpanded }]"
                 @click="devModeOptionsExpanded = !devModeOptionsExpanded"
               >
-                {{ devModeOptionsExpanded ? 'collapse' : 'expand' }}
+                {{ devModeOptionsExpanded ? "收起" : "展开" }}
               </span>
             </div>
           </div>
           <Transition name="fade-up">
             <div v-if="devModeOptionsExpanded" class="set-expand-box">
               <div class="set-item">
-                <span class="set-label">channel mode</span>
-                <div class="set-options">
-                  <span
-                    :class="['options', { choose: channelMode === 1 }]"
-                    @click="switchChannelMode(1)"
-                  >
-                    release
-                  </span>
-                  <span
-                    :class="['options', { choose: channelMode === 2 }]"
-                    @click="switchChannelMode(2)"
-                  >
-                    dev
-                  </span>
-                </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">expand all settings groups</span>
+                <span class="set-label">展开所有设置分组</span>
                 <div class="set-options">
                   <span
                     :class="['options', { choose: !expandAllGroups }]"
                     @click="handleCollapseAllGroups"
                   >
-                    off
+                    关闭
                   </span>
                   <span
                     :class="['options', { choose: expandAllGroups }]"
                     @click="handleExpandAllGroups"
                   >
-                    on
+                    开启
                   </span>
                 </div>
               </div>
               <div class="set-item">
-                <span class="set-label">clear all data</span>
+                <span class="set-label">停用所有开发中的功能</span>
                 <div class="set-options">
                   <span
-                    class="options"
-                    @click.stop="handleClearDataKeepChannel"
+                    :class="['options', { choose: !devFeaturesDisabled }]"
+                    @click="restoreDefaultDevFeatures"
                   >
-                    ok
+                    关闭
+                  </span>
+                  <span
+                    :class="['options', { choose: devFeaturesDisabled }]"
+                    @click="disableAllDevFeatures"
+                  >
+                    开启
                   </span>
                 </div>
               </div>
               <div class="set-item">
-                <span class="set-label">close development mode</span>
+                <span class="set-label">版本信息</span>
                 <div class="set-options">
                   <span
-                    class="options"
-                    @click="closeDevModeConfirmVisible = true"
+                    :class="['options', { choose: versionFieldsExpanded }]"
+                    @click="versionFieldsExpanded = !versionFieldsExpanded"
                   >
-                    confirm
+                    {{ versionFieldsExpanded ? "收起" : "展开" }}
                   </span>
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="closeDevModeConfirmVisible" class="set-warn" style="flex-direction: column; align-items: stretch" @click="closeDevModeConfirmVisible = false">
-                  <template v-if="channelMode === 1">
-                    <div style="display: flex; align-items: center; justify-content: space-between">
-                      <span class="warn-text">when submitting to the release channel, the defined version needs to be updated</span>
-                      <span class="options" @click.stop="confirmCloseDevMode">confirm</span>
+                <div v-if="versionFieldsExpanded" class="set-expand-box">
+                  <div class="set-item">
+                    <span class="set-label">站点基础版本</span>
+                    <div class="set-options">
+                      <input
+                        v-model="siteVersion"
+                        type="text"
+                        style="
+                          padding: 6px 8px;
+                          font-size: 0.9375rem;
+                          border-radius: 8px;
+                          min-width: 30px;
+                          border: 1px solid var(--main-card-border);
+                          background-color: var(--main-card-background);
+                          color: var(--main-font-color);
+                          font-family: var(--main-font-family);
+                          text-align: center;
+                          height: 100%;
+                          box-sizing: border-box;
+                        "
+                        placeholder="V1.1"
+                      />
                     </div>
-                    <div class="set-item" style="margin-top: 14px">
-                      <span class="set-label">site version</span>
-                      <div class="set-options">
-                        <input
-                          v-model="siteVersion"
-                          type="text"
-                          style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 30px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
-                          placeholder="V1.1"
-                          @click.stop
-                        />
-                      </div>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">站点基础版本日期</span>
+                    <div class="set-options">
+                      <input
+                        v-model="siteVersionDate"
+                        type="text"
+                        style="
+                          padding: 6px 8px;
+                          font-size: 0.9375rem;
+                          border-radius: 8px;
+                          min-width: 30px;
+                          border: 1px solid var(--main-card-border);
+                          background-color: var(--main-card-background);
+                          color: var(--main-font-color);
+                          font-family: var(--main-font-family);
+                          text-align: center;
+                          height: 100%;
+                          box-sizing: border-box;
+                        "
+                        placeholder="2026.8.24"
+                      />
                     </div>
-                    <div class="set-item">
-                      <span class="set-label">site version date</span>
-                      <div class="set-options">
-                        <input
-                          v-model="siteVersionDate"
-                          type="text"
-                          style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 30px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
-                          placeholder="2026.8.24"
-                          @click.stop
-                        />
-                      </div>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">当前版本内部版本</span>
+                    <div class="set-options">
+                      <input
+                        v-model="branchVersion"
+                        type="text"
+                        style="
+                          padding: 6px 8px;
+                          font-size: 0.9375rem;
+                          border-radius: 8px;
+                          min-width: 30px;
+                          border: 1px solid var(--main-card-border);
+                          background-color: var(--main-card-background);
+                          color: var(--main-font-color);
+                          font-family: var(--main-font-family);
+                          text-align: center;
+                          height: 100%;
+                          box-sizing: border-box;
+                        "
+                        placeholder="106"
+                      />
                     </div>
-                  </template>
-                  <template v-else>
-                    <div style="display: flex; align-items: center; justify-content: space-between">
-                      <span class="warn-text">are you sure you want to turn off development mode</span>
-                      <span class="options" @click.stop="confirmCloseDevMode">confirm</span>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">内部版本构建时间</span>
+                    <div class="set-options">
+                      <input
+                        v-model="branchBuildTime"
+                        type="text"
+                        style="
+                          padding: 6px 8px;
+                          font-size: 0.9375rem;
+                          border-radius: 8px;
+                          min-width: 30px;
+                          border: 1px solid var(--main-card-border);
+                          background-color: var(--main-card-background);
+                          color: var(--main-font-color);
+                          font-family: var(--main-font-family);
+                          text-align: center;
+                          height: 100%;
+                          box-sizing: border-box;
+                        "
+                        placeholder="2026.09.22 15:24:38"
+                      />
                     </div>
-                  </template>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">自动获取内部版本构建时间</span>
+                    <div class="set-options">
+                      <span class="options" @click="autoFillBranchBuildTime">执行</span>
+                    </div>
+                  </div>
+                  <div class="set-item">
+                    <span class="set-label">确认修改</span>
+                    <div class="set-options">
+                      <span class="options" @click="confirmAllVersionFields">执行</span>
+                    </div>
+                  </div>
+                </div>
+              </Transition>
+              <div class="set-item">
+                <span class="set-label">DEFAULT_DEV_MODE 随机化</span>
+                <div class="set-options">
+                  <span class="options" @click="randomizeDefaultDevMode">确认</span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">清除所有数据</span>
+                <div class="set-options">
+                  <span class="options" @click.stop="handleClearDataKeepDevMode"> 确认 </span>
+                </div>
+              </div>
+              <div class="set-item">
+                <span class="set-label">关闭开发模式</span>
+                <div class="set-options">
+                  <span class="options" @click="closeDevModeConfirmVisible = true"> 确认 </span>
+                </div>
+              </div>
+              <Transition name="fade-up">
+                <div
+                  v-if="closeDevModeConfirmVisible"
+                  class="set-warn"
+                  @click="closeDevModeConfirmVisible = false"
+                >
+                  <span class="warn-text">你指的是要关闭开发模式吗 / 请确认推送前已经完成了相关设置</span>
+                  <span class="options" @click.stop="confirmCloseDevMode">确认</span>
                 </div>
               </Transition>
             </div>
@@ -186,12 +268,7 @@
         <div class="set-item">
           <span class="set-label">调整明暗显示外观</span>
           <div class="set-options">
-            <span
-              v-if="scheduledThemeEnabled"
-              class="options choose"
-            >
-              定时切换
-            </span>
+            <span v-if="scheduledThemeEnabled" class="options choose"> 定时切换 </span>
             <span
               :class="['options', { choose: !scheduledThemeEnabled && themeType === 'auto' }]"
               @click="setThemeType('auto')"
@@ -243,7 +320,7 @@
               :class="['options', { choose: themeColorExpanded }]"
               @click="themeColorExpanded = !themeColorExpanded"
             >
-              {{ themeColorExpanded ? '收起' : '展开' }}
+              {{ themeColorExpanded ? "收起" : "展开" }}
             </span>
           </div>
         </div>
@@ -323,7 +400,11 @@
                 <div class="set-item">
                   <span class="set-label">自定义主要色（#RRGGBB）</span>
                   <div class="set-options">
-                    <div class="color-preview" :style="{ backgroundColor: customPrimaryColor }" @click="$refs.primaryColorInput.click()"></div>
+                    <div
+                      class="color-preview"
+                      :style="{ backgroundColor: customPrimaryColor }"
+                      @click="$refs.primaryColorInput.click()"
+                    ></div>
                     <input
                       ref="primaryColorInput"
                       v-model="customPrimaryColor"
@@ -342,7 +423,11 @@
                 <div class="set-item">
                   <span class="set-label">自定义辅助色（#RRGGBB）</span>
                   <div class="set-options">
-                    <div class="color-preview" :style="{ backgroundColor: customSecondaryColor }" @click="$refs.secondaryColorInput.click()"></div>
+                    <div
+                      class="color-preview"
+                      :style="{ backgroundColor: customSecondaryColor }"
+                      @click="$refs.secondaryColorInput.click()"
+                    ></div>
                     <input
                       ref="secondaryColorInput"
                       v-model="customSecondaryColor"
@@ -378,14 +463,24 @@
                 </span>
                 <span
                   :class="['options', { choose: removeAnimations }]"
-                  @click="removeAnimations = true; removeAnimationsWarnVisible = true"
+                  @click="
+                    removeAnimations = true;
+                    removeAnimationsWarnVisible = true;
+                  "
                 >
                   开启
                 </span>
               </div>
             </div>
             <Transition name="fade-up">
-              <div v-if="removeAnimationsWarnVisible" class="set-warn" @click="removeAnimations = false; removeAnimationsWarnVisible = false">
+              <div
+                v-if="removeAnimationsWarnVisible"
+                class="set-warn"
+                @click="
+                  removeAnimations = false;
+                  removeAnimationsWarnVisible = false;
+                "
+              >
                 <span class="warn-text">开启此选项将移除所有过渡动画，你确定要继续吗</span>
                 <span class="options" @click.stop="applyRemoveAnimations">确认</span>
               </div>
@@ -399,7 +494,7 @@
               :class="['options', { choose: messageSettingsExpanded }]"
               @click="messageSettingsExpanded = !messageSettingsExpanded"
             >
-              {{ messageSettingsExpanded ? '收起' : '展开' }}
+              {{ messageSettingsExpanded ? "收起" : "展开" }}
             </span>
           </div>
         </div>
@@ -464,42 +559,42 @@
                     </span>
                   </template>
                   <template v-else>
-                  <span
-                    :class="['options', { choose: messagePosition === 'left-top' }]"
-                    @click="setMessagePosition('left-top')"
-                  >
-                    左上
-                  </span>
-                  <span
-                    :class="['options', { choose: messagePosition === 'left-bottom' }]"
-                    @click="setMessagePosition('left-bottom')"
-                  >
-                    左下
-                  </span>
-                  <span
-                    :class="['options', { choose: messagePosition === 'right-top' }]"
-                    @click="setMessagePosition('right-top')"
-                  >
-                    右上
-                  </span>
-                  <span
-                    :class="['options', { choose: messagePosition === 'right-bottom' }]"
-                    @click="setMessagePosition('right-bottom')"
-                  >
-                    右下
-                  </span>
-                  <span
-                    :class="['options', { choose: messagePosition === 'top-center' }]"
-                    @click="setMessagePosition('top-center')"
-                  >
-                    顶部居中
-                  </span>
-                  <span
-                    :class="['options', { choose: messagePosition === 'bottom-center' }]"
-                    @click="setMessagePosition('bottom-center')"
-                  >
-                    底部居中
-                  </span>
+                    <span
+                      :class="['options', { choose: messagePosition === 'left-top' }]"
+                      @click="setMessagePosition('left-top')"
+                    >
+                      左上
+                    </span>
+                    <span
+                      :class="['options', { choose: messagePosition === 'left-bottom' }]"
+                      @click="setMessagePosition('left-bottom')"
+                    >
+                      左下
+                    </span>
+                    <span
+                      :class="['options', { choose: messagePosition === 'right-top' }]"
+                      @click="setMessagePosition('right-top')"
+                    >
+                      右上
+                    </span>
+                    <span
+                      :class="['options', { choose: messagePosition === 'right-bottom' }]"
+                      @click="setMessagePosition('right-bottom')"
+                    >
+                      右下
+                    </span>
+                    <span
+                      :class="['options', { choose: messagePosition === 'top-center' }]"
+                      @click="setMessagePosition('top-center')"
+                    >
+                      顶部居中
+                    </span>
+                    <span
+                      :class="['options', { choose: messagePosition === 'bottom-center' }]"
+                      @click="setMessagePosition('bottom-center')"
+                    >
+                      底部居中
+                    </span>
                   </template>
                 </template>
               </div>
@@ -588,7 +683,7 @@
               :class="['options', { choose: islandSettingsExpanded }]"
               @click="islandSettingsExpanded = !islandSettingsExpanded"
             >
-              {{ islandSettingsExpanded ? '收起' : '展开' }}
+              {{ islandSettingsExpanded ? "收起" : "展开" }}
             </span>
           </div>
         </div>
@@ -681,7 +776,7 @@
               :class="['options', { choose: musicPlayerExpanded }]"
               @click="musicPlayerExpanded = !musicPlayerExpanded"
             >
-              {{ musicPlayerExpanded ? '收起' : '展开' }}
+              {{ musicPlayerExpanded ? "收起" : "展开" }}
             </span>
           </div>
         </div>
@@ -690,16 +785,10 @@
             <div class="set-item">
               <span class="set-label">音乐播放器</span>
               <div class="set-options">
-                <span
-                  :class="['options', { choose: !playerShow }]"
-                  @click="playerShow = false"
-                >
+                <span :class="['options', { choose: !playerShow }]" @click="playerShow = false">
                   关闭
                 </span>
-                <span
-                  :class="['options', { choose: playerShow }]"
-                  @click="playerShow = true"
-                >
+                <span :class="['options', { choose: playerShow }]" @click="playerShow = true">
                   开启
                 </span>
               </div>
@@ -785,7 +874,19 @@
                   <input
                     v-model="playerCustomIdsInput"
                     type="text"
-                    style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 120px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                    style="
+                      padding: 6px 8px;
+                      font-size: 0.9375rem;
+                      border-radius: 8px;
+                      min-width: 120px;
+                      border: 1px solid var(--main-card-border);
+                      background-color: var(--main-card-background);
+                      color: var(--main-font-color);
+                      font-family: var(--main-font-family);
+                      text-align: center;
+                      height: 100%;
+                      box-sizing: border-box;
+                    "
                     placeholder="多个ID用逗号分隔"
                     @keyup.enter="confirmCustomIds"
                   />
@@ -833,16 +934,10 @@
         <div class="set-item">
           <span class="set-label">自定义右键菜单</span>
           <div class="set-options">
-            <span
-              :class="['options', { choose: !useRightMenu }]"
-              @click="setRightMenu(false)"
-            >
+            <span :class="['options', { choose: !useRightMenu }]" @click="setRightMenu(false)">
               关闭
             </span>
-            <span
-              :class="['options', { choose: useRightMenu }]"
-              @click="setRightMenu(true)"
-            >
+            <span :class="['options', { choose: useRightMenu }]" @click="setRightMenu(true)">
               开启
             </span>
           </div>
@@ -856,10 +951,7 @@
             >
               关闭
             </span>
-            <span
-              :class="['options', { choose: useCustomCursor }]"
-              @click="setCustomCursor(true)"
-            >
+            <span :class="['options', { choose: useCustomCursor }]" @click="setCustomCursor(true)">
               开启
             </span>
           </div>
@@ -899,8 +991,16 @@
           </div>
         </div>
         <Transition name="fade-up">
-          <div v-if="showMoreSettingsWarnVisible" ref="warnRef" class="set-warn" @click="showMoreSettings = false; showMoreSettingsWarnVisible = false">
-            <span class="warn-text">更改这些选项可能导致未知的问题，你确定要继续吗</span>
+          <div
+            v-if="showMoreSettingsWarnVisible"
+            ref="warnRef"
+            class="set-warn"
+            @click="
+              showMoreSettings = false;
+              showMoreSettingsWarnVisible = false;
+            "
+          >
+            <span class="warn-text">你指的是要更改更多的选项吗，这可能导致未知的问题</span>
             <span class="options" @click.stop="confirmShowMoreSettings">确认</span>
           </div>
         </Transition>
@@ -913,7 +1013,7 @@
                   :class="['options', { choose: moreFontsExpanded }]"
                   @click="handleMoreFontsClick"
                 >
-                  {{ moreFontsExpanded ? '收起' : '展开' }}
+                  {{ moreFontsExpanded ? "收起" : "展开" }}
                 </span>
               </div>
             </div>
@@ -939,9 +1039,16 @@
                 <div class="set-item">
                   <span class="set-label">全站字体大小</span>
                   <div class="set-options">
-                    <span v-if="!fontSizeEditing" class="options" @click="fontSizeWarnVisible = true">修改</span>
+                    <span
+                      v-if="!fontSizeEditing"
+                      class="options"
+                      @click="fontSizeWarnVisible = true"
+                      >修改</span
+                    >
                     <template v-if="fontSizeEditing">
-                      <span v-if="fontSize !== 17" class="options" @click="resetFontSize">恢复默认</span>
+                      <span v-if="fontSize !== 17" class="options" @click="resetFontSize"
+                        >恢复默认</span
+                      >
                       <span class="options" @click="store.changeFontSize(false)"> - </span>
                       <span class="num">{{ fontSize }}</span>
                       <span class="options" @click="store.changeFontSize(true)"> + </span>
@@ -951,45 +1058,24 @@
                   </div>
                 </div>
                 <Transition name="fade-up">
-                  <div v-if="fontSizeWarnVisible" class="set-warn" @click="fontSizeWarnVisible = false">
-                    <span class="warn-text">修改字体大小可能导致未知的问题，你确定要继续吗</span>
-                    <span class="options" @click.stop="fontSizeEditing = true; fontSizeWarnVisible = false; store.fontSizePending = true">确认</span>
+                  <div
+                    v-if="fontSizeWarnVisible"
+                    class="set-warn"
+                    @click="fontSizeWarnVisible = false"
+                  >
+                    <span class="warn-text">你指的是要修改字体大小吗，这可能导致未知的问题</span>
+                    <span
+                      class="options"
+                      @click.stop="
+                        fontSizeEditing = true;
+                        fontSizeWarnVisible = false;
+                        store.fontSizePending = true;
+                      "
+                      >确认</span
+                    >
                   </div>
                 </Transition>
               </div>
-            </Transition>
-            <!-- 开发模式入口 -->
-            <Transition name="fade-up">
-              <template v-if="devModeEntryVisible">
-                <div v-if="devModeEntrySuccess" class="set-warn" @click="devModeEntryClose" style="cursor: pointer">
-                  <span class="warn-text">success</span>
-                  <span class="options">ok</span>
-                </div>
-                <div v-else-if="devModeEntryError" class="set-warn set-warn-static">
-                  <span class="warn-text">error</span>
-                  <span class="options" @click="devModeEntryClose">ok</span>
-                </div>
-                <div v-else-if="devModeEntryStep === 0" class="set-item">
-                  <span class="set-label" style="color: var(--main-error-color)">confirm entry into development mode</span>
-                  <div class="set-options">
-                    <span class="options" @click="devModeEntryClose">no</span>
-                    <span class="options devmode-yes-btn" @click="devModeEntryStep = 1">yes</span>
-                  </div>
-                </div>
-                <div v-else-if="devModeEntryStep === 1" class="set-item">
-                  <span class="set-label" style="color: var(--main-error-color)">verification required</span>
-                  <div class="set-options">
-                    <input
-                      v-model="devModeEntryInput"
-                      class="devmode-entry-input"
-                      type="text"
-                      placeholder="verification code"
-                      @keyup.enter="devModeEntryVerify"
-                    />
-                    <span class="options devmode-yes-btn" @click="devModeEntryVerify">continue</span>
-                  </div>
-                </div>
-              </template>
             </Transition>
             <span class="title">实验性功能</span>
             <span class="set-desc">以下选项处于实验性阶段，可能出现未知的问题</span>
@@ -1017,13 +1103,24 @@
               </div>
             </div>
             <Transition name="fade-up">
-              <div v-if="layoutWarnVisible" class="set-warn" @click="layoutWarnVisible = false; siteLayoutDisplay = siteLayout">
-                <span class="warn-text">强制更改页面布局可能导致未知的问题，你确定要继续吗</span>
+              <div
+                v-if="layoutWarnVisible"
+                class="set-warn"
+                @click="
+                  layoutWarnVisible = false;
+                  siteLayoutDisplay = siteLayout;
+                "
+              >
+                <span class="warn-text">你指的是要强制更改页面布局吗，这可能导致未知的问题</span>
                 <span class="options" @click.stop="handleLayoutWarnConfirm">确认</span>
               </div>
             </Transition>
             <Transition name="fade-up">
-              <div v-if="layoutConfirmVisible" class="set-warn set-warn-purple" @click="handleLayoutFail">
+              <div
+                v-if="layoutConfirmVisible"
+                class="set-warn set-warn-purple"
+                @click="handleLayoutFail"
+              >
                 <span />
                 <span class="warn-text">网站能正常显示吗？</span>
                 <span class="warn-countdown">{{ layoutCountdown }}秒后将恢复自动选择</span>
@@ -1079,7 +1176,7 @@
                   :class="['options', { choose: weatherSectionExpanded }]"
                   @click="weatherSectionExpanded = !weatherSectionExpanded"
                 >
-                  {{ weatherSectionExpanded ? '收起' : '展开' }}
+                  {{ weatherSectionExpanded ? "收起" : "展开" }}
                 </span>
               </div>
             </div>
@@ -1131,13 +1228,31 @@
                     <input
                       v-model="weatherManualCity"
                       type="text"
-                      style="padding: 6px 8px; font-size: 0.9375rem; border-radius: 8px; min-width: 80px; border: 1px solid var(--main-card-border); background-color: var(--main-card-background); color: var(--main-font-color); font-family: var(--main-font-family); text-align: center; height: 100%; box-sizing: border-box;"
+                      style="
+                        padding: 6px 8px;
+                        font-size: 0.9375rem;
+                        border-radius: 8px;
+                        min-width: 80px;
+                        border: 1px solid var(--main-card-border);
+                        background-color: var(--main-card-background);
+                        color: var(--main-font-color);
+                        font-family: var(--main-font-family);
+                        text-align: center;
+                        height: 100%;
+                        box-sizing: border-box;
+                      "
                       placeholder="例如：苏州"
-                      @keyup.enter="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
+                      @keyup.enter="
+                        weatherRefreshTrigger++;
+                        window.dispatchEvent(new Event('weather-refresh'));
+                      "
                     />
                     <span
                       class="options"
-                      @click="weatherRefreshTrigger++; window.dispatchEvent(new Event('weather-refresh'))"
+                      @click="
+                        weatherRefreshTrigger++;
+                        window.dispatchEvent(new Event('weather-refresh'));
+                      "
                     >
                       确认
                     </span>
@@ -1168,22 +1283,21 @@
                 </div>
               </div>
             </Transition>
-            <!-- 测试分支（开发环境） -->
-            <template v-if="channelMode >= 2">
+            <!-- 开发中的功能（开发模式） -->
+            <template v-if="store.devMode === 2">
               <div class="set-item">
-                <span class="set-label set-label-channel">来自dev分支的新内容</span>
+                <span class="set-label">开发中的功能</span>
                 <div class="set-options">
                   <span
-                    :class="['options', { choose: devChannelExpanded }]"
-                    @click="devChannelExpanded = !devChannelExpanded"
+                    :class="['options', { choose: devFeaturesExpanded }]"
+                    @click="devFeaturesExpanded = !devFeaturesExpanded"
                   >
-                    {{ devChannelExpanded ? '收起' : '展开' }}
+                    {{ devFeaturesExpanded ? "收起" : "展开" }}
                   </span>
                 </div>
               </div>
               <Transition name="fade-up">
-                <div v-if="devChannelExpanded && (channelMode === 2 || showAllGroups)" class="set-expand-box">
-                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送导致存在严重缺陷。<br>该分支更新较为频繁。</span>
+                <div v-if="devFeaturesExpanded" class="set-expand-box">
                   <div class="set-item">
                     <span class="set-label">背景模糊</span>
                     <div class="set-options">
@@ -1227,19 +1341,14 @@
                         :class="['options', { choose: pwaCacheLimit === limit }]"
                         @click="pwaCacheLimit = limit"
                       >
-                        {{ limit === 0 ? '无限' : limit }}
+                        {{ limit === 0 ? "无限" : limit }}
                       </span>
                     </div>
                   </div>
                   <div class="set-item">
                     <span class="set-label">清除 PWA 缓存</span>
                     <div class="set-options">
-                      <span
-                        class="options"
-                        @click="clearPwaCache"
-                      >
-                        清除
-                      </span>
+                      <span class="options" @click="clearPwaCache"> 清除 </span>
                     </div>
                   </div>
                   <div class="set-item">
@@ -1259,190 +1368,236 @@
                       </span>
                     </div>
                   </div>
-
                 </div>
-
               </Transition>
             </template>
-          <span class="title">关于</span>
-          <div class="set-item">
-            <span class="set-label">本站信息</span>
-            <div class="set-options">
-              <span
-                :class="['options', { choose: aboutWebsiteExpanded }]"
-                @click="aboutWebsiteExpanded = !aboutWebsiteExpanded"
-              >
-                {{ aboutWebsiteExpanded ? '收起' : '展开' }}
-              </span>
-            </div>
-          </div>
-          <Transition name="fade-up">
-            <div v-if="aboutWebsiteExpanded" class="set-expand-box">
-              <div class="set-item">
-                <span class="set-label">当前分支内部版本</span>
-                <div class="set-options">
-                  <span class="about-version-pill">{{ branchVersion }}</span>
-                </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">内部版本构建时间</span>
-                <div class="set-options">
-                  <span class="about-version-pill">{{ branchBuildTime || '暂无' }}</span>
-                </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">基础版本（release）</span>
-                <div class="set-options">
-                  <span class="about-version-pill">{{ siteVersion }} - {{ siteVersionDate }}</span>
-                </div>
-              </div>
-              <div class="set-item">
-                <span class="set-label">关于本站</span>
-                <div class="set-options">
-                  <a href="/pages/about-website.html" class="options" @click="store.changeShowStatus('showSettings')">前往</a>
-                </div>
+            <span class="title">关于</span>
+            <div class="set-item">
+              <span class="set-label">本站信息</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: aboutWebsiteExpanded }]"
+                  @click="aboutWebsiteExpanded = !aboutWebsiteExpanded"
+                >
+                  {{ aboutWebsiteExpanded ? "收起" : "展开" }}
+                </span>
               </div>
             </div>
-          </Transition>
-          <div class="set-item">
-            <span class="set-label">分支策略</span>
-            <div class="set-options">
-              <span
-                :class="['options', { choose: stableChannelExpanded }]"
-                @click="stableChannelExpanded = !stableChannelExpanded"
-              >
-                {{ stableChannelExpanded ? '收起' : '展开' }}
-              </span>
-            </div>
-          </div>
-          <Transition name="fade-up">
-            <div v-if="stableChannelExpanded" class="set-expand-box">
-              <template v-if="channelMode === 1">
+            <Transition name="fade-up">
+              <div v-if="aboutWebsiteExpanded" class="set-expand-box">
                 <div class="set-item">
-                  <span class="set-label" style="color: var(--main-color)">当前处于正式分支（selfuse分支）</span>
+                  <span class="set-label">当前分支内部版本</span>
+                  <div class="set-options">
+                    <span class="about-version-pill">{{ branchVersion }}</span>
+                  </div>
                 </div>
+                <div class="set-item">
+                  <span class="set-label">内部版本构建时间</span>
+                  <div class="set-options">
+                    <span class="about-version-pill">{{ branchBuildTime || "暂无" }}</span>
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">基础版本（release）</span>
+                  <div class="set-options">
+                    <span class="about-version-pill"
+                      >{{ siteVersion }} - {{ siteVersionDate }}</span
+                    >
+                  </div>
+                </div>
+                <div class="set-item">
+                  <span class="set-label">关于本站</span>
+                  <div class="set-options">
+                    <a
+                      href="/pages/about-website.html"
+                      class="options"
+                      @click="store.changeShowStatus('showSettings')"
+                      >前往</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </Transition>
+            <div class="set-item">
+              <span class="set-label">分支策略</span>
+              <div class="set-options">
+                <span
+                  :class="['options', { choose: branchStrategyExpanded }]"
+                  @click="branchStrategyExpanded = !branchStrategyExpanded"
+                >
+                  {{ branchStrategyExpanded ? "收起" : "展开" }}
+                </span>
+              </div>
+            </div>
+            <Transition name="fade-up">
+              <div v-if="branchStrategyExpanded" class="set-expand-box">
+                <!-- 开发模式入口 -->
+                <Transition name="fade-up">
+                  <template v-if="devModeEntryVisible">
+                    <div
+                      v-if="devModeEntrySuccess"
+                      class="set-warn"
+                      @click="devModeEntryClose"
+                      style="cursor: pointer"
+                    >
+                      <span class="warn-text">成功</span>
+                      <span class="options">确定</span>
+                    </div>
+                    <div v-else-if="devModeEntryError" class="set-warn set-warn-static">
+                      <span class="warn-text">错误</span>
+                      <span class="options" @click="devModeEntryClose">确定</span>
+                    </div>
+                    <div v-else-if="devModeEntryStep === 0" class="set-item">
+                      <span class="set-label" style="color: var(--main-error-color)"
+                        >你指的是要进入开发模式吗，请不要在生产环境执行此操作</span
+                      >
+                      <div class="set-options">
+                        <span class="options" @click="devModeEntryClose">取消</span>
+                        <span
+                          class="options devmode-yes-btn"
+                          @click="
+                            devModeEntryStep = 1;
+                            resetDevModeEntryTimer();
+                          "
+                          >确认</span
+                        >
+                      </div>
+                    </div>
+                    <div v-else-if="devModeEntryStep === 1" class="set-item">
+                      <span class="set-label" style="color: var(--main-error-color)">需要验证</span>
+                      <div class="set-options">
+                        <input
+                          v-model="devModeEntryInput"
+                          class="devmode-entry-input"
+                          type="text"
+                          placeholder="验证码"
+                          @input="resetDevModeEntryTimer"
+                          @keyup.enter="devModeEntryVerify"
+                        />
+                        <span class="options devmode-yes-btn" @click="devModeEntryVerify"
+                          >继续</span
+                        >
+                      </div>
+                    </div>
+                  </template>
+                </Transition>
                 <div class="set-item set-item-channel">
                   <span class="set-label">master分支（release）</span>
-                  <span class="set-desc">定期收拢各分支进度，更新版本。<br>建议下游开发者跟进此分支。</span>
+                  <span class="set-desc"
+                    >定期收拢各分支进度，更新版本。<br />建议下游开发者跟进此分支。</span
+                  >
                 </div>
                 <div class="set-item set-item-channel">
                   <span class="set-label">selfuse分支</span>
                   <span class="set-desc">用于作者日常更新，本站的部署跟随该分支。</span>
                 </div>
                 <div class="set-item set-item-channel">
-                  <span class="set-label">dev分支</span>
-                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送导致存在严重缺陷。<br>该分支更新较为频繁。</span>
+                  <span class="set-label">dev/beta/canary分支</span>
+                  <span class="set-desc"
+                    >由于不再需要，已移除。<br />「它们已经完成了它们的使命。」</span
+                  >
                 </div>
-                <div class="set-item set-item-channel">
-                  <span class="set-label">beta/canary分支</span>
-                  <span class="set-desc">由于不再需要，已移除。</span>
-                </div>
-                <div class="set-item" style="margin-bottom: 4px;">
-                  <span class="set-label">前往预览测试分支</span>
-                  <div class="set-options">
-                    <a href="https://dev.sgexilq.com" target="_blank" class="options">dev分支</a>
-                  </div>
-                </div>
-              </template>
-              <template v-if="channelMode >= 2">
-                <div class="set-item">
-                  <span class="set-label" style="color: var(--main-color)">当前处于测试分支（dev分支）</span>
-                </div>
-                <div class="set-item set-item-channel">
-                  <span class="set-label">master分支（release）</span>
-                  <span class="set-desc">定期收拢各分支进度，更新版本。<br>建议下游开发者跟进此分支。</span>
-                </div>
-                <div class="set-item set-item-channel">
-                  <span class="set-label">selfuse分支</span>
-                  <span class="set-desc">用于作者日常更新，本站的部署跟随该分支。</span>
-                </div>
-                <div class="set-item set-item-channel">
-                  <span class="set-label">dev分支</span>
-                  <span class="set-desc">推送开发中的新功能，代码可能未经任何验证与测试即直接推送导致存在严重缺陷。<br>该分支更新较为频繁。</span>
-                </div>
-                <div class="set-item set-item-channel">
-                  <span class="set-label">beta/canary分支</span>
-                  <span class="set-desc">由于不再需要，已移除。</span>
-                </div>
-                <div class="set-item">
-                  <span class="set-label">返回正式分支</span>
-                  <div class="set-options">
-                    <a href="https://sgexilq.com" target="_blank" class="options">selfuse分支</a>
-                  </div>
-                </div>
-              </template>
+              </div>
+            </Transition>
+            <div class="set-item">
+              <span class="set-label">查看源码</span>
+              <div class="set-options">
+                <a
+                  href="https://github.com/murasakizs/vitepress-theme-curve/tree/master"
+                  target="_blank"
+                  class="options"
+                  >Github</a
+                >
+              </div>
             </div>
-          </Transition>
-          <div class="set-item">
-            <span class="set-label">查看源码</span>
-            <div class="set-options">
-              <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/master" target="_blank" class="options">master分支</a>
-              <a href="https://github.com/murasakizs/vitepress-theme-curve/tree/dev" target="_blank" class="options">dev分支</a>
+            <div class="set-item">
+              <span class="set-label">反馈与建议</span>
+              <div class="set-options">
+                <a href="mailto:sgexilq.com" target="_blank" class="options">EMail</a>
+                <a href="https://myat-q.sgexilq.com" target="_blank" class="options">QQ</a>
+                <a
+                  href="https://github.com/murasakizs/vitepress-theme-curve/issues"
+                  target="_blank"
+                  class="options"
+                  >Github</a
+                >
+              </div>
             </div>
-          </div>
-          <div class="set-item">
-            <span class="set-label">反馈与建议</span>
-            <div class="set-options">
-              <a href="mailto:sgexilq.com" target="_blank" class="options">EMail</a>
-              <a href="https://myat-q.sgexilq.com" target="_blank" class="options">QQ</a>
-              <a href="https://github.com/murasakizs/vitepress-theme-curve/issues" target="_blank" class="options">Github</a>
+            <div class="set-item">
+              <span class="set-label">导入/导出配置</span>
+              <div class="set-options">
+                <span class="options" @click="handleImportConfig">导入</span>
+                <span class="options" @click="handleExportConfig">导出</span>
+              </div>
             </div>
-          </div>
-          <div class="set-item">
-            <span class="set-label">导入/导出配置</span>
-            <div class="set-options">
-              <span class="options" @click="handleImportConfig">导入</span>
-              <span class="options" @click="handleExportConfig">导出</span>
-            </div>
-          </div>
-          <input
-            ref="importFileInput"
-            type="file"
-            accept=".dat,.json"
-            style="display: none"
-            @change="handleFileImport"
-          />
-          <Transition name="fade-up">
-            <div v-if="importConfirmVisible" class="set-warn set-warn-purple-import" @click="cancelImportConfirm">
-              <span class="warn-text">你确定要导入配置数据吗</span>
-              <span class="options" @click.stop="confirmImportConfirm">确认</span>
-            </div>
-          </Transition>
-          <Transition name="fade-up">
-            <div v-if="importWarnVisible" class="set-warn set-warn-red">
-              <template v-if="importWarnType === 'high'">
-                <span class="warn-text" v-html="'你导入的配置文件版本过高，无法导入<br>请联系网站管理员拉取更新'"></span>
-                <div class="warn-actions">
-                  <span class="warn-yes" @click="cancelImportWarn">确认</span>
-                </div>
-              </template>
-              <template v-else-if="importWarnType === 'low'">
-                <span class="warn-text">你导入的配置文件版本过低，可能存在兼容性问题，你确定要继续吗</span>
-                <div class="warn-actions">
-                  <span class="warn-no" @click="cancelImportWarn">取消</span>
-                  <span class="warn-yes" @click="confirmImportWarn">确认</span>
-                </div>
-              </template>
-            </div>
-          </Transition>
-          <div class="set-item">
-            <span class="set-label">恢复默认配置</span>
-            <div class="set-options">
-              <span
-                v-if="!showResetConfirm"
-                class="options reset-btn"
-                @click="showResetConfirm = true; scrollToResetWarn(); showResetWarning()"
+            <input
+              ref="importFileInput"
+              type="file"
+              accept=".dat,.json"
+              style="display: none"
+              @change="handleFileImport"
+            />
+            <Transition name="fade-up">
+              <div
+                v-if="importConfirmVisible"
+                class="set-warn set-warn-purple-import"
+                @click="cancelImportConfirm"
               >
-                确认
-              </span>
+                <span class="warn-text">你指的是要导入配置数据吗</span>
+                <span class="options" @click.stop="confirmImportConfirm">确认</span>
+              </div>
+            </Transition>
+            <Transition name="fade-up">
+              <div v-if="importWarnVisible" class="set-warn set-warn-red">
+                <template v-if="importWarnType === 'high'">
+                  <span
+                    class="warn-text"
+                    v-html="'你导入的配置文件版本过高，无法导入<br>请联系网站管理员拉取更新'"
+                  ></span>
+                  <div class="warn-actions">
+                    <span class="warn-yes" @click="cancelImportWarn">确认</span>
+                  </div>
+                </template>
+                <template v-else-if="importWarnType === 'low'">
+                  <span class="warn-text"
+                    >你导入的配置文件版本过低，可能存在兼容性问题，你确定要继续吗</span
+                  >
+                  <div class="warn-actions">
+                    <span class="warn-no" @click="cancelImportWarn">取消</span>
+                    <span class="warn-yes" @click="confirmImportWarn">确认</span>
+                  </div>
+                </template>
+              </div>
+            </Transition>
+            <div class="set-item">
+              <span class="set-label">恢复默认配置</span>
+              <div class="set-options">
+                <span
+                  v-if="!showResetConfirm"
+                  class="options reset-btn"
+                  @click="
+                    showResetConfirm = true;
+                    scrollToResetWarn();
+                    showResetWarning();
+                  "
+                >
+                  确认
+                </span>
+              </div>
             </div>
-          </div>
-          <Transition name="fade-up">
-            <div v-if="showResetConfirm" ref="resetWarnRef" class="set-warn" @click="showResetConfirm = false">
-              <span class="warn-text">即将恢复默认配置，此操作将清空所有本地存储并完全重新拉取资源，请再次确认</span>
-              <span class="options" @click.stop="handleResetConfig">确认</span>
-            </div>
-          </Transition>
+            <Transition name="fade-up">
+              <div
+                v-if="showResetConfirm"
+                ref="resetWarnRef"
+                class="set-warn"
+                @click="showResetConfirm = false"
+              >
+                <span class="warn-text"
+                  >你指的是要恢复默认配置吗，此操作将清空所有本地存储并完全重新拉取资源</span
+                >
+                <span class="options" @click.stop="handleResetConfig">确认</span>
+              </div>
+            </Transition>
           </div>
         </Transition>
       </div>
@@ -1459,20 +1614,79 @@ import { useIsMobileLayout } from "@/utils/layout.js";
 const store = mainStore();
 const { theme } = useData();
 const {
-  importFileInput, importConfirmVisible, importWarnVisible, importWarnType,
-  handleExportConfig, handleImportConfig, handleFileImport,
-  confirmImportWarn, cancelImportWarn, confirmImportConfirm, cancelImportConfirm,
+  importFileInput,
+  importConfirmVisible,
+  importWarnVisible,
+  importWarnType,
+  handleExportConfig,
+  handleImportConfig,
+  handleFileImport,
+  confirmImportWarn,
+  cancelImportWarn,
+  confirmImportConfirm,
+  cancelImportConfirm,
 } = useConfigIO(theme.siteVersion || "V1.0");
-const { themeType, themeColor, highContrast, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType, backgroundBlur, playerShow, playerAutoPlay, playerPlayMode, playerMusicSource, playerCustomIds, showMoreSettings, showMoreSettingsConfirmed, devChannelExpanded, stableChannelExpanded, useRightMenu, useCustomCursor, siteLayout, siteLayoutPending, lastSiteLayout, messageStyle, messagePosition, progressDirection, messageDuration, islandMode, islandUseThemeColor, islandShowSeconds, islandShowDate, islandPlayerSupport, islandStyle, customThemeEnabled, customPrimaryColor, customSecondaryColor, lastCustomPrimaryColor, lastCustomSecondaryColor, customThemeBeforeHighContrast, removeAnimations, channelMode, scheduledThemeEnabled, scheduledLightTime, scheduledDarkTime, pwaCacheEnabled, pwaCacheLimit, readingProgressEnabled, imageWebpEnabled, weatherProvider, weatherLocationMode, weatherManualCity, weatherRefreshTrigger, weatherWidgetEnabled, weatherSectionExpanded, devModeOptionsExpanded, siteVersion, siteVersionDate, branchVersion, branchBuildTime } =
-  storeToRefs(store);
-
-// 切换分支模式并清除旧缓存
-const switchChannelMode = (mode) => {
-  saveStoreDefaults({ DEFAULT_CHANNEL_MODE: mode, bumpVersion: true });
-  const prev = JSON.parse(localStorage.getItem('siteData') || '{}');
-  localStorage.setItem('siteData', JSON.stringify({ ...prev, channelMode: mode }));
-  window.location.reload();
-};
+const {
+  themeType,
+  themeColor,
+  highContrast,
+  fontFamily,
+  fontSize,
+  infoPosition,
+  backgroundType,
+  backgroundUrl,
+  bannerType,
+  backgroundBlur,
+  playerShow,
+  playerAutoPlay,
+  playerPlayMode,
+  playerMusicSource,
+  playerCustomIds,
+  showMoreSettings,
+  showMoreSettingsConfirmed,
+  devFeaturesExpanded,
+  branchStrategyExpanded,
+  useRightMenu,
+  useCustomCursor,
+  siteLayout,
+  siteLayoutPending,
+  lastSiteLayout,
+  messageStyle,
+  messagePosition,
+  progressDirection,
+  messageDuration,
+  islandMode,
+  islandUseThemeColor,
+  islandShowSeconds,
+  islandShowDate,
+  islandPlayerSupport,
+  islandStyle,
+  customThemeEnabled,
+  customPrimaryColor,
+  customSecondaryColor,
+  lastCustomPrimaryColor,
+  lastCustomSecondaryColor,
+  customThemeBeforeHighContrast,
+  removeAnimations,
+  scheduledThemeEnabled,
+  scheduledLightTime,
+  scheduledDarkTime,
+  pwaCacheEnabled,
+  pwaCacheLimit,
+  readingProgressEnabled,
+  imageWebpEnabled,
+  weatherProvider,
+  weatherLocationMode,
+  weatherManualCity,
+  weatherRefreshTrigger,
+  weatherWidgetEnabled,
+  weatherSectionExpanded,
+  devModeOptionsExpanded,
+  siteVersion,
+  siteVersionDate,
+  branchVersion,
+  branchBuildTime,
+} = storeToRefs(store);
 
 // PWA 缓存增强相关
 const pwaCacheClearing = ref(false);
@@ -1485,7 +1699,7 @@ const clearPwaCache = async () => {
     const runtimeCaches = ["api-cache", "html-cache", "page-cache", "post-cache"];
     let cleared = 0;
     for (const name of cacheNames) {
-      if (runtimeCaches.some(rc => name.includes(rc))) {
+      if (runtimeCaches.some((rc) => name.includes(rc))) {
         await caches.delete(name);
         cleared++;
       }
@@ -1525,7 +1739,10 @@ const startLayoutCountdown = () => {
   siteLayoutPending.value = true;
   // 显示警告消息
   if (typeof $message !== "undefined") {
-    $message.warning(`页面布局未确认，<span style="color: var(--main-color)">10</span>秒后将恢复自动选择`, { duration: 10000, html: true });
+    $message.warning(
+      `页面布局未确认，<span style="color: var(--main-color)">10</span>秒后将恢复自动选择`,
+      { duration: 10000, html: true },
+    );
   }
   layoutTimer = setInterval(() => {
     layoutCountdown.value--;
@@ -1591,10 +1808,9 @@ const handleLayoutOk = () => {
 const messageSettingsExpanded = ref(false);
 const moreFontsExpanded = ref(false);
 // 开发模式入口
-const devModeEntryClickCount = ref(0);
 const devModeEntryVisible = ref(false);
 const devModeEntryStep = ref(0);
-const devModeEntryInput = ref('');
+const devModeEntryInput = ref("");
 const devModeEntryError = ref(false);
 const devModeEntrySuccess = ref(false);
 // 超级岛设置展开状态
@@ -1609,43 +1825,80 @@ const confirmCustomIds = () => {
     $message.success("歌单 ID 已更新");
   }
 };
-// 展开所有设置分组
+// 展开所有设置分组（开发模式启用时默认开启；手动关闭仅本会话有效，不写入 index.js）
 const aboutWebsiteExpanded = ref(false);
-const expandAllGroups = ref(false);
-const handleExpandAllGroups = () => {
-  expandAllGroups.value = true;
+// 开发模式选项里「版本信息」合并菜单展开状态
+const versionFieldsExpanded = ref(false);
+const expandAllGroups = ref(store.devMode === 2);
+const applyExpandAllGroups = () => {
   showMoreSettings.value = true;
   showMoreSettingsConfirmed.value = true;
-  moreFontsExpanded.value = true;
+  themeColorExpanded.value = true;
   messageSettingsExpanded.value = true;
   islandSettingsExpanded.value = true;
-  devChannelExpanded.value = true;
+  musicPlayerExpanded.value = true;
+  moreFontsExpanded.value = true;
+  weatherSectionExpanded.value = true;
+  devFeaturesExpanded.value = true;
+  aboutWebsiteExpanded.value = true;
+  branchStrategyExpanded.value = true;
+};
+const applyCollapseAllGroups = () => {
+  showMoreSettings.value = false;
+  showMoreSettingsConfirmed.value = false;
+  themeColorExpanded.value = false;
+  messageSettingsExpanded.value = false;
+  islandSettingsExpanded.value = false;
+  musicPlayerExpanded.value = false;
+  moreFontsExpanded.value = false;
+  weatherSectionExpanded.value = false;
+  devFeaturesExpanded.value = false;
+  aboutWebsiteExpanded.value = false;
+  branchStrategyExpanded.value = false;
+};
+const handleExpandAllGroups = () => {
+  expandAllGroups.value = true;
+  applyExpandAllGroups();
 };
 const handleCollapseAllGroups = () => {
   expandAllGroups.value = false;
-  showMoreSettings.value = false;
-  showMoreSettingsConfirmed.value = false;
-  moreFontsExpanded.value = false;
-  messageSettingsExpanded.value = false;
-  islandSettingsExpanded.value = false;
-  // 分支展开状态恢复为默认：当前分支展开，其他关闭
-  const mode = channelMode.value;
-  devChannelExpanded.value = mode === 3;
+  applyCollapseAllGroups();
+};
+
+// 停用所有开发中的功能：开启=一键关闭该分组全部选项；关闭=恢复默认设置
+const devFeaturesDisabled = computed(
+  () => !backgroundBlur.value && !pwaCacheEnabled.value && !imageWebpEnabled.value,
+);
+const disableAllDevFeatures = () => {
+  backgroundBlur.value = false;
+  pwaCacheEnabled.value = false;
+  imageWebpEnabled.value = false;
+  if (typeof $message !== "undefined") {
+    $message.success("已停用所有开发中的功能");
+  }
+};
+const restoreDefaultDevFeatures = () => {
+  // 恢复 store/index.js 中的默认值
+  backgroundBlur.value = false;
+  pwaCacheEnabled.value = true;
+  pwaCacheLimit.value = 100;
+  imageWebpEnabled.value = false;
+  if (typeof $message !== "undefined") {
+    $message.success("开发中的功能已恢复默认设置");
+  }
 };
 // 主题颜色设置展开状态
 const themeColorExpanded = ref(false);
 // 开发模式选项展开状态（已移至 store 持久化）
-// 显示全部分组（开发模式下展示所有分支分组内容）
-const showAllGroups = ref(false);
 // 关闭开发模式确认提示
 const closeDevModeConfirmVisible = ref(false);
 const themeColorList = [
-  { value: 'pink', label: '泠粉' },
-  { value: 'purple', label: '幻紫' },
-  { value: 'blue', label: '栈蓝' },
-  { value: 'red', label: '火红' },
-  { value: 'green', label: '春绿' },
-  { value: 'gray', label: '失灰' },
+  { value: "pink", label: "泠粉" },
+  { value: "purple", label: "幻紫" },
+  { value: "blue", label: "栈蓝" },
+  { value: "red", label: "火红" },
+  { value: "green", label: "春绿" },
+  { value: "gray", label: "失灰" },
 ];
 // 字体大小调整状态
 const fontSizeEditing = ref(false);
@@ -1655,56 +1908,101 @@ const advancedSettingsExpanded = ref(false);
 const showMoreSettingsWarnVisible = ref(false);
 
 // 开发模式入口方法
+// 10 秒内点击 10 次「更多字体」按钮展示开发模式入口（入口显示在分支策略合并菜单内）
+const devModeEntryClickTimestamps = ref([]);
+const DEV_MODE_ENTRY_CLICKS = 10;
+const DEV_MODE_ENTRY_CLICK_WINDOW = 10000;
+// 入口展示后 10 秒无操作自动隐藏
+const devModeEntryHideTimer = ref(null);
+const DEV_MODE_ENTRY_IDLE_TIMEOUT = 10000;
+
+const resetDevModeEntryTimer = () => {
+  if (devModeEntryHideTimer.value) clearTimeout(devModeEntryHideTimer.value);
+  if (!devModeEntryVisible.value) return;
+  devModeEntryHideTimer.value = setTimeout(() => {
+    // 无操作自动隐藏入口（不开启开发模式）
+    devModeEntryVisible.value = false;
+    devModeEntryStep.value = 0;
+    devModeEntryInput.value = "";
+    devModeEntryError.value = false;
+    devModeEntrySuccess.value = false;
+    devModeEntryHideTimer.value = null;
+  }, DEV_MODE_ENTRY_IDLE_TIMEOUT);
+};
+
 const handleMoreFontsClick = () => {
   moreFontsExpanded.value = !moreFontsExpanded.value;
-  devModeEntryClickCount.value++;
+  if (store.devMode === 2) return;
 
-  // 5秒内按6下展示开发模式入口
-  if (devModeEntryClickCount.value >= 6 && store.devMode !== 2) {
+  const now = Date.now();
+  devModeEntryClickTimestamps.value = devModeEntryClickTimestamps.value.filter(
+    (ts) => now - ts < DEV_MODE_ENTRY_CLICK_WINDOW,
+  );
+  devModeEntryClickTimestamps.value.push(now);
+
+  if (devModeEntryClickTimestamps.value.length >= DEV_MODE_ENTRY_CLICKS) {
+    devModeEntryClickTimestamps.value = [];
     devModeEntryVisible.value = true;
     devModeEntryStep.value = 0;
     devModeEntryError.value = false;
     devModeEntrySuccess.value = false;
-    devModeEntryInput.value = '';
+    devModeEntryInput.value = "";
+    // 入口在分支策略合并菜单内，展开该菜单
+    branchStrategyExpanded.value = true;
+    resetDevModeEntryTimer();
   }
-
-  // 5秒内没有继续点击则重置计数
-  setTimeout(() => {
-    if (devModeEntryClickCount.value < 6) {
-      devModeEntryClickCount.value = 0;
-    }
-  }, 5000);
 };
 
 const devModeEntryVerify = () => {
-  if (devModeEntryInput.value === 'devyes') {
+  if (devModeEntryInput.value === "devyes") {
     devModeEntrySuccess.value = true;
     devModeEntryError.value = false;
+    // 成功后等用户点「确定」，不再自动隐藏
+    if (devModeEntryHideTimer.value) {
+      clearTimeout(devModeEntryHideTimer.value);
+      devModeEntryHideTimer.value = null;
+    }
   } else {
     devModeEntryError.value = true;
-    devModeEntryInput.value = '';
+    devModeEntryInput.value = "";
+    // 失败提示保留 10 秒后自动收起
+    resetDevModeEntryTimer();
   }
 };
 
 const devModeEntryClose = () => {
+  if (devModeEntryHideTimer.value) {
+    clearTimeout(devModeEntryHideTimer.value);
+    devModeEntryHideTimer.value = null;
+  }
   if (devModeEntrySuccess.value) {
     store.devMode = 2;
-    saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value, DEFAULT_DEV_MODE: 2, bumpVersion: true });
+    // 启用开发模式时默认开启「展开所有设置分组」
+    expandAllGroups.value = true;
+    applyExpandAllGroups();
+    saveStoreDefaults({
+      siteVersion: siteVersion.value,
+      siteVersionDate: siteVersionDate.value,
+      branchVersion: branchVersion.value,
+      branchBuildTime: branchBuildTime.value,
+      DEFAULT_DEV_MODE: 2,
+      bumpVersion: true,
+    });
     if (typeof $message !== "undefined") {
       $message.success("开发模式已启用");
     }
   }
   devModeEntryVisible.value = false;
-  devModeEntryClickCount.value = 0;
+  devModeEntryClickTimestamps.value = [];
   devModeEntryStep.value = 0;
-  devModeEntryInput.value = '';
+  devModeEntryInput.value = "";
   devModeEntryError.value = false;
   devModeEntrySuccess.value = false;
 };
 
 const resetFontSize = () => {
   store.fontSize = 17;
-  if (typeof document !== 'undefined') {
+  if (typeof document !== "undefined") {
     document.documentElement.style.fontSize = "17px";
   }
 };
@@ -1717,7 +2015,10 @@ const confirmFontSizeEdit = () => {
   fontSizeEditing.value = false;
   store.fontSizePending = false;
   if (typeof $message !== "undefined") {
-    $message.success(`全站字体大小已修改为 <span style="color: var(--main-color-blue)">${fontSize.value}</span>`, { html: true });
+    $message.success(
+      `全站字体大小已修改为 <span style="color: var(--main-color-blue)">${fontSize.value}</span>`,
+      { html: true },
+    );
   }
 };
 // 恢复默认配置
@@ -1740,8 +2041,8 @@ const saveStoreDefaults = async (data) => {
 // 切换天气定位方式
 const switchLocationMode = (mode, label) => {
   weatherLocationMode.value = mode;
-  window.dispatchEvent(new Event('weather-refresh'));
-  if (typeof $message !== 'undefined') {
+  window.dispatchEvent(new Event("weather-refresh"));
+  if (typeof $message !== "undefined") {
     $message.success(`天气定位方式已切换为 ${label}`);
   }
 };
@@ -1749,22 +2050,16 @@ const switchLocationMode = (mode, label) => {
 // 切换天气数据提供商
 const switchWeatherProvider = (provider) => {
   weatherProvider.value = provider;
-  window.dispatchEvent(new Event('weather-refresh'));
-  if (typeof $message !== 'undefined') {
-    $message.success('已切换天气数据源');
+  window.dispatchEvent(new Event("weather-refresh"));
+  if (typeof $message !== "undefined") {
+    $message.success("已切换天气数据源");
   }
 };
 
-// 关闭开发模式（保存版本到 store/index.js）
+// 关闭开发模式（写回 store/index.js 默认值；版本号/构建时间由开发模式选项手动维护）
 const confirmCloseDevMode = async () => {
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  branchVersion.value = (branchVersion.value || 0) + 1;
-  branchBuildTime.value = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
   store.devMode = 1;
   await saveStoreDefaults({
-    branchVersion: branchVersion.value,
-    branchBuildTime: branchBuildTime.value,
     DEFAULT_DEV_MODE: 1,
     bumpVersion: true,
   });
@@ -1774,17 +2069,68 @@ const confirmCloseDevMode = async () => {
   }
 };
 
-// 清除数据但保留当前分支和开发模式选项
-const handleClearDataKeepChannel = async () => {
+// 自动获取当前时间填入内部版本构建时间
+const autoFillBranchBuildTime = () => {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  branchBuildTime.value = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+};
+
+// 保存版本信息（站点版本 / 日期 / 内部版本 / 构建时间，一次写入）
+const confirmAllVersionFields = async () => {
+  const num = parseInt(String(branchVersion.value).replace(/[^\d]/g, ""), 10);
+  if (Number.isNaN(num)) {
+    if (typeof $message !== "undefined") {
+      $message.error("内部版本需为数字");
+    }
+    return;
+  }
+  branchVersion.value = num;
+  await saveStoreDefaults({
+    siteVersion: siteVersion.value,
+    siteVersionDate: siteVersionDate.value,
+    branchVersion: num,
+    branchBuildTime: branchBuildTime.value,
+    bumpVersion: true,
+  });
+  if (typeof $message !== "undefined") {
+    $message.success("版本信息已保存");
+  }
+};
+
+// 将 DEFAULT_DEV_MODE 写回为随机数
+const randomizeDefaultDevMode = async () => {
+  const random = Math.floor(Math.random() * 1000000);
+  await saveStoreDefaults({ DEFAULT_DEV_MODE: random, bumpVersion: true });
+  if (typeof $message !== "undefined") {
+    $message.success(`DEFAULT_DEV_MODE 已设为随机数 ${random}`);
+  }
+};
+
+// 清除数据但保留开发模式选项
+const handleClearDataKeepDevMode = async () => {
   if (typeof $message !== "undefined") {
     $message.warning("数据已清除，页面即将刷新");
   }
-  const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
-  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value };
-  const savedVersion = localStorage.getItem('siteDataVersion');
-  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value });
+  const savedData = {
+    devMode: dev,
+    devModeOptionsExpanded: devExpanded,
+    siteVersion: siteVersion.value,
+    siteVersionDate: siteVersionDate.value,
+    branchVersion: branchVersion.value,
+    branchBuildTime: branchBuildTime.value,
+  };
+  const savedVersion = localStorage.getItem("siteDataVersion");
+  saveStoreDefaults({
+    siteVersion: siteVersion.value,
+    siteVersionDate: siteVersionDate.value,
+    branchVersion: branchVersion.value,
+    branchBuildTime: branchBuildTime.value,
+    DEFAULT_DEV_MODE: dev,
+    bumpVersion: true,
+  });
 
   // 清除 localStorage 和 sessionStorage
   localStorage.clear();
@@ -1835,12 +2181,25 @@ const handleResetConfig = async () => {
   if (typeof $message !== "undefined") {
     $message.warning("配置已恢复默认，页面即将刷新");
   }
-  const mode = channelMode.value;
   const dev = store.devMode;
   const devExpanded = devModeOptionsExpanded.value;
-  const savedData = { channelMode: mode, devMode: dev, devModeOptionsExpanded: devExpanded, siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value };
-  const savedVersion = localStorage.getItem('siteDataVersion');
-  saveStoreDefaults({ siteVersion: siteVersion.value, siteVersionDate: siteVersionDate.value, branchVersion: branchVersion.value, branchBuildTime: branchBuildTime.value });
+  const savedData = {
+    devMode: dev,
+    devModeOptionsExpanded: devExpanded,
+    siteVersion: siteVersion.value,
+    siteVersionDate: siteVersionDate.value,
+    branchVersion: branchVersion.value,
+    branchBuildTime: branchBuildTime.value,
+  };
+  const savedVersion = localStorage.getItem("siteDataVersion");
+  saveStoreDefaults({
+    siteVersion: siteVersion.value,
+    siteVersionDate: siteVersionDate.value,
+    branchVersion: branchVersion.value,
+    branchBuildTime: branchBuildTime.value,
+    DEFAULT_DEV_MODE: dev,
+    bumpVersion: true,
+  });
   // 清空 localStorage 和 sessionStorage
   localStorage.clear();
   sessionStorage.clear();
@@ -1883,17 +2242,17 @@ const showResetWarning = () => {
 const setBannerType = (type) => {
   bannerType.value = type;
   if (typeof $message !== "undefined") {
-    $message.success(`首页Banner高度已切换为${type === 'half' ? '半屏' : '全屏'}`);
+    $message.success(`首页Banner高度已切换为${type === "half" ? "半屏" : "全屏"}`);
   }
 };
 
 // 设置全站背景
 const setBackgroundType = (type) => {
   backgroundType.value = type;
-  if (type === 'image') {
-    themeType.value = 'dark';
+  if (type === "image") {
+    themeType.value = "dark";
   }
-  const typeNames = { close: '关闭', patterns: '纹理', image: '自定义图片' };
+  const typeNames = { close: "关闭", patterns: "纹理", image: "自定义图片" };
   if (typeof $message !== "undefined") {
     $message.success(`全站背景已切换为${typeNames[type]}`);
   }
@@ -1907,16 +2266,16 @@ const setThemeColor = (color) => {
 // 设置高对比度模式
 const setHighContrast = (enabled) => {
   // 记录开启前的自定义主题色状态
-  if (enabled === 'max' && !customThemeBeforeHighContrast.value) {
+  if (enabled === "max" && !customThemeBeforeHighContrast.value) {
     customThemeBeforeHighContrast.value = customThemeEnabled.value;
   }
   highContrast.value = enabled;
-  if (typeof document !== 'undefined') {
-    document.documentElement.classList.remove('high-contrast', 'high-contrast-max');
-    if (enabled === 'max') {
-      document.documentElement.classList.add('high-contrast', 'high-contrast-max');
+  if (typeof document !== "undefined") {
+    document.documentElement.classList.remove("high-contrast", "high-contrast-max");
+    if (enabled === "max") {
+      document.documentElement.classList.add("high-contrast", "high-contrast-max");
     } else if (enabled) {
-      document.documentElement.classList.add('high-contrast');
+      document.documentElement.classList.add("high-contrast");
     }
   }
   // 关闭最高对比度时，恢复之前的自定义主题色状态
@@ -1925,7 +2284,7 @@ const setHighContrast = (enabled) => {
     toggleCustomTheme(true);
   }
   if (typeof $message !== "undefined") {
-    const labels = { false: '关闭', true: '开启', max: '最高' };
+    const labels = { false: "关闭", true: "开启", max: "最高" };
     $message.success(`已切换高对比度模式为：${labels[String(enabled)]}`, { duration: 3000 });
   }
 };
@@ -1944,13 +2303,13 @@ const toggleCustomTheme = (enabled) => {
     // 关闭自定义主题色
     customThemeEnabled.value = false;
     // 恢复上次选择的主题色
-    if (typeof document !== 'undefined') {
+    if (typeof document !== "undefined") {
       const html = document.documentElement;
       // 清除自定义颜色
-      html.style.removeProperty('--main-color');
-      html.style.removeProperty('--main-color-bg');
-      html.style.removeProperty('--main-accent');
-      html.style.removeProperty('--main-accent-bg');
+      html.style.removeProperty("--main-color");
+      html.style.removeProperty("--main-color-bg");
+      html.style.removeProperty("--main-accent");
+      html.style.removeProperty("--main-accent-bg");
     }
     // 恢复默认主题色
     store.changeThemeColor(themeColor.value);
@@ -1962,7 +2321,7 @@ const revertCustomTheme = () => {
   customPrimaryColor.value = lastCustomPrimaryColor.value;
   customSecondaryColor.value = lastCustomSecondaryColor.value;
   if (typeof $message !== "undefined") {
-    $message.success('已撤销自定义主题色', { duration: 3000 });
+    $message.success("已撤销自定义主题色", { duration: 3000 });
   }
 };
 
@@ -1978,11 +2337,11 @@ const applyCustomTheme = () => {
 // 移除动画
 const setRemoveAnimations = (enabled) => {
   removeAnimations.value = enabled;
-  if (typeof document !== 'undefined') {
-    document.documentElement.classList.toggle('remove-animations', enabled);
+  if (typeof document !== "undefined") {
+    document.documentElement.classList.toggle("remove-animations", enabled);
   }
   if (typeof $message !== "undefined") {
-    $message.success(`已${enabled ? '开启' : '关闭'}移除动画`);
+    $message.success(`已${enabled ? "开启" : "关闭"}移除动画`);
   }
 };
 
@@ -1996,7 +2355,7 @@ const toggleScheduledTheme = (enabled) => {
     }
   } else {
     store.stopScheduledTheme();
-    themeType.value = 'auto';
+    themeType.value = "auto";
     store.updateActualThemeValue();
     if (typeof $message !== "undefined") {
       $message.success("显示外观已切换为跟随系统");
@@ -2012,11 +2371,11 @@ const onScheduledTimeChange = () => {
 
 const applyRemoveAnimations = () => {
   removeAnimationsWarnVisible.value = false;
-  if (typeof document !== 'undefined') {
-    document.documentElement.classList.add('remove-animations');
+  if (typeof document !== "undefined") {
+    document.documentElement.classList.add("remove-animations");
   }
   if (typeof $message !== "undefined") {
-    $message.success('已开启移除动画');
+    $message.success("已开启移除动画");
   }
 };
 
@@ -2028,7 +2387,7 @@ const setThemeType = (type) => {
     store.stopScheduledTheme();
   }
   themeType.value = type;
-  const typeNames = { auto: '跟随系统', dark: '深色', light: '浅色' };
+  const typeNames = { auto: "跟随系统", dark: "深色", light: "浅色" };
   if (typeof $message !== "undefined") {
     $message.success(`显示外观已切换为${typeNames[type]}`);
   }
@@ -2037,7 +2396,13 @@ const setThemeType = (type) => {
 // 设置全站字体
 const setFontFamily = (font) => {
   fontFamily.value = font;
-  const fontNames = { vsans: 'vivo Sans', hmos: 'HarmonyOS Sans', xlfont: '小赖字体', misans: 'MiSans', browserfont: '浏览器字体' };
+  const fontNames = {
+    vsans: "vivo Sans",
+    hmos: "HarmonyOS Sans",
+    xlfont: "小赖字体",
+    misans: "MiSans",
+    browserfont: "浏览器字体",
+  };
   if (typeof $message !== "undefined") {
     $message.success(`全站字体已切换为${fontNames[font]}`);
   }
@@ -2047,7 +2412,7 @@ const setFontFamily = (font) => {
 const setInfoPosition = (position) => {
   infoPosition.value = position;
   if (typeof $message !== "undefined") {
-    $message.success(`额外信息显示位置已切换为${position === 'normal' ? '默认位置' : '右下角'}`);
+    $message.success(`额外信息显示位置已切换为${position === "normal" ? "默认位置" : "右下角"}`);
   }
 };
 
@@ -2055,7 +2420,7 @@ const setInfoPosition = (position) => {
 const setRightMenu = (enabled) => {
   useRightMenu.value = enabled;
   if (typeof $message !== "undefined") {
-    $message.success(`已${enabled ? '开启' : '关闭'}自定义右键菜单`);
+    $message.success(`已${enabled ? "开启" : "关闭"}自定义右键菜单`);
   }
 };
 
@@ -2064,7 +2429,7 @@ const setCustomCursor = (enabled) => {
   useCustomCursor.value = enabled;
   store.toggleCustomCursor();
   if (typeof $message !== "undefined") {
-    $message.success(`已${enabled ? '开启' : '关闭'}自定义光标样式`);
+    $message.success(`已${enabled ? "开启" : "关闭"}自定义光标样式`);
   }
 };
 
@@ -2099,44 +2464,51 @@ const confirmShowMoreSettings = () => {
 
 // 获取消息样式名称
 const getMessageStyleName = (style) => {
-  const names = { bar: '传统', card: '卡片', island: '超级岛' };
+  const names = { bar: "传统", card: "卡片", island: "超级岛" };
   return names[style] || style;
 };
 
 // 获取超级岛模式名称
 const getIslandModeName = (mode) => {
-  const names = { dynamic: '灵动', extended: '拓展' };
+  const names = { dynamic: "灵动", extended: "拓展" };
   return names[mode] || mode;
 };
 
 // 获取消息位置名称
 const getMessagePositionName = (position) => {
   const names = {
-    'bar-top': '顶部', 'bar-bottom': '底部',
-    'left-top': '左上', 'left-bottom': '左下',
-    'right-top': '右上', 'right-bottom': '右下',
-    'top-center': '顶部居中', 'bottom-center': '底部居中'
+    "bar-top": "顶部",
+    "bar-bottom": "底部",
+    "left-top": "左上",
+    "left-bottom": "左下",
+    "right-top": "右上",
+    "right-bottom": "右下",
+    "top-center": "顶部居中",
+    "bottom-center": "底部居中",
   };
   return names[position] || position;
 };
 
 // 获取进度条方向名称
 const getProgressDirectionName = (direction) => {
-  const names = { normal: '正向', reverse: '逆向', decorative: '装饰', disabled: '关闭' };
+  const names = { normal: "正向", reverse: "逆向", decorative: "装饰", disabled: "关闭" };
   return names[direction] || direction;
 };
 
 // 获取显示时间名称
 const getMessageDurationName = (duration) => {
-  const names = { 1000: '1秒', 2000: '2秒', 3000: '3秒', 5000: '5秒', 0: '手动关闭' };
+  const names = { 1000: "1秒", 2000: "2秒", 3000: "3秒", 5000: "5秒", 0: "手动关闭" };
   return names[duration] || `${duration / 1000}秒`;
 };
 
 // 显示消息设置成功消息
 const showMessageSettingsSuccess = () => {
   if (typeof $message !== "undefined") {
-    const islandModeText = messageStyle.value === "island" ? ` ${getIslandModeName(islandMode.value)}` : '';
-    $message.success(`消息样式已切换为 ${getMessageStyleName(messageStyle.value)}${islandModeText} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`);
+    const islandModeText =
+      messageStyle.value === "island" ? ` ${getIslandModeName(islandMode.value)}` : "";
+    $message.success(
+      `消息样式已切换为 ${getMessageStyleName(messageStyle.value)}${islandModeText} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`,
+    );
   }
 };
 
@@ -2178,7 +2550,7 @@ const setIslandMode = (mode) => {
 const setIslandUseThemeColor = (value) => {
   islandUseThemeColor.value = value;
   if (typeof $message !== "undefined") {
-    $message.success(`超级岛使用主题色已${value ? '开启' : '关闭'}`);
+    $message.success(`超级岛使用主题色已${value ? "开启" : "关闭"}`);
   }
 };
 
@@ -2186,7 +2558,7 @@ const setIslandUseThemeColor = (value) => {
 const setIslandShowSeconds = (value) => {
   islandShowSeconds.value = value;
   if (typeof $message !== "undefined") {
-    $message.success(`超级岛时间读秒已${value ? '开启' : '关闭'}`);
+    $message.success(`超级岛时间读秒已${value ? "开启" : "关闭"}`);
   }
 };
 
@@ -2194,7 +2566,7 @@ const setIslandShowSeconds = (value) => {
 const setIslandShowDate = (value) => {
   islandShowDate.value = value;
   if (typeof $message !== "undefined") {
-    $message.success(`超级岛显示日期已${value ? '开启' : '关闭'}`);
+    $message.success(`超级岛显示日期已${value ? "开启" : "关闭"}`);
   }
 };
 
@@ -2203,7 +2575,10 @@ const sendTestMessage = (type = "info") => {
   if (typeof $message !== "undefined") {
     const isCard = messageStyle.value === "card";
     const isIsland = messageStyle.value === "island";
-    $message[type](`测试消息 | 当前设置 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`, { card: isCard, island: isIsland });
+    $message[type](
+      `测试消息 | 当前设置 ${getMessageStyleName(messageStyle.value)} ${getMessagePositionName(messagePosition.value)} ${getProgressDirectionName(progressDirection.value)} ${getMessageDurationName(messageDuration.value)}`,
+      { card: isCard, island: isIsland },
+    );
   }
 };
 
@@ -2265,24 +2640,6 @@ onMounted(() => {
   if (scheduledThemeEnabled.value) {
     store.startScheduledTheme();
   }
-  // 初始化时强制关闭不属于当前分支的功能选项
-  const mode = channelMode.value;
-  if (mode !== 5) {
-    removeAnimations.value = false;
-    backgroundBlur.value = false;
-    pwaCacheEnabled.value = false;
-    imageWebpEnabled.value = false;
-    if (scheduledThemeEnabled.value) {
-      scheduledThemeEnabled.value = false;
-      store.stopScheduledTheme();
-    }
-  }
-  // 根据分支模式设置展开状态
-  if (showAllGroups.value) {
-    devChannelExpanded.value = true;
-  } else if (channelMode.value >= 2) {
-    devChannelExpanded.value = channelMode.value === 2;
-  }
 });
 
 // 根据页面布局更新消息样式
@@ -2306,6 +2663,10 @@ const updateMessageStyleByLayout = () => {
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
   clearTimeout(resizeTimer);
+  if (devModeEntryHideTimer.value) {
+    clearTimeout(devModeEntryHideTimer.value);
+    devModeEntryHideTimer.value = null;
+  }
 });
 
 // 切换消息样式时重置位置
@@ -2334,8 +2695,18 @@ watch(
       themeColorExpanded.value = false;
       musicPlayerExpanded.value = false;
       playerCustomIdsInput.value = playerCustomIds.value;
-      showAllGroups.value = false;
       closeDevModeConfirmVisible.value = false;
+      // 重置开发模式入口状态
+      if (devModeEntryHideTimer.value) {
+        clearTimeout(devModeEntryHideTimer.value);
+        devModeEntryHideTimer.value = null;
+      }
+      devModeEntryVisible.value = false;
+      devModeEntryStep.value = 0;
+      devModeEntryInput.value = "";
+      devModeEntryError.value = false;
+      devModeEntrySuccess.value = false;
+      devModeEntryClickTimestamps.value = [];
       layoutWarnVisible.value = false;
       fontSizeEditing.value = false;
       fontSizeWarnVisible.value = false;
@@ -2344,6 +2715,10 @@ watch(
       importConfirmVisible.value = false;
       if (showMoreSettings.value && !showMoreSettingsConfirmed.value) {
         showMoreSettings.value = false;
+      }
+      // 若已开启「展开所有设置分组」，重新展开所有分组
+      if (expandAllGroups.value) {
+        applyExpandAllGroups();
       }
     }
     if (!val) {
@@ -2520,7 +2895,7 @@ watch(
     border: 1px solid #fecaca;
     transition: transform var(--press-out) var(--press-ease);
     // 只有整块可点的警告面板给按下反馈，纯提示类的排除掉
-    &:not(.set-warn-channel):not(.set-warn-red):not(.set-warn-static):active {
+    &:not(.set-warn-red):not(.set-warn-static):active {
       transform: scale(0.98);
       transition-duration: var(--press-in);
     }
@@ -2575,14 +2950,6 @@ watch(
     &:active {
       background-color: color-mix(in srgb, var(--main-error-color) 80%, #000) !important;
       transition-duration: var(--press-in);
-    }
-  }
-  .set-warn-channel {
-    background-color: var(--main-color-bg);
-    border-color: var(--main-color);
-    cursor: default;
-    .warn-text {
-      color: var(--main-color);
     }
   }
   .set-warn-purple {
@@ -2718,7 +3085,10 @@ watch(
       border-radius: 8px;
       padding: 6px 8px;
       min-width: 30px;
-      transition: color 0.3s, background-color 0.3s, transform var(--press-out) var(--press-ease);
+      transition:
+        color 0.3s,
+        background-color 0.3s,
+        transform var(--press-out) var(--press-ease);
       &:hover {
         background-color: #b91c1c !important;
       }
@@ -2787,7 +3157,9 @@ watch(
     border-radius: 6px;
     cursor: pointer;
     flex-shrink: 0;
-    transition: border-color 0.3s, transform var(--press-out) var(--press-ease);
+    transition:
+      border-color 0.3s,
+      transform var(--press-out) var(--press-ease);
     &:hover {
       border-color: var(--main-color);
     }
@@ -2946,13 +3318,6 @@ html.dark .set-list .set-warn {
     }
   }
 }
-html.dark .set-list .set-warn-channel {
-  background-color: var(--main-color-bg);
-  border-color: var(--main-color);
-  .warn-text {
-    color: var(--main-color);
-  }
-}
 html.dark .set-list .set-warn.set-warn-purple {
   background-color: #1e1833;
   border-color: #3b2d6b;
@@ -3054,13 +3419,6 @@ html.dark.high-contrast-max .set-warn {
     color: #000000 !important;
     background: #ffffff !important;
     border-color: #ffffff !important;
-  }
-}
-html.dark.high-contrast-max .set-warn-channel {
-  background-color: var(--main-color-bg) !important;
-  border-color: var(--main-color) !important;
-  .warn-text {
-    color: var(--main-color) !important;
   }
 }
 

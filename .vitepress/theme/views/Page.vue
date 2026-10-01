@@ -11,7 +11,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { ensureCodeFontLoaded } from "@/utils/fontLoader.mjs";
 import { useDesktopAside } from "@/utils/useDesktopAside.mjs";
@@ -32,7 +31,6 @@ onMounted(() => {
   loadCodeFontIfNeeded();
 });
 </script>
-
 
 <style lang="scss" scoped>
 @use "../style/post.scss";

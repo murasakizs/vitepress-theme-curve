@@ -72,15 +72,15 @@ pnpm build
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/31ebe949-6ce7-46b7-a5fb-a73da20412d6/deploy-status)](https://app.netlify.com/sites/imsyy-blog/deploys)
 
-| 命令 | 说明 |
-| --- | --- |
-| `pnpm dev` | 启动开发服务器（`vitepress dev --host`） |
-| `pnpm build` | 构建静态站点（产出 `sitemap.xml`、`rss.xml` 与 PWA 资源） |
-| `pnpm preview` | 预览构建产物 |
-| `pnpm lint` | ESLint 检查并自动修复（`.js/.jsx/.cjs/.mjs/.vue`，**不含点目录**） |
-| `pnpm format` | Prettier 格式化当前目录（`.prettierignore` 已排除 `dist`、锁文件与生成的 `*.d.ts`） |
-| `pnpm deploy:vercel` | 通过 Vercel CLI 部署 |
-| `npx tsc --noEmit` | TypeScript 类型检查（**不覆盖 `.vue`**，见下） |
+| 命令                 | 说明                                                                                |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| `pnpm dev`           | 启动开发服务器（`vitepress dev --host`）                                            |
+| `pnpm build`         | 构建静态站点（产出 `sitemap.xml`、`rss.xml` 与 PWA 资源）                           |
+| `pnpm preview`       | 预览构建产物                                                                        |
+| `pnpm lint`          | ESLint 检查并自动修复（`.js/.jsx/.cjs/.mjs/.vue`，**不含点目录**）                  |
+| `pnpm format`        | Prettier 格式化当前目录（`.prettierignore` 已排除 `dist`、锁文件与生成的 `*.d.ts`） |
+| `pnpm deploy:vercel` | 通过 Vercel CLI 部署                                                                |
+| `npx tsc --noEmit`   | TypeScript 类型检查（**不覆盖 `.vue`**，见下）                                      |
 
 ## 已知问题
 
@@ -125,4 +125,3 @@ pnpm build
 **Powered by VitePress**
 
 </div>
-

@@ -18,8 +18,7 @@ const checkWebpSupport = () => {
   if (webpSupported !== null) return webpSupported;
   try {
     const canvas = document.createElement("canvas");
-    webpSupported =
-      canvas.toDataURL("image/webp").indexOf("data:image/webp") === 0;
+    webpSupported = canvas.toDataURL("image/webp").indexOf("data:image/webp") === 0;
   } catch {
     webpSupported = false;
   }

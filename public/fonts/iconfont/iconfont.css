@@ -1,10 +1,11 @@
 @font-face {
   font-family: "iconfont";
   font-display: swap;
-  src: url('iconfont.woff2') format('woff2'),
-       url('iconfont.woff') format('woff'),
-       url('iconfont.ttf') format('truetype'),
-       url('iconfont.svg#iconfont') format('svg');
+  src:
+    url("iconfont.woff2") format("woff2"),
+    url("iconfont.woff") format("woff"),
+    url("iconfont.ttf") format("truetype"),
+    url("iconfont.svg#iconfont") format("svg");
 }
 
 .iconfont {

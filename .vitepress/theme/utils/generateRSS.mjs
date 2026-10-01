@@ -34,7 +34,14 @@ export const createRssFile = async (config, themeConfig) => {
   let posts = await createContentLoader("posts/**/*.md", {
     render: true,
     globOptions: {
-      ignore: ["**/node_modules/**", "**/dist/**", "**/README.md", "**/TODO.md", "_*.md", "**/_*.md"],
+      ignore: [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/README.md",
+        "**/TODO.md",
+        "_*.md",
+        "**/_*.md",
+      ],
     },
   }).load();
   // 日期降序排序

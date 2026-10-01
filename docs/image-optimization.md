@@ -6,12 +6,12 @@
 
 ## 功能概览
 
-| 功能 | 描述 | 默认状态 |
-|------|------|----------|
-| **骨架屏加载** | 图片加载时显示 shimmer 动画，加载完成后渐入显示 | 已启用 |
-| **原生懒加载** | 所有 Markdown 图片自动添加 `loading="lazy"` | 已启用 |
-| **WebP 自动降级** | 客户端检测 WebP 支持，自动加载 WebP 版本（如有） | 已启用 |
-| **Fancybox 灯箱** | 点击图片可放大查看，支持缩放、旋转、幻灯片 | 已启用 |
+| 功能              | 描述                                             | 默认状态 |
+| ----------------- | ------------------------------------------------ | -------- |
+| **骨架屏加载**    | 图片加载时显示 shimmer 动画，加载完成后渐入显示  | 已启用   |
+| **原生懒加载**    | 所有 Markdown 图片自动添加 `loading="lazy"`      | 已启用   |
+| **WebP 自动降级** | 客户端检测 WebP 支持，自动加载 WebP 版本（如有） | 已启用   |
+| **Fancybox 灯箱** | 点击图片可放大查看，支持缩放、旋转、幻灯片       | 已启用   |
 
 ---
 
@@ -97,6 +97,7 @@ public/images/
 ```
 
 系统会自动：
+
 1. 为图片添加 `data-webp="/images/photo.webp"` 属性
 2. 客户端检测浏览器 WebP 支持
 3. 如果支持且 WebP 文件存在，自动替换为 WebP 版本
@@ -151,11 +152,11 @@ const tryLoadWebp = (img) => {
 
   const tempImg = new Image();
   tempImg.onload = () => {
-    img.src = webpSrc;  // 替换为 WebP
+    img.src = webpSrc; // 替换为 WebP
     img.classList.add("loaded");
   };
   tempImg.onerror = () => {
-    img.classList.add("loaded");  // WebP 不存在，使用原图
+    img.classList.add("loaded"); // WebP 不存在，使用原图
   };
   tempImg.src = webpSrc;
 };
@@ -185,7 +186,7 @@ const tryLoadWebp = (img) => {
 export const themeConfig = {
   // 图片灯箱
   fancybox: {
-    enable: true,  // 设为 false 可禁用
+    enable: true, // 设为 false 可禁用
     js: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js",
     css: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/fancyapps-ui/5.0.36/fancybox/fancybox.min.css",
   },
@@ -226,20 +227,20 @@ fancybox: {
 ### HTML 输出示例
 
 ```html
-<img src="/images/photo.png" alt="图片描述" loading="lazy" data-webp="/images/photo.webp">
+<img src="/images/photo.png" alt="图片描述" loading="lazy" data-webp="/images/photo.webp" />
 ```
 
 ---
 
 ## 修改的文件
 
-| 文件路径 | 修改内容 |
-|----------|----------|
-| `.vitepress/theme/utils/initImageLazy.mjs` | **新建** - 图片懒加载增强工具 |
-| `.vitepress/theme/index.mjs` | 导入并注册 `initImageLazy` |
-| `.vitepress/theme/style/main.scss` | 添加骨架屏 CSS 样式 |
+| 文件路径                                    | 修改内容                        |
+| ------------------------------------------- | ------------------------------- |
+| `.vitepress/theme/utils/initImageLazy.mjs`  | **新建** - 图片懒加载增强工具   |
+| `.vitepress/theme/index.mjs`                | 导入并注册 `initImageLazy`      |
+| `.vitepress/theme/style/main.scss`          | 添加骨架屏 CSS 样式             |
 | `.vitepress/theme/utils/markdownConfig.mjs` | 图片渲染器添加 `data-webp` 属性 |
-| `themeConfig.mjs` | 启用 Fancybox 灯箱配置 |
+| `themeConfig.mjs`                           | 启用 Fancybox 灯箱配置          |
 
 ---
 

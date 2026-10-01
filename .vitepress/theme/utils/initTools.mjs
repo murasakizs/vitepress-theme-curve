@@ -28,7 +28,6 @@ export const routeChange = (type, to) => {
   if (typeof window === "undefined") return false;
   // 跳转前
   if (type === "before") {
-
     isOnlyAfter = false;
     // const isSame = isSamePage(to);
     // 更改上次路径
@@ -38,11 +37,9 @@ export const routeChange = (type, to) => {
   }
   // 跳转后
   else if (type === "after") {
-
     const isSame = isSamePage(to);
     const pathName = new URL(to, window.location.origin).pathname;
     if (isSame && lastPathName === pathName) {
-
       if (!isOnlyAfter) changeLoading();
       return false;
     } else {

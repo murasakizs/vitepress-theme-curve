@@ -53,7 +53,7 @@ export const themeConfig = {
           href: "/rss.xml",
         },
       ],
-            // iconfont preload
+      // iconfont preload
       [
         "link",
         {
@@ -168,14 +168,14 @@ export const themeConfig = {
       // 是否开启封面显示 文章不设置cover封面会显示异常，可以设置下方默认封面
       enable: false,
       // 封面布局方式: left | right | both
-      coverLayout: 'both',
+      coverLayout: "both",
       // 默认封面(随机展示)
       defaultCover: [
-        'https://example.com/1.avif',
-        'https://example.com/2.avif',
-        'https://example.com/3.avif'
-      ]
-    }
+        "https://example.com/1.avif",
+        "https://example.com/2.avif",
+        "https://example.com/3.avif",
+      ],
+    },
   },
   // 页脚信息
   footer: {
@@ -220,7 +220,11 @@ export const themeConfig = {
       {
         text: "项目",
         items: [
-          { text: "本站源码", link: "https://github.com/kazukokawagawa/vitepress-theme-curve", newTab: true },
+          {
+            text: "本站源码",
+            link: "https://github.com/kazukokawagawa/vitepress-theme-curve",
+            newTab: true,
+          },
         ],
       },
       //{
@@ -243,9 +247,7 @@ export const themeConfig = {
       },
       {
         text: "服务",
-        items: [
-          { text: "站点状态", link: "https://status.chiyu.it", newTab: true },
-        ],
+        items: [{ text: "站点状态", link: "https://status.chiyu.it", newTab: true }],
       },
     ],
     // 页脚徽标

@@ -2,35 +2,67 @@ import { ref } from "vue";
 
 // 混淆编码
 const obfuscate = (str) => {
-  const shifted = str.split('').map(c => {
-    const code = c.charCodeAt(0);
-    return String.fromCharCode(code + 3);
-  }).join('');
+  const shifted = str
+    .split("")
+    .map((c) => {
+      const code = c.charCodeAt(0);
+      return String.fromCharCode(code + 3);
+    })
+    .join("");
   return btoa(encodeURIComponent(shifted));
 };
 
 // 混淆解码
 const deobfuscate = (str) => {
   const decoded = decodeURIComponent(atob(str));
-  return decoded.split('').map(c => {
-    const code = c.charCodeAt(0);
-    return String.fromCharCode(code - 3);
-  }).join('');
+  return decoded
+    .split("")
+    .map((c) => {
+      const code = c.charCodeAt(0);
+      return String.fromCharCode(code - 3);
+    })
+    .join("");
 };
 
 // 有效配置键（与 store persist paths 对齐）
 const VALID_CONFIG_KEYS = [
-  "themeType", "themeColor", "bannerType", "useRightMenu", "useCustomCursor",
-  "playerShow", "playerVolume", "backgroundBlur", "backgroundType", "fontFamily",
-  "fontSize", "infoPosition", "backgroundUrl", "highContrast", "siteLayout",
-  "messageStyle", "messagePosition", "progressDirection", "messageDuration",
-  "islandMode", "islandUseThemeColor", "islandShowSeconds", "islandShowDate",
-  "islandPlayerSupport", "islandStyle",
-  "customThemeEnabled", "customPrimaryColor", "customSecondaryColor",
-  "removeAnimations", "showMoreSettings",
-  "scheduledThemeEnabled", "scheduledLightTime", "scheduledDarkTime",
-  "devChannelExpanded",
-  "pwaCacheEnabled", "pwaCacheLimit", "readingProgressEnabled",
+  "themeType",
+  "themeColor",
+  "bannerType",
+  "useRightMenu",
+  "useCustomCursor",
+  "playerShow",
+  "playerVolume",
+  "backgroundBlur",
+  "backgroundType",
+  "fontFamily",
+  "fontSize",
+  "infoPosition",
+  "backgroundUrl",
+  "highContrast",
+  "siteLayout",
+  "messageStyle",
+  "messagePosition",
+  "progressDirection",
+  "messageDuration",
+  "islandMode",
+  "islandUseThemeColor",
+  "islandShowSeconds",
+  "islandShowDate",
+  "islandPlayerSupport",
+  "islandStyle",
+  "customThemeEnabled",
+  "customPrimaryColor",
+  "customSecondaryColor",
+  "removeAnimations",
+  "showMoreSettings",
+  "scheduledThemeEnabled",
+  "scheduledLightTime",
+  "scheduledDarkTime",
+  "devFeaturesExpanded",
+  "pwaCacheEnabled",
+  "pwaCacheLimit",
+  "readingProgressEnabled",
   "imageWebpEnabled",
 ];
 

@@ -19,7 +19,10 @@
         v-for="(item, index) in pageNumber"
         :key="index"
         :class="[item === '...' ? 'point' : 'page-item', { choose: item === currentPage }]"
-        @click="item !== '...' && jumpPage(item === 1 ? `${routePath}` : `${routePath}/page/${item}`, item)"
+        @click="
+          item !== '...' &&
+          jumpPage(item === 1 ? `${routePath}` : `${routePath}/page/${item}`, item)
+        "
       >
         <span class="page-num">{{ item }}</span>
       </div>

@@ -33,4 +33,5 @@ test.html
 
 .vercel
 .claude
+.playwright-cli/
 public/data/postData.json

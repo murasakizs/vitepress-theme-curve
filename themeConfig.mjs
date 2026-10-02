@@ -18,7 +18,7 @@ export const themeConfig = {
     },
   },
   // 备案信息（留空则不显示）
-  icp: "",
+  icp: "萌ICP备20262118号",
   // 建站日期
   since: "2026-08-19",
 

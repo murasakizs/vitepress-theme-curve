@@ -94,12 +94,10 @@
         <!-- AI 摘要 -->
         <ArticleGPT />
         <!-- 文章内容：加密文章解锁后用解密 HTML 渲染，其余走 VitePress 渲染产物 -->
-        <div
-          v-if="decryptedHtml !== null"
-          id="page-content"
-          class="markdown-main-style"
-          v-html="decryptedHtml"
-        />
+        <!-- 加密文解密后补一层 div，与 VitePress Content 的 DOM 结构对齐（标题样式依赖 div > h1/h2/h3） -->
+        <div v-if="decryptedHtml !== null" id="page-content" class="markdown-main-style">
+          <div v-html="decryptedHtml" />
+        </div>
         <Content v-else id="page-content" class="markdown-main-style" />
         <!-- 参考资料 -->
         <References />

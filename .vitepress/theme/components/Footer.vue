@@ -9,7 +9,7 @@
         <a
           v-if="theme.icp"
           class="icp link"
-          href="https://icp.gov.moe/?keyword=20259222"
+          href="https://icp.gov.moe/?keyword=20262118"
           target="_blank"
         >
           <i class="iconfont icon-safe" />

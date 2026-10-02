@@ -1972,7 +1972,7 @@ const devModeEntryVerify = () => {
   }
 };
 
-const devModeEntryClose = () => {
+const devModeEntryClose = async () => {
   if (devModeEntryHideTimer.value) {
     clearTimeout(devModeEntryHideTimer.value);
     devModeEntryHideTimer.value = null;
@@ -1982,7 +1982,7 @@ const devModeEntryClose = () => {
     // 启用开发模式时默认开启「展开所有设置分组」
     expandAllGroups.value = true;
     applyExpandAllGroups();
-    saveStoreDefaults({
+    await saveStoreDefaults({
       siteVersion: siteVersion.value,
       siteVersionDate: siteVersionDate.value,
       branchVersion: branchVersion.value,
@@ -2115,17 +2115,14 @@ const handleClearDataKeepDevMode = async () => {
     $message.warning("数据已清除，页面即将刷新");
   }
   const dev = store.devMode;
-  const devExpanded = devModeOptionsExpanded.value;
   const savedData = {
-    devMode: dev,
-    devModeOptionsExpanded: devExpanded,
     siteVersion: siteVersion.value,
     siteVersionDate: siteVersionDate.value,
     branchVersion: branchVersion.value,
     branchBuildTime: branchBuildTime.value,
   };
   const savedVersion = localStorage.getItem("siteDataVersion");
-  saveStoreDefaults({
+  await saveStoreDefaults({
     siteVersion: siteVersion.value,
     siteVersionDate: siteVersionDate.value,
     branchVersion: branchVersion.value,
@@ -2184,17 +2181,14 @@ const handleResetConfig = async () => {
     $message.warning("配置已恢复默认，页面即将刷新");
   }
   const dev = store.devMode;
-  const devExpanded = devModeOptionsExpanded.value;
   const savedData = {
-    devMode: dev,
-    devModeOptionsExpanded: devExpanded,
     siteVersion: siteVersion.value,
     siteVersionDate: siteVersionDate.value,
     branchVersion: branchVersion.value,
     branchBuildTime: branchBuildTime.value,
   };
   const savedVersion = localStorage.getItem("siteDataVersion");
-  saveStoreDefaults({
+  await saveStoreDefaults({
     siteVersion: siteVersion.value,
     siteVersionDate: siteVersionDate.value,
     branchVersion: branchVersion.value,

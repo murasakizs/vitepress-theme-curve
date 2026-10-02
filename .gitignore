@@ -31,6 +31,7 @@ test.html
 *.sln
 *.sw?
 
+.mimocode
 .vercel
 .claude
 .playwright-cli/

@@ -30,7 +30,7 @@ INFP-T，生男心女，性取向双，高一休学\
 
 <hr style="border: none; border-bottom: 1px dashed var(--main-color-bg); height: 0; background: none; margin: 1.5rem 0" />
 
-以上针对的是二次元圈的部分哦，接下来是身份的方面——
+以上针对的是二次元圈的部分哦，接下来是身份的方面——\
 （如果你反对LGBTQ，那也没关系的，跳过就好啦）
 
 走上这条路是我自己的选择，有时候也会担心自己的选择到底是不是正确的。\
@@ -80,9 +80,9 @@ STEAM：<a href="https://myat-s.sgexilq.com" target="_blank" style="color: var(-
 
 <hr style="border: none; border-bottom: 1px dashed var(--main-color-bg); height: 0; background: none; margin: 1.5rem 0" />
 
-另外关于自己的页面：<a href="https://sgexilq.com/pages/about-me" target="_blank" style="color: var(--main-color)"><strong>关于泠酱</strong></a>
+另外关于自己的页面：<a href="/pages/about-me" style="color: var(--main-color)"><strong>关于泠酱</strong></a>
 
-继续探索小站：<a href="https://sgexilq.com" target="_blank" style="color: var(--main-color)"><strong>sgexilq.com</strong></a>
+继续探索小站：<a href="/" style="color: var(--main-color)"><strong>sgexilq.com</strong></a>
 
 向我匿名提问！：<a href="https://ngl.sgexilq.com" target="_blank" style="color: var(--main-color)"><strong>NGL.Link</strong></a>（会在Twitter回复）
 

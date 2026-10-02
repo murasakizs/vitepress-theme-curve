@@ -80,6 +80,8 @@ STEAM：<a href="https://myat-s.sgexilq.com" target="_blank" style="color: var(-
 
 <hr style="border: none; border-bottom: 1px dashed var(--main-color-bg); height: 0; background: none; margin: 1.5rem 0" />
 
+另外关于自己的页面：<a href="https://sgexilq.com/pages/about-me" target="_blank" style="color: var(--main-color)"><strong>关于泠酱</strong></a>
+
 继续探索小站：<a href="https://sgexilq.com" target="_blank" style="color: var(--main-color)"><strong>sgexilq.com</strong></a>
 
 向我匿名提问！：<a href="https://ngl.sgexilq.com" target="_blank" style="color: var(--main-color)"><strong>NGL.Link</strong></a>（会在Twitter回复）

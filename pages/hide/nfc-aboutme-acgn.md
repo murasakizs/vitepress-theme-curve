@@ -5,6 +5,7 @@ categories: [归档]
 tags: [归档]
 description: 二次元扩列卡
 top: false
+layout: post
 ---
 
 初次见面，还请多指教~

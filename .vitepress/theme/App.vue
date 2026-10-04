@@ -142,10 +142,11 @@ const startImportCheck = () => {
   }, 1000);
 };
 
-// 判断是否为文章页面
+// 判断是否为文章页面：路径在 posts/ 下，或 frontmatter 显式声明 layout: post
+// （pages/ 下的独立文章用后者走文章样式，又不进 RSS / 文章列表）
 const isPostPage = computed(() => {
   const routePath = decodeURIComponent(route.path);
-  return routePath.includes("/posts/");
+  return routePath.includes("/posts/") || frontmatter.value.layout === "post";
 });
 
 // 开启右键菜单

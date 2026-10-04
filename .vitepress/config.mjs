@@ -113,7 +113,7 @@ export default withPwa(
     // 构建排除
     // 下划线前缀的 md 一律视为仓库内部文件（审计 / 分析等临时产物），
     // 绝不发布到站点：它们既会生成页面，也会被 sitemap 收录。
-    srcExclude: ["**/README.md", "**/TODO.md", "_*.md", "**/_*.md", "AGENTS.md"],
+    srcExclude: ["**/README.md", "**/TODO.md", "_*.md", "**/_*.md", "AGENTS.md", "agent"],
     // transformPageData
     transformPageData: async (pageData) => {
       // canonical URL

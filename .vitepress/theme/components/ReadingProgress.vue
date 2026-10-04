@@ -16,6 +16,7 @@ import { mainStore } from "@/store";
 const store = mainStore();
 const { readingProgressEnabled, pwaCacheLimit } = storeToRefs(store);
 const route = useRoute();
+const { frontmatter } = useData();
 
 // 配置
 const props = defineProps({
@@ -112,10 +113,10 @@ const loadReadingData = () => {
   return readingData[postId] || null;
 };
 
-// 检查是否为文章页面
+// 检查是否为文章页面（posts/ 路径，或 frontmatter 声明 layout: post）
 const checkIsPostPage = () => {
   const routePath = decodeURIComponent(route.path);
-  isPostPage.value = routePath.includes("/posts/");
+  isPostPage.value = routePath.includes("/posts/") || frontmatter.value.layout === "post";
   isVisible.value = isPostPage.value;
 };
 

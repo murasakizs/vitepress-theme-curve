@@ -135,27 +135,45 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
         const $a = $(el);
         const href = $a.attr("href");
         const classesStr = $a.attr("class");
-        const innerText = $a.text();
+        // 保留嵌套图标/图片（text() 会丢弃子元素）
+        const innerHtml = $.html($a.contents());
         // 检查是否包含排除的类
         const classes = classesStr ? classesStr.trim().split(" ") : [];
         if (excludeClass.some((className) => classes.includes(className))) {
           return;
         }
+        // 同源链接不需要中转
+        if (href) {
+          try {
+            const linkUrl = new URL(href, "https://placeholder.local");
+            if (linkUrl.origin === "https://placeholder.local") return;
+          } catch {
+            return;
+          }
+        }
         // 存在链接且非中转页
         if (href && !href.includes(redirectPage)) {
           // Base64 编码 href
           const encodedHref = Buffer.from(href, "utf-8").toString("base64");
-          // 获取所有属性
+          // 获取所有属性（排除 href / original-href，稍后单独写入）
           const attributes = el.attribs;
+          // 转义属性值中的 HTML 特殊字符
+          const escapeAttr = (s) =>
+            String(s)
+              .replace(/&/g, "&amp;")
+              .replace(/"/g, "&quot;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
           // 重构属性字符串，保留原有属性
           let attributesStr = "";
           for (let attr in attributes) {
             if (Object.prototype.hasOwnProperty.call(attributes, attr)) {
-              attributesStr += ` ${attr}="${attributes[attr]}"`;
+              if (attr === "href" || attr === "original-href") continue;
+              attributesStr += ` ${attr}="${escapeAttr(attributes[attr])}"`;
             }
           }
           // 构造新标签
-          const newLink = `<a href="${redirectPage}#url=${encodedHref}" original-href="${href}" ${attributesStr}>${innerText}</a>`;
+          const newLink = `<a href="${redirectPage}#url=${encodedHref}" original-href="${escapeAttr(href)}" ${attributesStr}>${innerHtml}</a>`;
           // 替换原有标签
           $a.replaceWith(newLink);
         }

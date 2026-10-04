@@ -382,8 +382,7 @@ onMounted(() => {
 });
 onBeforeUnmount(() => {
   if (scrollHandler) window.removeEventListener("scroll", scrollHandler);
-  if (modalScrollHandler)
-    document.removeEventListener("scroll", modalScrollHandler, { capture: true });
+  if (modalScrollHandler) document.removeEventListener("scroll", modalScrollHandler, { capture: true });
 });
 const attachAudioListeners = () => {
   const audio = window.$player?.audio;

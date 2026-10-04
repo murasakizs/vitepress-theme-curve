@@ -82,7 +82,7 @@ export default withPwa(
           .loading {
             display: none !important;
           }
-          .mian-layout {
+          .main-layout {
             display: block !important;
           }
         </style>`,
@@ -113,7 +113,7 @@ export default withPwa(
     // 构建排除
     // 下划线前缀的 md 一律视为仓库内部文件（审计 / 分析等临时产物），
     // 绝不发布到站点：它们既会生成页面，也会被 sitemap 收录。
-    srcExclude: ["**/README.md", "**/TODO.md", "_*.md", "**/_*.md"],
+    srcExclude: ["**/README.md", "**/TODO.md", "_*.md", "**/_*.md", "AGENTS.md"],
     // transformPageData
     transformPageData: async (pageData) => {
       // canonical URL
@@ -194,34 +194,64 @@ export default withPwa(
               req.on("end", () => {
                 try {
                   const data = JSON.parse(body);
+                  // 输入格式白名单：只校验请求里出现过的键，不合规直接 400
+                  const validators = {
+                    siteVersion: (v) => /^V?\d+(\.\d+)*$/.test(v),
+                    siteVersionDate: (v) =>
+                      /^\d{4}\.\d{1,2}\.\d{1,2}(\s\d{1,2}:\d{2}:\d{2})?$/.test(v),
+                    branchBuildTime: (v) =>
+                      /^\d{4}\.\d{1,2}\.\d{1,2}(\s\d{1,2}:\d{2}:\d{2})?$/.test(v),
+                    branchVersion: (v) => /^\d+$/.test(v),
+                    DEFAULT_DEV_MODE: (v) => /^\d+$/.test(v),
+                    resetVersion: (v) => /^\d+$/.test(v),
+                    bumpVersion: (v) => typeof v === "boolean",
+                  };
+                  for (const key of Object.keys(data)) {
+                    const validate = validators[key];
+                    if (validate && !validate(data[key])) {
+                      res.statusCode = 400;
+                      res.setHeader("Content-Type", "application/json");
+                      res.end(JSON.stringify({ ok: false, error: `字段 ${key} 格式不合法` }));
+                      return;
+                    }
+                  }
                   const storePath = path.resolve(__dirname, "./theme/store/index.js");
                   let content = fs.readFileSync(storePath, "utf-8");
-                  if (data.siteVersion != null)
+                  // 函数式替换：返回值不再解释 $ 等特殊字符
+                  if (data.siteVersion != null) {
                     content = content.replace(
                       /(siteVersion:\s*")[^"]*(")/,
-                      `$1${data.siteVersion}$2`,
+                      (_m, p1, p2) => `${p1}${data.siteVersion}${p2}`,
                     );
-                  if (data.siteVersionDate != null)
+                  }
+                  if (data.siteVersionDate != null) {
                     content = content.replace(
                       /(siteVersionDate:\s*")[^"]*(")/,
-                      `$1${data.siteVersionDate}$2`,
+                      (_m, p1, p2) => `${p1}${data.siteVersionDate}${p2}`,
                     );
-                  if (data.branchVersion != null)
-                    content = content.replace(/(branchVersion:\s*)\d+/, `$1${data.branchVersion}`);
-                  if (data.branchBuildTime != null)
+                  }
+                  if (data.branchVersion != null) {
+                    content = content.replace(
+                      /(branchVersion:\s*)\d+/,
+                      (_m, p1) => `${p1}${data.branchVersion}`,
+                    );
+                  }
+                  if (data.branchBuildTime != null) {
                     content = content.replace(
                       /(branchBuildTime:\s*")[^"]*(")/,
-                      `$1${data.branchBuildTime}$2`,
+                      (_m, p1, p2) => `${p1}${data.branchBuildTime}${p2}`,
                     );
-                  if (data.DEFAULT_DEV_MODE != null)
+                  }
+                  if (data.DEFAULT_DEV_MODE != null) {
                     content = content.replace(
                       /(DEFAULT_DEV_MODE\s*=\s*)\d+/,
-                      `$1${data.DEFAULT_DEV_MODE}`,
+                      (_m, p1) => `${p1}${data.DEFAULT_DEV_MODE}`,
                     );
+                  }
                   if (data.resetVersion) {
                     content = content.replace(
                       /(PERSIST_VERSION\s*=\s*)\d+/,
-                      `$1${data.resetVersion}`,
+                      (_m, p1) => `${p1}${data.resetVersion}`,
                     );
                   } else if (data.bumpVersion) {
                     content = content.replace(
@@ -281,7 +311,7 @@ export default withPwa(
         runtimeCaching: [
           // API 请求 - 网络优先
           {
-            urlPattern: /^\/api\/.*/i,
+            urlPattern: ({ url }) => url.pathname.startsWith("/api/"),
             handler: "NetworkFirst",
             options: {
               cacheName: "api-cache",
@@ -305,9 +335,13 @@ export default withPwa(
               },
             },
           },
-          // VitePress 生成的页面路由（cleanUrls 模式）
+          // VitePress 生成的页面路由（cleanUrls 模式，排除根级带点文件）
           {
-            urlPattern: /^\/[^/]+\/?$/i,
+            urlPattern: ({ url }) =>
+              /^\/[^/]+\/?$/.test(url.pathname) &&
+              !/\.(?:js|mjs|css|map|json|txt|xml|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|webmanifest)$/i.test(
+                url.pathname,
+              ),
             handler: "NetworkFirst",
             options: {
               cacheName: "page-cache",
@@ -318,9 +352,13 @@ export default withPwa(
               },
             },
           },
-          // 文章详情页路由
+          // 文章详情页路由（排除静态资源后缀）
           {
-            urlPattern: /^\/[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)+\/?$/i,
+            urlPattern: ({ url }) =>
+              /^\/[^/]+\/.+/.test(url.pathname) &&
+              !/\.(?:js|mjs|css|map|json|txt|xml|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|webmanifest)$/i.test(
+                url.pathname,
+              ),
             handler: "NetworkFirst",
             options: {
               cacheName: "post-cache",

@@ -8,7 +8,7 @@
   <!-- 导航栏 -->
   <Nav />
   <!-- 主内容 -->
-  <main :class="['mian-layout', { loading: loadingStatus, 'is-post': isPostPage }]">
+  <main :class="['main-layout', { loading: loadingStatus, 'is-post': isPostPage }]">
     <!-- 404 -->
     <NotFound v-if="page.isNotFound" />
     <!-- 首页 -->
@@ -322,7 +322,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-.mian-layout {
+.main-layout {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;

@@ -3,5 +3,6 @@ Allow: /
 Allow: /pages/
 Allow: /posts/
 Disallow: /redirect.html
+Disallow: /redirect
 
 Sitemap: https://sgexilq.com/sitemap.xml

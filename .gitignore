@@ -36,3 +36,10 @@ test.html
 .claude
 .playwright-cli/
 public/data/postData.json
+
+# Accidental junk files at repo root (anchored with leading / so we don't ignore
+# all .js/.json across the repo)
+/.js
+/.json
+/pnpm
+/package-lock.json

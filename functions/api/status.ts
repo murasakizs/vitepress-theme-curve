@@ -87,12 +87,6 @@ export async function onRequestGet(context: any) {
     const validatingCount = monitors.filter(
       (m: any) => m.attributes.status === "validating",
     ).length;
-    const upCount = monitors.filter(
-      (m: any) =>
-        m.attributes.status === "up" ||
-        m.attributes.status === "paused" ||
-        m.attributes.status === "pending",
-    ).length;
 
     let statusType: StatusType;
 

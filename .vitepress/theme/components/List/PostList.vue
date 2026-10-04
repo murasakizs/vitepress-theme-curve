@@ -97,29 +97,30 @@ const { theme: themeConfig } = useData();
 const asArray = (val) => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
-  if (typeof val === "string")
+  if (typeof val === "string") {
     return val
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
+  }
   return [];
 };
 
 // 计算布局类型
 const layoutType = computed(() =>
-  themeConfig.value?.cover?.twoColumns
+  (themeConfig.value?.cover?.twoColumns
     ? "twoColumns"
-    : (themeConfig.value?.cover?.showCover?.coverLayout ?? "left"),
+    : (themeConfig.value?.cover?.showCover?.coverLayout ?? "left")),
 );
 
 // 计算网格样式
 const gridStyle = computed(() =>
-  layoutType.value === "twoColumns"
+  (layoutType.value === "twoColumns"
     ? {
         "--grid-columns": 2,
         "--grid-gap": "1rem",
       }
-    : {},
+    : {}),
 );
 
 // 判断是否显示封面

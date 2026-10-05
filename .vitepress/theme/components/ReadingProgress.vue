@@ -10,12 +10,13 @@
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia';
-import { mainStore } from '@/store';
+import { storeToRefs } from "pinia";
+import { mainStore } from "@/store";
 
 const store = mainStore();
 const { readingProgressEnabled, pwaCacheLimit } = storeToRefs(store);
 const route = useRoute();
+const { frontmatter } = useData();
 
 // 配置
 const props = defineProps({
@@ -31,7 +32,7 @@ const readingStartTime = ref(null);
 const totalReadingTime = ref(0);
 const isVisible = ref(false);
 const isPostPage = ref(false);
-const contentSelector = '#page-content';
+const contentSelector = "#page-content";
 
 // 格式化阅读时间
 const formattedReadingTime = computed(() => {
@@ -83,7 +84,7 @@ const saveReadingData = () => {
   const postId = route.path;
   if (!postId) return;
 
-  const readingData = JSON.parse(localStorage.getItem('readingData') || '{}');
+  const readingData = JSON.parse(localStorage.getItem("readingData") || "{}");
   readingData[postId] = {
     scrollPercent: Math.round(scrollPercent.value),
     readingTime: Math.floor(totalReadingTime.value),
@@ -94,13 +95,13 @@ const saveReadingData = () => {
   const keys = Object.keys(readingData);
   const limit = pwaCacheLimit.value;
   if (limit > 0 && keys.length > limit) {
-    const sortedKeys = keys.sort((a, b) =>
-      (readingData[a].lastVisit || 0) - (readingData[b].lastVisit || 0)
+    const sortedKeys = keys.sort(
+      (a, b) => (readingData[a].lastVisit || 0) - (readingData[b].lastVisit || 0),
     );
-    sortedKeys.slice(0, keys.length - limit).forEach(key => delete readingData[key]);
+    sortedKeys.slice(0, keys.length - limit).forEach((key) => delete readingData[key]);
   }
 
-  localStorage.setItem('readingData', JSON.stringify(readingData));
+  localStorage.setItem("readingData", JSON.stringify(readingData));
 };
 
 // 加载阅读数据
@@ -108,14 +109,14 @@ const loadReadingData = () => {
   const postId = route.path;
   if (!postId) return null;
 
-  const readingData = JSON.parse(localStorage.getItem('readingData') || '{}');
+  const readingData = JSON.parse(localStorage.getItem("readingData") || "{}");
   return readingData[postId] || null;
 };
 
-// 检查是否为文章页面
+// 检查是否为文章页面（posts/ 路径，或 frontmatter 声明 layout: post）
 const checkIsPostPage = () => {
   const routePath = decodeURIComponent(route.path);
-  isPostPage.value = routePath.includes('/posts/');
+  isPostPage.value = routePath.includes("/posts/") || frontmatter.value.layout === "post";
   isVisible.value = isPostPage.value;
 };
 
@@ -146,7 +147,7 @@ watch(
       totalReadingTime.value = 0;
       scrollPercent.value = 0;
     }
-  }
+  },
 );
 
 onMounted(() => {
@@ -154,11 +155,11 @@ onMounted(() => {
   if (isPostPage.value) {
     startReadingTimer();
   }
-  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener("scroll", handleScroll, { passive: true });
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener("scroll", handleScroll);
   if (scrollTimer) {
     clearTimeout(scrollTimer);
   }
@@ -200,7 +201,9 @@ onBeforeUnmount(() => {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     opacity: 0;
     transform: translateY(-10px);
-    transition: opacity 0.3s, transform 0.3s;
+    transition:
+      opacity 0.3s,
+      transform 0.3s;
     pointer-events: none;
 
     .reading-time {
@@ -209,7 +212,7 @@ onBeforeUnmount(() => {
       gap: 4px;
 
       &::before {
-        content: '';
+        content: "";
         display: inline-block;
         width: 12px;
         height: 12px;

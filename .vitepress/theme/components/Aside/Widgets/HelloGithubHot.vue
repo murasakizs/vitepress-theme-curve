@@ -138,6 +138,11 @@ onMounted(() => {
           white-space: normal;
           opacity: 0.8;
           text-decoration: none;
+          // display 为 -webkit-box（非 flex/inline-block 等白名单值），按内联元素处理用透明度
+          &:active {
+            opacity: 0.6;
+            transition-duration: var(--press-in);
+          }
         }
       }
 

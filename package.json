@@ -8,27 +8,29 @@
   "github": "https://github.com/imsyy/vitepress-theme-curve",
   "blog": "https://blog.imsyy.top",
   "repository": "github:imsyy/vitepress-theme-curve",
-  "license": "MIT License",
-  "license-file": "LICENSE",
+  "license": "MIT",
   "engines": {
     "node": ">=20",
-    "npm": ">=10"
+    "pnpm": ">=10"
   },
   "type": "module",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",
+    "lint": "eslint . .vitepress --ext .js,.jsx,.cjs,.mjs,.vue --fix",
     "dev": "vitepress dev --host",
     "build": "vitepress build",
     "preview": "vitepress preview",
     "deploy:vercel": "vercel deploy"
   },
   "devDependencies": {
+    "@types/node": "^22.20.0",
+    "@typescript-eslint/parser": "^8.71.0",
     "@vercel/node": "^5.8.22",
     "cheerio": "1.0.0-rc.12",
     "defu": "^6.1.7",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-vue": "^9.33.0",
     "feed": "^4.2.2",
@@ -49,7 +51,6 @@
     "vitepress-plugin-tabs": "^0.5.0"
   },
   "dependencies": {
-    "@types/node": "^22.20.0",
     "@vite-pwa/vitepress": "^0.5.4",
     "@vueuse/core": "^11.3.0",
     "algoliasearch": "^5.55.1",

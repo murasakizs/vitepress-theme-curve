@@ -436,7 +436,10 @@
     &.tip {
       background-color: var(--main-info-color-gray);
       border-left-color: var(--main-info-color);
-      p, li, a, strong {
+      p,
+      li,
+      a,
+      strong {
         color: var(--main-info-color) !important;
       }
       a::before {

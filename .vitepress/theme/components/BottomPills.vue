@@ -7,8 +7,16 @@
         <Transition name="pill-expand">
           <div v-if="!store.playerFolded" class="pill-card">
             <div class="pill-card-header">
-              <span :class="{ active: store.playerPanelTab === 'list' }" @click="store.playerPanelTab = 'list'">播放列表</span>
-              <span :class="{ active: store.playerPanelTab === 'lrc' }" @click="store.playerPanelTab = 'lrc'">歌词</span>
+              <span
+                :class="{ active: store.playerPanelTab === 'list' }"
+                @click="store.playerPanelTab = 'list'"
+                >播放列表</span
+              >
+              <span
+                :class="{ active: store.playerPanelTab === 'lrc' }"
+                @click="store.playerPanelTab = 'lrc'"
+                >歌词</span
+              >
             </div>
             <div v-show="store.playerPanelTab === 'list'" class="pill-card-list">
               <div
@@ -25,13 +33,21 @@
               </div>
             </div>
             <div v-show="store.playerPanelTab === 'lrc'" class="pill-card-lrc">
-              <div v-if="hasPlayedOnce && pillLyrics.length" ref="lrcScrollRef" class="pill-card-lrc-scroll" @wheel.passive="pauseLyricFollow" @touchmove.passive="pauseLyricFollow">
+              <div
+                v-if="hasPlayedOnce && pillLyrics.length"
+                ref="lrcScrollRef"
+                class="pill-card-lrc-scroll"
+                @wheel.passive="pauseLyricFollow"
+                @touchmove.passive="pauseLyricFollow"
+              >
                 <div
                   v-for="(line, idx) in pillLyrics"
                   :key="idx"
                   :class="['pill-card-lrc-line', { active: idx === pillLyricIdx }]"
                   @click="seekToLine(idx)"
-                >{{ line.text }}</div>
+                >
+                  {{ line.text }}
+                </div>
               </div>
               <div v-else class="pill-card-lrc-empty">没有播放中的音乐</div>
             </div>
@@ -44,19 +60,35 @@
           <div v-if="!store.playerFolded" class="pill-ctrl-bar">
             <span class="pill-ctrl-name">
               <Transition name="pill-fade" mode="out-in">
-                <span :key="store.playerData?.name" class="pill-ctrl-name-inner">{{ store.playerData?.name || '未知曲目' }}</span>
+                <span :key="store.playerData?.name" class="pill-ctrl-name-inner">{{
+                  store.playerData?.name || "未知曲目"
+                }}</span>
               </Transition>
             </span>
             <div class="pill-ctrl-btns" @click.stop>
               <button class="pill-ctrl-btn" @click="prevSong">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                  <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
+                </svg>
               </button>
               <button class="pill-ctrl-btn" @click="togglePlay">
-                <svg v-if="!store.playState" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                <svg
+                  v-if="!store.playState"
+                  viewBox="0 0 24 24"
+                  width="22"
+                  height="22"
+                  fill="currentColor"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <svg v-else viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                </svg>
               </button>
               <button class="pill-ctrl-btn" @click="nextSong">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 18 14.5 12 6 6v12zM16 6v12h2V6h-2z"/></svg>
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                  <path d="M6 18 14.5 12 6 6v12zM16 6v12h2V6h-2z" />
+                </svg>
               </button>
             </div>
           </div>
@@ -64,13 +96,27 @@
       </div>
       <!-- 第一层（最底）：封面 + 歌词 药丸 -->
       <div class="pill-layer pill-layer-lyric">
-        <div :class="['pill-lyric', { 'island-theme-color': store.islandUseThemeColor }]" :style="pillLyricStyle" @click="store.playerFolded = !store.playerFolded">
+        <div
+          :class="['pill-lyric', { 'island-theme-color': store.islandUseThemeColor }]"
+          :style="pillLyricStyle"
+          @click="store.playerFolded = !store.playerFolded"
+        >
           <div :class="['pill-lyric-cover-wrap', { 'cover-fading': showOldCover }]">
             <div v-if="showOldCover && prevCover" class="cover-old-wrap">
-              <img :src="prevCover" :class="['pill-lyric-cover', { spinning: store.playState }]" alt="" />
+              <img
+                :src="prevCover"
+                :class="['pill-lyric-cover', { spinning: store.playState }]"
+                alt=""
+              />
             </div>
             <div class="cover-new-wrap">
-              <img v-if="store.playerData?.cover" :key="store.playerData.cover" :src="store.playerData.cover" :class="['pill-lyric-cover', { spinning: store.playState }]" alt="" />
+              <img
+                v-if="store.playerData?.cover"
+                :key="store.playerData.cover"
+                :src="store.playerData.cover"
+                :class="['pill-lyric-cover', { spinning: store.playState }]"
+                alt=""
+              />
             </div>
           </div>
           <span class="pill-lyric-text">
@@ -91,16 +137,16 @@ import { mainStore } from "@/store";
 const store = mainStore();
 const { playerData, playState } = storeToRefs(store);
 
-const visible = computed(() => store.islandStyle === 'extended' && store.playerShow);
+const visible = computed(() => store.islandStyle === "extended" && store.playerShow);
 const pillStackHidden = ref(false);
-const isMobile = ref(typeof window !== 'undefined' && window.innerWidth <= 768);
+const isMobile = ref(typeof window !== "undefined" && window.innerWidth <= 768);
 
 // 显示歌词：播放中但未到第一行时显示第一行，暂停后保持当前歌词
 const displayLyric = computed(() => {
-  if (!hasPlayedOnce.value) return 'Player';
+  if (!hasPlayedOnce.value) return "Player";
   if (store.playerLyric) return store.playerLyric;
   if (pillLyrics.value.length) return pillLyrics.value[0].text;
-  return '暂无歌词';
+  return "暂无歌词";
 });
 
 // 歌曲列表
@@ -112,23 +158,23 @@ const lrcScrollRef = ref(null);
 const userScrolling = ref(false);
 let followResumeTimer = null;
 const hasPlayedOnce = ref(false);
-const prevCover = ref('');
+const prevCover = ref("");
 
 // 胶囊宽度：未播放时基于"Player"文本，播放后取最长歌词并固定
 const pillLyricWidth = computed(() => {
-  if (!hasPlayedOnce.value) return 'Player'.length * 14 + 32;
+  if (!hasPlayedOnce.value) return "Player".length * 14 + 32;
   if (pillLyrics.value.length) {
-    const maxLen = Math.max(...pillLyrics.value.map(l => l.text.length));
+    const maxLen = Math.max(...pillLyrics.value.map((l) => l.text.length));
     const capped = Math.min(maxLen, 30);
     return capped * 14 + 32;
   }
-  return 'Player'.length * 14 + 32;
+  return "Player".length * 14 + 32;
 });
 
 const pillLyricStyle = computed(() => {
   const textWidth = pillLyricWidth.value;
-  const maxW = typeof window !== 'undefined' ? Math.min(480, window.innerWidth - 32) : 480;
-  return { width: Math.min(textWidth, maxW) + 'px' };
+  const maxW = typeof window !== "undefined" ? Math.min(480, window.innerWidth - 32) : 480;
+  return { width: Math.min(textWidth, maxW) + "px" };
 });
 
 // 从全局播放器同步
@@ -143,9 +189,9 @@ const syncFromPlayer = () => {
   if (song) {
     store.playerData = {
       ...store.playerData,
-      name: song.name || song.title || '未知曲目',
-      artist: song.artist || '未知艺术家',
-      cover: song.cover || song.pic || '',
+      name: song.name || song.title || "未知曲目",
+      artist: song.artist || "未知艺术家",
+      cover: song.cover || song.pic || "",
     };
   }
 };
@@ -196,21 +242,29 @@ const loadLyrics = async () => {
 const showOldCover = ref(false);
 let coverFadeTimer = null;
 const hasCoverChanged = ref(false);
-watch(() => store.playerData?.cover, (newCover, oldCover) => {
-  if (newCover && oldCover && newCover !== oldCover) {
-    prevCover.value = oldCover;
-    showOldCover.value = true;
-    hasCoverChanged.value = true;
-    if (coverFadeTimer) clearTimeout(coverFadeTimer);
-    coverFadeTimer = setTimeout(() => { showOldCover.value = false; }, 500);
-  }
-});
-watch(() => store.playState, (playing) => {
-  if (playing) {
-    hasPlayedOnce.value = true;
-    loadLyrics();
-  }
-});
+watch(
+  () => store.playerData?.cover,
+  (newCover, oldCover) => {
+    if (newCover && oldCover && newCover !== oldCover) {
+      prevCover.value = oldCover;
+      showOldCover.value = true;
+      hasCoverChanged.value = true;
+      if (coverFadeTimer) clearTimeout(coverFadeTimer);
+      coverFadeTimer = setTimeout(() => {
+        showOldCover.value = false;
+      }, 500);
+    }
+  },
+);
+watch(
+  () => store.playState,
+  (playing) => {
+    if (playing) {
+      hasPlayedOnce.value = true;
+      loadLyrics();
+    }
+  },
+);
 
 // 同步歌词高亮
 const syncLyric = () => {
@@ -232,7 +286,7 @@ const scrollToActiveLyric = () => {
   const el = container?.children[pillLyricIdx.value];
   if (!el) return;
   const offset = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
-  container.scrollTo({ top: offset, behavior: 'smooth' });
+  container.scrollTo({ top: offset, behavior: "smooth" });
 };
 
 // 用户手动滚动时暂停跟随，停止滚动 3 秒后回到当前行
@@ -257,23 +311,36 @@ const seekToLine = (idx) => {
 };
 
 // 歌词行高亮变化时跟随滚动
-watch(pillLyricIdx, scrollToActiveLyric, { flush: 'post' });
+watch(pillLyricIdx, scrollToActiveLyric, { flush: "post" });
 
 // 展开面板或切换到歌词页时立即定位到当前行
 watch(
   () => [store.playerFolded, store.playerPanelTab],
   () => {
-    if (store.playerFolded || store.playerPanelTab !== 'lrc') return;
+    if (store.playerFolded || store.playerPanelTab !== "lrc") return;
     scrollToActiveLyric();
   },
-  { flush: 'post' },
+  { flush: "post" },
 );
 
 // 控制
-const togglePlay = () => { window.$player?.toggle(); };
-const prevSong = () => { window.$player?.skipBack(); window.$player?.play(); };
-const nextSong = () => { window.$player?.skipForward(); window.$player?.play(); };
-const playSongByIdx = (idx) => { window.$player?.list.switch(idx); window.$player?.play(); syncFromPlayer(); loadLyrics(); };
+const togglePlay = () => {
+  window.$player?.toggle();
+};
+const prevSong = () => {
+  window.$player?.skipBack();
+  window.$player?.play();
+};
+const nextSong = () => {
+  window.$player?.skipForward();
+  window.$player?.play();
+};
+const playSongByIdx = (idx) => {
+  window.$player?.list.switch(idx);
+  window.$player?.play();
+  syncFromPlayer();
+  loadLyrics();
+};
 
 // 定时同步 + 监听切歌（暂停时也能捕获）
 let timer = null;
@@ -301,7 +368,7 @@ onMounted(() => {
   let lastModalScrollTop = 0;
   modalScrollHandler = (e) => {
     const el = e.target;
-    if (!el || !el.classList || !el.classList.contains('modal-content')) return;
+    if (!el || !el.classList || !el.classList.contains("modal-content")) return;
     const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 50;
     if (!store.playerFolded) store.playerFolded = true;
     if (atBottom) {
@@ -311,7 +378,7 @@ onMounted(() => {
     }
     lastModalScrollTop = el.scrollTop;
   };
-  document.addEventListener('scroll', modalScrollHandler, { passive: true, capture: true });
+  document.addEventListener("scroll", modalScrollHandler, { passive: true, capture: true });
 });
 onBeforeUnmount(() => {
   if (scrollHandler) window.removeEventListener("scroll", scrollHandler);
@@ -321,21 +388,40 @@ const attachAudioListeners = () => {
   const audio = window.$player?.audio;
   if (!audio || audio._pillBound) return;
   audio._pillBound = true;
-  const onLoaded = () => { syncFromPlayer(); loadLyrics(); };
-  const onEnded = () => { setTimeout(() => { syncFromPlayer(); loadLyrics(); }, 200); };
+  const onLoaded = () => {
+    syncFromPlayer();
+    loadLyrics();
+  };
+  const onEnded = () => {
+    setTimeout(() => {
+      syncFromPlayer();
+      loadLyrics();
+    }, 200);
+  };
   audio.addEventListener("loadeddata", onLoaded);
   audio.addEventListener("ended", onEnded);
-  audioListeners = [{ el: audio, fn: onLoaded, evt: "loadeddata" }, { el: audio, fn: onEnded, evt: "ended" }];
+  audioListeners = [
+    { el: audio, fn: onLoaded, evt: "loadeddata" },
+    { el: audio, fn: onEnded, evt: "ended" },
+  ];
 };
 onMounted(() => {
   syncFromPlayer();
-  timer = setInterval(() => { syncFromPlayer(); syncLyric(); }, 500);
+  timer = setInterval(() => {
+    syncFromPlayer();
+    syncLyric();
+  }, 500);
   attachAudioListeners();
   const retryTimer = setInterval(() => {
-    if (window.$player?.audio) { attachAudioListeners(); clearInterval(retryTimer); }
+    if (window.$player?.audio) {
+      attachAudioListeners();
+      clearInterval(retryTimer);
+    }
   }, 500);
   // 监听窗口大小变化
-  const onResize = () => { isMobile.value = window.innerWidth <= 768; };
+  const onResize = () => {
+    isMobile.value = window.innerWidth <= 768;
+  };
   window.addEventListener("resize", onResize);
 });
 onBeforeUnmount(() => {
@@ -359,7 +445,9 @@ onBeforeUnmount(() => {
   z-index: 9999;
   opacity: 1;
   transform: translateX(-50%) translateY(0);
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
   &.pill-hidden {
     opacity: 0;
     transform: translateX(-50%) translateY(20px);
@@ -388,10 +476,18 @@ onBeforeUnmount(() => {
   border: 1px solid var(--main-card-border);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
   cursor: pointer;
-  transition: border-color 0.3s, box-shadow 0.3s, width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform var(--press-out) var(--press-ease);
   &:hover {
     border-color: var(--main-color);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  }
+  &:active {
+    transform: scale(0.97);
+    transition-duration: var(--press-in);
   }
   @media (max-width: 768px) {
     padding: 0 12px 0 4px;
@@ -405,12 +501,16 @@ onBeforeUnmount(() => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    @media (max-width: 768px) { font-size: 13px; }
+    @media (max-width: 768px) {
+      font-size: 13px;
+    }
   }
   &.island-theme-color {
     background-color: var(--main-color);
     border-color: var(--main-color);
-    .pill-lyric-text { color: #ffffff; }
+    .pill-lyric-text {
+      color: #ffffff;
+    }
     &:hover {
       border-color: var(--main-color);
       box-shadow: 0 4px 16px var(--main-color-bg);
@@ -429,7 +529,8 @@ onBeforeUnmount(() => {
     animation: cover-fade-in 0.5s ease forwards;
   }
 }
-.cover-old-wrap, .cover-new-wrap {
+.cover-old-wrap,
+.cover-new-wrap {
   position: absolute;
   top: 0;
   left: 0;
@@ -437,12 +538,20 @@ onBeforeUnmount(() => {
   height: 32px;
 }
 @keyframes cover-fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 @keyframes cover-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .pill-lyric-cover {
   width: 32px;
@@ -450,7 +559,9 @@ onBeforeUnmount(() => {
   border-radius: 50%;
   object-fit: cover;
   outline: 1px solid var(--main-card-border);
-  &.spinning { animation: pill-rotate 20s linear infinite; }
+  &.spinning {
+    animation: pill-rotate 20s linear infinite;
+  }
 }
 .pill-lyric-text-inner {
   display: inline-block;
@@ -463,11 +574,19 @@ onBeforeUnmount(() => {
 .pill-text-leave-active {
   transition: opacity 0.15s ease;
 }
-.pill-text-enter-from { opacity: 0; }
-.pill-text-leave-to { opacity: 0; }
+.pill-text-enter-from {
+  opacity: 0;
+}
+.pill-text-leave-to {
+  opacity: 0;
+}
 @keyframes pill-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ---- 第二层：歌名 + 控制按钮 ----
@@ -482,7 +601,9 @@ onBeforeUnmount(() => {
   background-color: var(--main-card-background);
   border: 1px solid var(--main-card-border);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
   box-sizing: border-box;
   &:hover {
     border-color: var(--main-color);
@@ -535,11 +656,17 @@ onBeforeUnmount(() => {
     color: var(--main-color);
     background-color: var(--main-color-bg);
   }
-  &:active { transform: scale(0.92); }
+  &:active {
+    transform: scale(0.92);
+    transition-duration: var(--press-in);
+  }
   @media (max-width: 768px) {
     width: 38px;
     height: 38px;
-    svg { width: 18px; height: 18px; }
+    svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 
@@ -571,10 +698,18 @@ onBeforeUnmount(() => {
     cursor: pointer;
     padding-bottom: 2px;
     border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
+    transition:
+      color 0.2s,
+      border-color 0.2s,
+      opacity 0.2s;
     &.active {
       color: var(--main-color);
       border-bottom-color: var(--main-color);
+    }
+    // 行内元素不支持 transform，用透明度做按下反馈
+    &:active {
+      opacity: 0.6;
+      transition-duration: var(--press-in);
     }
   }
   @media (max-width: 768px) {
@@ -587,7 +722,9 @@ onBeforeUnmount(() => {
   overflow-y: auto;
   padding: 0 8px 8px;
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .pill-card-item {
   display: flex;
@@ -596,9 +733,20 @@ onBeforeUnmount(() => {
   padding: 8px 10px;
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
-  &:hover { background-color: var(--main-color-bg); }
-  &.active .pill-card-item-name { color: var(--main-color); font-weight: 600; }
+  transition:
+    background-color 0.2s,
+    transform var(--press-out) var(--press-ease);
+  &:hover {
+    background-color: var(--main-color-bg);
+  }
+  &:active {
+    transform: scale(0.98);
+    transition-duration: var(--press-in);
+  }
+  &.active .pill-card-item-name {
+    color: var(--main-color);
+    font-weight: 600;
+  }
   @media (max-width: 768px) {
     padding: 6px 8px;
     gap: 8px;
@@ -652,7 +800,9 @@ onBeforeUnmount(() => {
   height: 288px;
   overflow-y: auto;
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .pill-card-lrc-empty {
   height: 288px;
@@ -670,9 +820,21 @@ onBeforeUnmount(() => {
   color: var(--main-font-second-color);
   text-align: center;
   cursor: pointer;
-  transition: color 0.3s, font-weight 0.3s;
-  &:hover { color: var(--main-font-color); }
-  &.active { color: var(--main-color); font-weight: 600; }
+  transition:
+    color 0.3s,
+    font-weight 0.3s,
+    transform var(--press-out) var(--press-ease);
+  &:hover {
+    color: var(--main-font-color);
+  }
+  &:active {
+    transform: scale(0.98);
+    transition-duration: var(--press-in);
+  }
+  &.active {
+    color: var(--main-color);
+    font-weight: 600;
+  }
   @media (max-width: 768px) {
     padding: 4px 0;
     font-size: 12px;
@@ -697,9 +859,14 @@ onBeforeUnmount(() => {
 }
 
 // 封面/歌词淡入淡出
-.pill-fade-enter-active, .pill-fade-leave-active {
+.pill-fade-enter-active,
+.pill-fade-leave-active {
   transition: opacity 0.25s ease;
 }
-.pill-fade-enter-from { opacity: 0; }
-.pill-fade-leave-to { opacity: 0; }
+.pill-fade-enter-from {
+  opacity: 0;
+}
+.pill-fade-leave-to {
+  opacity: 0;
+}
 </style>

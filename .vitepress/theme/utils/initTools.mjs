@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import { mainStore } from "@/store";
 import { jumpRedirect } from "./commonTools.mjs";
 
@@ -28,7 +29,6 @@ export const routeChange = (type, to) => {
   if (typeof window === "undefined") return false;
   // 跳转前
   if (type === "before") {
-
     isOnlyAfter = false;
     // const isSame = isSamePage(to);
     // 更改上次路径
@@ -38,11 +38,9 @@ export const routeChange = (type, to) => {
   }
   // 跳转后
   else if (type === "after") {
-
     const isSame = isSamePage(to);
     const pathName = new URL(to, window.location.origin).pathname;
     if (isSame && lastPathName === pathName) {
-
       if (!isOnlyAfter) changeLoading();
       return false;
     } else {
@@ -68,6 +66,25 @@ const changeLoading = (option = {}) => {
   loadingTimer = setTimeout(
     () => {
       store.loadingStatus = false;
+      // 跨页锚点补滚动：路由切换期间 .main-layout.loading 是 display:none，
+      // VitePress 在 loadPage 的 nextTick 里量到的 getBoundingClientRect 全是 0，
+      // 锚点滚动会落到错误位置。等 loading 结束、布局恢复后再滚一次。
+      if (typeof window !== "undefined" && window.location.hash) {
+        nextTick(() => {
+          requestAnimationFrame(() => {
+            try {
+              const id = decodeURIComponent(window.location.hash).slice(1);
+              const target = document.getElementById(id);
+              if (target) {
+                const top = window.scrollY + target.getBoundingClientRect().top - 80;
+                window.scrollTo({ top, behavior: "instant" });
+              }
+            } catch (e) {
+              console.warn(e);
+            }
+          });
+        });
+      }
       // 替换链接
       // jumpRedirect(null, true);
       // 清除定时器

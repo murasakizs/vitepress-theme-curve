@@ -11,7 +11,7 @@ const lerp = (a, b, n) => {
 
 // getStyle 辅助函数也需要只在客户端运行
 const getStyle = (el, attr) => {
-  if (typeof window === 'undefined') return false; // 在非浏览器环境下直接返回
+  if (typeof window === "undefined") return false; // 在非浏览器环境下直接返回
   try {
     return window.getComputedStyle ? window.getComputedStyle(el)[attr] : el.currentStyle[attr];
   } catch (e) {
@@ -22,7 +22,7 @@ const getStyle = (el, attr) => {
 
 const cursorInit = () => {
   // 确保只在客户端初始化光标
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     mainCursor = new Cursor();
     return mainCursor;
   }
@@ -36,7 +36,7 @@ class Cursor {
       prev: null,
     };
     this.pt = [];
-    this.currentThemeType = 'auto';
+    this.currentThemeType = "auto";
 
     // 所有 DOM 操作和事件绑定都在 create/init 中处理，这些方法会包含环境检查
     this.create();
@@ -45,7 +45,8 @@ class Cursor {
   }
 
   move(left, top) {
-    if (this.cursor) { // 确保 this.cursor 存在
+    if (this.cursor) {
+      // 确保 this.cursor 存在
       this.cursor.style["left"] = `${left}px`;
       this.cursor.style["top"] = `${top}px`;
     }
@@ -53,7 +54,7 @@ class Cursor {
 
   create() {
     // 确保只在客户端创建 DOM 元素
-    if (typeof document === 'undefined') return;
+    if (typeof document === "undefined") return;
 
     if (!this.cursor) {
       this.cursor = document.createElement("div");
@@ -70,30 +71,43 @@ class Cursor {
       if (this.scr) {
         this.scr.remove();
       }
-      document.body.style.cursor = 'auto';
+      document.body.style.cursor = "auto";
       return;
     }
 
     var el = document.getElementsByTagName("*");
-    for (let i = 0; i < el.length; i++)
-      if (getStyle(el[i], "cursor") == "pointer") this.pt.push(el[i].outerHTML);
+    for (let i = 0; i < el.length; i++) if (getStyle(el[i], "cursor") == "pointer") this.pt.push(el[i].outerHTML);
 
     if (!this.scr) {
       document.body.appendChild((this.scr = document.createElement("style")));
     }
   }
 
-  updateCursorStyle(themeType, themeColor = 'pink') {
-    if (typeof window === 'undefined' || !this.scr) return;
+  updateCursorStyle(themeType, themeColor = "pink") {
+    if (typeof window === "undefined" || !this.scr) return;
 
     const cursorColorMap = {
-      light: { pink: '%23e8558e', purple: '%238000ff', blue: '%234fc3f7', red: '%23ef5350', green: '%2366bb6a', gray: '%239e9e9e' },
-      dark:  { pink: '%23f06292', purple: '%23b388ff', blue: '%2381d4fa', red: '%23ef9a9a', green: '%23a5d6a7', gray: '%23757575' }
+      light: {
+        pink: "%23e8558e",
+        purple: "%238000ff",
+        blue: "%234fc3f7",
+        red: "%23ef5350",
+        green: "%2366bb6a",
+        gray: "%239e9e9e",
+      },
+      dark: {
+        pink: "%23f06292",
+        purple: "%23b388ff",
+        blue: "%2381d4fa",
+        red: "%23ef9a9a",
+        green: "%23a5d6a7",
+        gray: "%23757575",
+      },
     };
 
     let actualTheme;
-    if (themeType === 'auto') {
-      actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (themeType === "auto") {
+      actualTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     } else {
       actualTheme = themeType;
     }
@@ -102,22 +116,26 @@ class Cursor {
     this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'><circle cx='4' cy='4' r='4' fill='${cursorColor}' /></svg>") 4 4, auto !important}`;
   }
 
-  setThemeType(newThemeType, themeColor = 'pink') {
+  setThemeType(newThemeType, themeColor = "pink") {
     this.currentThemeType = newThemeType;
     this.currentThemeColor = themeColor;
-    if (typeof window !== 'undefined' && this.cursor && !/Mobi|Android/i.test(navigator.userAgent)) {
-        this.updateCursorStyle(newThemeType, themeColor);
+    if (
+      typeof window !== "undefined" &&
+      this.cursor &&
+      !/Mobi|Android/i.test(navigator.userAgent)
+    ) {
+      this.updateCursorStyle(newThemeType, themeColor);
     }
   }
 
   setCursorColor(hexColor) {
-    if (typeof window === 'undefined' || !this.scr) return;
-    const encoded = hexColor.replace('#', '%23');
+    if (typeof window === "undefined" || !this.scr) return;
+    const encoded = hexColor.replace("#", "%23");
     this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'><circle cx='4' cy='4' r='4' fill='${encoded}' /></svg>") 4 4, auto !important}`;
   }
 
   enable() {
-    if (typeof document === 'undefined' || !this.cursor) return;
+    if (typeof document === "undefined" || !this.cursor) return;
     this.cursor.classList.remove("disabled");
     if (this.scr) {
       this.scr.sheet.disabled = false;
@@ -125,7 +143,7 @@ class Cursor {
   }
 
   disable() {
-    if (typeof document === 'undefined' || !this.cursor) return;
+    if (typeof document === "undefined" || !this.cursor) return;
     this.cursor.classList.add("disabled");
     if (this.scr) {
       this.scr.sheet.disabled = true;
@@ -133,10 +151,14 @@ class Cursor {
   }
 
   refresh() {
-    if (typeof document === 'undefined') return; // 确保在客户端
+    if (typeof document === "undefined") return; // 确保在客户端
 
-    this.scr.remove();
-    this.cursor.classList.remove("active");
+    // 移动端在 init() 里会提前 return，this.scr 可能尚未创建；
+    // 桌面端则必须先置空，否则 create() 里的 `if (!this.scr)` 为假，
+    // 被 remove() 掉的 <style> 不会重新挂回，自定义光标样式永久失效。
+    this.scr?.remove();
+    this.scr = null;
+    this.cursor?.classList.remove("active");
     this.pos = {
       curr: null,
       prev: null,
@@ -149,11 +171,11 @@ class Cursor {
   }
 
   init() {
-    if (typeof document === 'undefined') return; // 确保在客户端
+    if (typeof document === "undefined") return; // 确保在客户端
 
     const isMobile = /Mobi|Android/i.test(navigator.userAgent);
     if (isMobile) {
-        return;
+      return;
     }
 
     document.onmousemove = (e) => {
@@ -172,11 +194,11 @@ class Cursor {
   }
 
   render() {
-    if (typeof document === 'undefined') return; // 确保在客户端
+    if (typeof document === "undefined") return; // 确保在客户端
 
     const isMobile = /Mobi|Android/i.test(navigator.userAgent);
     if (isMobile) {
-        return;
+      return;
     }
 
     if (this.pos.prev) {

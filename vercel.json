@@ -11,9 +11,16 @@
           "value": "noindex, nofollow"
         }
       ]
+    },
+    {
+      "source": "/redirect",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ],
-  "rewrites": [
-    { "source": "/redirect", "destination": "/redirect.html" }
-  ]
+  "rewrites": [{ "source": "/redirect", "destination": "/redirect.html" }]
 }

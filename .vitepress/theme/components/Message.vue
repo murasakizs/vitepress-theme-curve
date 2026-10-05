@@ -5,35 +5,68 @@
     <div
       v-if="!messageIsland || store.islandMode !== 'extended'"
       class="message-wrapper"
-      :class="[
-        messageIsland ? 'island' : store.messagePosition,
-        messageShow ? 'show' : 'hide'
-      ]"
+      :class="[messageIsland ? 'island' : store.messagePosition, messageShow ? 'show' : 'hide']"
       :style="{ '--duration': messageDuration + 'ms' }"
     >
       <span v-if="messageCard && !messageIsland" :class="['message-type', messageType]">
-        {{ { success: '成功 Success', warning: '警告 Warning', error: '错误 Error', info: '信息 Info' }[messageType] }}
+        {{
+          {
+            success: "成功 Success",
+            warning: "警告 Warning",
+            error: "错误 Error",
+            info: "信息 Info",
+          }[messageType]
+        }}
       </span>
       <div
-        :class="['message', messageType, store.progressDirection, store.messagePosition, { always: messageAlways, card: messageCard, island: messageIsland, 'island-theme-color': messageIsland && store.islandUseThemeColor }]"
+        :class="[
+          'message',
+          messageType,
+          store.progressDirection,
+          store.messagePosition,
+          {
+            always: messageAlways,
+            card: messageCard,
+            island: messageIsland,
+            'island-theme-color': messageIsland && store.islandUseThemeColor,
+          },
+        ]"
         @click="closeMessage"
       >
         <div class="message-content">
-          <span v-if="messageIsland && store.progressDirection !== 'disabled'" class="island-progress">
+          <span
+            v-if="messageIsland && store.progressDirection !== 'disabled'"
+            class="island-progress"
+          >
             <svg viewBox="0 0 24 24" class="island-progress-ring" :key="messageKey">
-              <circle cx="12" cy="12" r="10" fill="none" stroke-width="2.5" class="progress-track" />
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                fill="none"
+                stroke-width="2.5"
+                class="progress-track"
+              />
               <circle cx="12" cy="12" r="10" fill="none" stroke-width="2.5" class="progress-fill" />
             </svg>
           </span>
           <span v-if="messageHtml" class="text" v-html="messageContent"></span>
           <span v-else class="text">{{ messageContent || "默认消息内容" }}</span>
-          <span v-if="messageIsland && islandChannelText" :class="['island-channel', islandChannelClass]">{{ islandChannelText }}</span>
+          <span
+            v-if="messageIsland && islandChannelText"
+            :class="['island-channel', islandChannelClass]"
+            >{{ islandChannelText }}</span
+          >
           <span v-if="messageClose" class="close">
             <i class="iconfont icon-close"></i>
           </span>
         </div>
       </div>
-      <div v-if="messageCard && !messageIsland && store.progressDirection !== 'disabled'" :class="['message-progress', store.progressDirection]" :key="messageKey">
+      <div
+        v-if="messageCard && !messageIsland && store.progressDirection !== 'disabled'"
+        :class="['message-progress', store.progressDirection]"
+        :key="messageKey"
+      >
         <div class="message-progress-bar" />
       </div>
     </div>
@@ -41,13 +74,19 @@
     <div
       v-show="messageIsland && store.islandMode === 'extended' && islandWrapperShow"
       class="island-extended-wrapper"
-      :class="{ 'show': islandWrapperShow }"
+      :class="{ show: islandWrapperShow }"
     >
       <TransitionGroup name="island-stack" tag="div" class="island-stack">
         <div
           v-for="msg in islandMessages.slice().reverse()"
           :key="msg.key"
-          :class="['message', msg.type, 'island', 'island-extended', { 'island-theme-color': store.islandUseThemeColor }]"
+          :class="[
+            'message',
+            msg.type,
+            'island',
+            'island-extended',
+            { 'island-theme-color': store.islandUseThemeColor },
+          ]"
           :style="{ '--duration': msg.duration + 'ms' }"
           @click="closeIslandMessage(msg.key)"
         >
@@ -60,56 +99,105 @@
       <!-- 子药丸（跟随最下面一条消息） -->
       <Transition name="island-pills">
         <div v-if="islandMessages.length > 0" class="island-pills">
-        <div :class="['island-pill', bottomMessageType, { 'island-theme-color': store.islandUseThemeColor }]">
-          <span v-if="store.progressDirection !== 'disabled'" class="island-progress pill-progress">
-            <svg viewBox="0 0 24 24" class="island-progress-ring">
-              <circle cx="12" cy="12" r="10" fill="none" stroke-width="2.5" class="progress-track" />
-              <circle cx="12" cy="12" r="10" fill="none" stroke-width="2.5" class="progress-fill" :style="{ strokeDashoffset: 62.83 - (62.83 * bottomMessageElapsed / bottomMessageDuration) }" />
-            </svg>
-          </span>
-          <span class="pill-text">{{ { success: '成功 Success', warning: '警告 Warning', error: '错误 Error', info: '信息 Info' }[bottomMessageType] }}</span>
-        </div>
-        <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
-          <template v-if="store.islandPlayerSupport && store.playState && store.playerShow">
-            <span class="pill-text pill-music">
-              <img v-if="store.playerData?.cover" :src="store.playerData.cover" :class="['pill-music-cover', { spinning: store.playState }]" alt="" />
-              <span class="pill-music-info">
-                <span class="pill-music-name">{{ store.playerData?.name || '未知曲目' }}</span>
+          <div
+            :class="[
+              'island-pill',
+              bottomMessageType,
+              { 'island-theme-color': store.islandUseThemeColor },
+            ]"
+          >
+            <span
+              v-if="store.progressDirection !== 'disabled'"
+              class="island-progress pill-progress"
+            >
+              <svg viewBox="0 0 24 24" class="island-progress-ring">
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  fill="none"
+                  stroke-width="2.5"
+                  class="progress-track"
+                />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  fill="none"
+                  stroke-width="2.5"
+                  class="progress-fill"
+                  :style="{
+                    strokeDashoffset:
+                      62.83 - (62.83 * bottomMessageElapsed) / bottomMessageDuration,
+                  }"
+                />
+              </svg>
+            </span>
+            <span class="pill-text">{{
+              {
+                success: "成功 Success",
+                warning: "警告 Warning",
+                error: "错误 Error",
+                info: "信息 Info",
+              }[bottomMessageType]
+            }}</span>
+          </div>
+          <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
+            <template v-if="store.islandPlayerSupport && store.playState && store.playerShow">
+              <span class="pill-text pill-music">
+                <img
+                  v-if="store.playerData?.cover"
+                  :src="store.playerData.cover"
+                  :class="['pill-music-cover', { spinning: store.playState }]"
+                  alt=""
+                />
+                <span class="pill-music-info">
+                  <span class="pill-music-name">{{ store.playerData?.name || "未知曲目" }}</span>
+                </span>
               </span>
-            </span>
-          </template>
-          <template v-else>
-            <span class="pill-text" v-if="store.islandShowDate">
-              <span class="time-date">{{ currentDate }}</span>&nbsp;
-              <span v-if="store.islandShowSeconds">
-                <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
-              </span>
-              <span v-else>
-                <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
-              </span>
-            </span>
-            <span class="pill-text" v-else-if="store.islandShowSeconds">
-              <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span><span class="time-separator">:</span><span class="time-part time-seconds">{{ currentSeconds }}</span>
-            </span>
-            <span class="pill-text" v-else>
-              <span class="time-part">{{ currentHours }}</span><span class="time-separator">:</span><span class="time-part">{{ currentMinutes }}</span>
-            </span>
-          </template>
-        </div>
-        <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
-          <span class="pill-text">
-            <template v-if="effectiveChannelMode === 5">
-              <span class="pill-prefix error">{{ pillText }}</span>
-            </template>
-            <template v-else-if="pillChannel">
-              <span :class="['pill-prefix', pillChannelClass]">{{ pillChannel }}</span><span>.sgexilq</span><span class="pill-domain">.com</span>
             </template>
             <template v-else>
-              <span>sgexilq</span><span class="pill-domain">.com</span>
+              <span class="pill-text" v-if="store.islandShowDate">
+                <span class="time-date">{{ currentDate }}</span
+                >&nbsp;
+                <span v-if="store.islandShowSeconds">
+                  <span class="time-part">{{ currentHours }}</span
+                  ><span class="time-separator">:</span
+                  ><span class="time-part">{{ currentMinutes }}</span
+                  ><span class="time-separator">:</span
+                  ><span class="time-part time-seconds">{{ currentSeconds }}</span>
+                </span>
+                <span v-else>
+                  <span class="time-part">{{ currentHours }}</span
+                  ><span class="time-separator">:</span
+                  ><span class="time-part">{{ currentMinutes }}</span>
+                </span>
+              </span>
+              <span class="pill-text" v-else-if="store.islandShowSeconds">
+                <span class="time-part">{{ currentHours }}</span
+                ><span class="time-separator">:</span
+                ><span class="time-part">{{ currentMinutes }}</span
+                ><span class="time-separator">:</span
+                ><span class="time-part time-seconds">{{ currentSeconds }}</span>
+              </span>
+              <span class="pill-text" v-else>
+                <span class="time-part">{{ currentHours }}</span
+                ><span class="time-separator">:</span
+                ><span class="time-part">{{ currentMinutes }}</span>
+              </span>
             </template>
-          </span>
+          </div>
+          <div :class="['island-pill', { 'island-theme-color': store.islandUseThemeColor }]">
+            <span class="pill-text">
+              <template v-if="store.devMode === 2">
+                <span class="pill-prefix error">{{ pillText }}</span>
+              </template>
+              <template v-else>
+                <span>sgexilq</span><span class="pill-domain">.com</span>
+              </template>
+            </span>
+          </div>
         </div>
-      </div>
       </Transition>
     </div>
   </Teleport>
@@ -120,9 +208,6 @@ import { mainStore } from "@/store";
 import { useIsMobileLayout } from "@/utils/layout.js";
 
 const store = mainStore();
-
-// 有效分支模式（响应式）
-const effectiveChannelMode = computed(() => store.effectiveChannelMode);
 
 // 根据页面布局决定默认消息样式
 const isMobileLayout = useIsMobileLayout();
@@ -155,42 +240,22 @@ const currentDate = ref("");
 let timeInterval = null;
 let progressInterval = null;
 
-// 根据分支模式显示不同的药丸文本
-const pillChannel = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 2) return 'beta';
-  if (mode === 3) return 'dev';
-  return '';
-});
-const pillChannelClass = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 2) return 'info';
-  if (mode === 3) return 'warning';
-  return '';
-});
+// 药丸文本
 const pillText = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 5) return '开发模式';
-  const channel = pillChannel.value;
-  return channel ? `${channel}.sgexilq.com` : 'sgexilq.com';
+  if (store.devMode === 2) return "开发模式";
+  return "sgexilq.com";
 });
 
-// 灵动模式消息末尾的分支文本
+// 灵动模式消息末尾的开发模式文本
 const islandChannelText = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 5) return '开发模式';
-  if (mode === 2) return 'beta分支';
-  if (mode === 3) return 'dev分支';
-  return '';
+  if (store.devMode === 2) return "开发模式";
+  return "";
 });
 
-// 灵动模式分支文本颜色类
+// 灵动模式开发模式文本颜色类
 const islandChannelClass = computed(() => {
-  const mode = effectiveChannelMode.value;
-  if (mode === 5) return 'channel-devmode';
-  if (mode === 2) return 'channel-beta';
-  if (mode === 3) return 'channel-dev';
-  return '';
+  if (store.devMode === 2) return "channel-devmode";
+  return "";
 });
 
 // 拓展模式消息数组
@@ -202,7 +267,7 @@ const progressUpdateKey = ref(0);
 
 // 计算最下面一条消息的类型和key（数组第一条，因为显示是倒序）
 const bottomMessageType = computed(() => {
-  if (islandMessages.value.length === 0) return 'info';
+  if (islandMessages.value.length === 0) return "info";
   return islandMessages.value[0].type;
 });
 const bottomMessageKey = computed(() => {
@@ -224,7 +289,7 @@ const bottomMessageElapsed = computed(() => {
 
 // 关闭拓展模式消息
 const closeIslandMessage = (key) => {
-  const index = islandMessages.value.findIndex(m => m.key === key);
+  const index = islandMessages.value.findIndex((m) => m.key === key);
   if (index !== -1) {
     islandMessages.value.splice(index, 1);
     clearTimeout(islandMessageTimeouts.value[key]);
@@ -246,13 +311,20 @@ const closeIslandMessage = (key) => {
 // 消息处理
 const showMessage = (text, type = "info", options = {}, func = null) => {
   // 解构配置
-  const { close = false, always = false, duration = store.messageDuration, card = useCardStyle.value, island = useIslandStyle.value, html = false } = options;
+  const {
+    close = false,
+    always = false,
+    duration = store.messageDuration,
+    card = useCardStyle.value,
+    island = useIslandStyle.value,
+    html = false,
+  } = options;
 
   // 清除之前的超时
   clearTimeout(messageTimeOut.value);
 
   // 拓展模式
-  if (island && store.islandMode === 'extended') {
+  if (island && store.islandMode === "extended") {
     // 清除待执行的隐藏超时，防止新消息到达时容器被错误隐藏
     clearTimeout(islandWrapperHideTimeout.value);
 
@@ -265,7 +337,7 @@ const showMessage = (text, type = "info", options = {}, func = null) => {
       duration,
       close: close || duration === 0,
       always: always || duration === 0,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     });
     messageShow.value = true;
     messageIsland.value = true;
@@ -288,7 +360,7 @@ const showMessage = (text, type = "info", options = {}, func = null) => {
     messageShow.value = false;
     setTimeout(() => {
       messageIsland.value = island;
-      messageClose.value = card || island ? false : (close || duration === 0);
+      messageClose.value = card || island ? false : close || duration === 0;
       messageContent.value = text;
       messageType.value = type;
       messageAlways.value = always || duration === 0;
@@ -310,7 +382,7 @@ const showMessage = (text, type = "info", options = {}, func = null) => {
     messageShow.value = false;
     nextTick().then(() => {
       messageIsland.value = island;
-      messageClose.value = card || island ? false : (close || duration === 0);
+      messageClose.value = card || island ? false : close || duration === 0;
       messageContent.value = text;
       messageType.value = type;
       messageAlways.value = always || duration === 0;
@@ -358,12 +430,12 @@ const closeMessage = () => {
 // 更新时间
 const updateTime = () => {
   const now = new Date();
-  const hours = now.getHours().toString().padStart(2, '0');
-  const minutes = now.getMinutes().toString().padStart(2, '0');
-  const seconds = now.getSeconds().toString().padStart(2, '0');
+  const hours = now.getHours().toString().padStart(2, "0");
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  const seconds = now.getSeconds().toString().padStart(2, "0");
   const year = now.getFullYear();
-  const month = (now.getMonth() + 1).toString().padStart(2, '0');
-  const day = now.getDate().toString().padStart(2, '0');
+  const month = (now.getMonth() + 1).toString().padStart(2, "0");
+  const day = now.getDate().toString().padStart(2, "0");
   currentTime.value = `${hours}:${minutes}:${seconds}`;
   currentHours.value = hours;
   currentMinutes.value = minutes;
@@ -412,39 +484,51 @@ onUnmounted(() => {
     bottom: 32px;
     left: 32px;
     transform: translateY(-10px);
-    &.show { transform: translateY(0); }
+    &.show {
+      transform: translateY(0);
+    }
   }
   &.left-top {
     top: 32px;
     left: 32px;
     transform: translateY(-10px);
-    &.show { transform: translateY(0); }
+    &.show {
+      transform: translateY(0);
+    }
   }
   &.right-bottom {
     bottom: 32px;
     right: 32px;
     transform: translateY(-10px);
-    &.show { transform: translateY(0); }
+    &.show {
+      transform: translateY(0);
+    }
   }
   &.right-top {
     top: 32px;
     right: 32px;
     transform: translateY(-10px);
-    &.show { transform: translateY(0); }
+    &.show {
+      transform: translateY(0);
+    }
   }
   &.bottom-center {
     bottom: 32px;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
     align-items: center;
-    &.show { transform: translateX(-50%) translateY(0); }
+    &.show {
+      transform: translateX(-50%) translateY(0);
+    }
   }
   &.top-center {
     top: 32px;
     left: 50%;
     transform: translateX(-50%) translateY(-10px);
     align-items: center;
-    &.show { transform: translateX(-50%) translateY(0); }
+    &.show {
+      transform: translateX(-50%) translateY(0);
+    }
   }
   // 超级岛样式
   &.island {
@@ -473,6 +557,7 @@ onUnmounted(() => {
   width: 100vw;
   background-color: var(--main-color);
   z-index: 3000;
+  transition: opacity var(--press-out) var(--press-ease);
   .message-content {
     display: flex;
     flex-direction: row;
@@ -548,6 +633,11 @@ onUnmounted(() => {
   &.disabled::after {
     display: none;
   }
+  // 点击反馈：元素自身为 position: fixed，无法使用 transform
+  &:active {
+    opacity: 0.85;
+    transition-duration: var(--press-in);
+  }
   &.bar-bottom {
     top: auto;
     bottom: 0;
@@ -594,11 +684,21 @@ onUnmounted(() => {
         font-size: clamp(12px, 0.9vw, 18px);
       }
     }
-    .message-content .text { color: var(--main-color); }
-    &.success::before { background-color: var(--main-success-color); }
-    &.warning::before { background-color: var(--main-warning-color); }
-    &.error::before { background-color: var(--main-error-color); }
-    &.info::before { background-color: var(--main-info-color); }
+    .message-content .text {
+      color: var(--main-color);
+    }
+    &.success::before {
+      background-color: var(--main-success-color);
+    }
+    &.warning::before {
+      background-color: var(--main-warning-color);
+    }
+    &.error::before {
+      background-color: var(--main-error-color);
+    }
+    &.info::before {
+      background-color: var(--main-info-color);
+    }
     @media (max-width: 768px) {
       width: 85vw;
       padding: 16px 24px;
@@ -636,12 +736,6 @@ onUnmounted(() => {
         color: #ffffff;
       }
       .message-content .island-channel {
-        &.channel-beta {
-          color: rgba(144, 147, 153, 0.8);
-        }
-        &.channel-dev {
-          color: rgba(230, 162, 60, 0.8);
-        }
         &.channel-devmode {
           color: rgba(245, 108, 108, 0.8);
         }
@@ -677,12 +771,6 @@ onUnmounted(() => {
       .island-channel {
         font-size: 14px;
         margin-left: -6px;
-        &.channel-beta {
-          color: var(--main-info-color);
-        }
-        &.channel-dev {
-          color: var(--main-warning-color);
-        }
         &.channel-devmode {
           color: var(--main-error-color);
           font-weight: bold;
@@ -698,14 +786,30 @@ onUnmounted(() => {
       }
     }
     // 环形进度条
-    &.success .progress-track { stroke: rgba(103, 194, 58, 0.2); }
-    &.success .progress-fill { stroke: var(--main-success-color); }
-    &.warning .progress-track { stroke: rgba(230, 162, 60, 0.2); }
-    &.warning .progress-fill { stroke: var(--main-warning-color); }
-    &.error .progress-track { stroke: rgba(245, 108, 108, 0.2); }
-    &.error .progress-fill { stroke: var(--main-error-color); }
-    &.info .progress-track { stroke: rgba(144, 147, 153, 0.2); }
-    &.info .progress-fill { stroke: var(--main-info-color); }
+    &.success .progress-track {
+      stroke: rgba(103, 194, 58, 0.2);
+    }
+    &.success .progress-fill {
+      stroke: var(--main-success-color);
+    }
+    &.warning .progress-track {
+      stroke: rgba(230, 162, 60, 0.2);
+    }
+    &.warning .progress-fill {
+      stroke: var(--main-warning-color);
+    }
+    &.error .progress-track {
+      stroke: rgba(245, 108, 108, 0.2);
+    }
+    &.error .progress-fill {
+      stroke: var(--main-error-color);
+    }
+    &.info .progress-track {
+      stroke: rgba(144, 147, 153, 0.2);
+    }
+    &.info .progress-fill {
+      stroke: var(--main-info-color);
+    }
     // 拓展模式
     &.island-extended {
       width: 700px;
@@ -756,10 +860,18 @@ onUnmounted(() => {
       color: var(--main-font-color);
       white-space: nowrap;
       .pill-prefix {
-        &.success { color: var(--main-success-color); }
-        &.warning { color: var(--main-warning-color); }
-        &.error { color: var(--main-error-color); }
-        &.info { color: var(--main-info-color); }
+        &.success {
+          color: var(--main-success-color);
+        }
+        &.warning {
+          color: var(--main-warning-color);
+        }
+        &.error {
+          color: var(--main-error-color);
+        }
+        &.info {
+          color: var(--main-info-color);
+        }
       }
       .pill-domain {
         color: var(--main-color);
@@ -789,8 +901,12 @@ onUnmounted(() => {
       }
     }
     @keyframes pill-cover-rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
     }
     .pill-music-info {
       display: flex;
@@ -812,14 +928,30 @@ onUnmounted(() => {
       }
     }
     // 消息类型颜色
-    &.success .pill-text { color: var(--main-success-color); }
-    &.warning .pill-text { color: var(--main-warning-color); }
-    &.error .pill-text { color: var(--main-error-color); }
-    &.info .pill-text { color: var(--main-info-color); }
-    &.success .progress-fill { stroke: var(--main-success-color); }
-    &.warning .progress-fill { stroke: var(--main-warning-color); }
-    &.error .progress-fill { stroke: var(--main-error-color); }
-    &.info .progress-fill { stroke: var(--main-info-color); }
+    &.success .pill-text {
+      color: var(--main-success-color);
+    }
+    &.warning .pill-text {
+      color: var(--main-warning-color);
+    }
+    &.error .pill-text {
+      color: var(--main-error-color);
+    }
+    &.info .pill-text {
+      color: var(--main-info-color);
+    }
+    &.success .progress-fill {
+      stroke: var(--main-success-color);
+    }
+    &.warning .progress-fill {
+      stroke: var(--main-warning-color);
+    }
+    &.error .progress-fill {
+      stroke: var(--main-error-color);
+    }
+    &.info .progress-fill {
+      stroke: var(--main-info-color);
+    }
     // 使用主题色
     &.island-theme-color {
       background-color: var(--main-color);
@@ -827,10 +959,18 @@ onUnmounted(() => {
       .pill-text {
         color: #ffffff;
         .pill-prefix {
-          &.success { color: #ffffff; }
-          &.warning { color: #ffffff; }
-          &.error { color: #ffffff; }
-          &.info { color: #ffffff; }
+          &.success {
+            color: #ffffff;
+          }
+          &.warning {
+            color: #ffffff;
+          }
+          &.error {
+            color: #ffffff;
+          }
+          &.info {
+            color: #ffffff;
+          }
         }
         .pill-domain,
         .time-separator,
@@ -903,10 +1043,18 @@ onUnmounted(() => {
   margin-bottom: 8px;
   font-size: clamp(18px, 1.5vw, 27px);
   font-weight: 600;
-  &.success { color: var(--main-success-color); }
-  &.warning { color: var(--main-warning-color); }
-  &.error { color: var(--main-error-color); }
-  &.info { color: var(--main-info-color); }
+  &.success {
+    color: var(--main-success-color);
+  }
+  &.warning {
+    color: var(--main-warning-color);
+  }
+  &.error {
+    color: var(--main-error-color);
+  }
+  &.info {
+    color: var(--main-info-color);
+  }
 }
 .message-progress {
   margin-top: 16px;
@@ -928,8 +1076,12 @@ onUnmounted(() => {
     animation: none;
   }
 }
-.message-progress-bar { background-color: var(--main-color); }
-.message-wrapper .message.always ~ .message-progress .message-progress-bar { animation: loading 1.5s infinite; }
+.message-progress-bar {
+  background-color: var(--main-color);
+}
+.message-wrapper .message.always ~ .message-progress .message-progress-bar {
+  animation: loading 1.5s infinite;
+}
 
 // 超级岛环形进度条
 .island-progress {

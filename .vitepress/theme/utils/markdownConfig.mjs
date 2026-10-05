@@ -1,6 +1,7 @@
 import { tabsMarkdownPlugin } from "vitepress-plugin-tabs";
 import markdownItAttrs from "markdown-it-attrs";
 import container from "markdown-it-container";
+import { encryptPostHtml } from "./mdEncrypt.mjs";
 
 // markdown-it
 const markdownConfig = (md, themeConfig) => {
@@ -30,8 +31,16 @@ const markdownConfig = (md, themeConfig) => {
         const isChecked = md.renderInline(check, {
           references: env.references,
         });
+        // isChecked 是 markdown 渲染结果（可能含标签/属性），不能直接插进 class 属性。
+        // 取纯文本再做 HTML 转义，并折叠空白，避免产出畸形 class。
+        const modifier = md.utils.escapeHtml(
+          isChecked
+            .replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim(),
+        );
         return `<div class="radio">
-          <div class="radio-point ${isChecked}" />`;
+          <div class="radio-point${modifier ? ` ${modifier}` : ""}" />`;
       } else {
         return "</div>";
       }
@@ -39,11 +48,21 @@ const markdownConfig = (md, themeConfig) => {
   });
   // button
   md.use(container, "button", {
-    render: (tokens, idx, _options) => {
+    render: (tokens, idx, _options, env) => {
       const token = tokens[idx];
       const check = token.info.trim().slice("button".length).trim();
       if (token.nesting === 1) {
-        return `<button class="button ${check}">`;
+        // 与 radio 分支同一套处理：`check` 是作者写的行内 markdown，
+        // 直接拼进 class 会被 `x" onclick="…` 这类输入撑开属性、注入脚本。
+        // 先渲染行内 markdown，取纯文本再 HTML 转义。
+        const rendered = md.renderInline(check, { references: env.references });
+        const modifier = md.utils.escapeHtml(
+          rendered
+            .replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim(),
+        );
+        return `<button class="button${modifier ? ` ${modifier}` : ""}">`;
       } else {
         return "</button>";
       }
@@ -68,10 +87,31 @@ const markdownConfig = (md, themeConfig) => {
     return "</table></div>";
   };
   // 图片 - 支持 WebP 自动转换（客户端处理）
+  /**
+   * 判断 tokens[idx] 处的图片是否已处于作者书写的链接（link_open…link_close）内部。
+   * 用 token 栈做嵌套深度判定，不依赖渲染后的字符串。
+   *
+   * 注意两点（均经实测确认）：
+   *   1. image 规则的 tokens 是 inline 的 children 数组，link_open/link_close 就在其中；
+   *   2. markdown-it **没有** renderer.rules.link_close 这个规则（默认走 renderToken），
+   *      所以不能用「调用默认 link_close 比较返回值」的写法，只能用 nesting 计数配对。
+   */
+  const insideLink = (tokens, idx) => {
+    let depth = 0;
+    for (let i = 0; i < idx; i += 1) {
+      const { type, nesting } = tokens[i];
+      if (type === "link_open") depth += nesting;
+      else if (type === "link_close") depth += nesting;
+    }
+    return depth > 0;
+  };
   md.renderer.rules.image = (tokens, idx) => {
     const token = tokens[idx];
-    const src = token.attrs[token.attrIndex("src")][1];
-    const alt = token.content;
+    // src / alt 来自作者书写的 markdown，必须转义后再拼进 HTML 属性：
+    // 本仓库的 image 规则是自己拼字符串的（不是走默认 token 渲染器），
+    // 不转义时 `![a" onerror="alert(1)](x.png)` 会撑开 alt 属性并注入事件。
+    const src = md.utils.escapeHtml(token.attrs[token.attrIndex("src")][1]);
+    const alt = md.utils.escapeHtml(token.content);
 
     // 生成 WebP 路径（将扩展名替换为 .webp）
     const webpSrc = src.replace(/\.(png|jpe?g|bmp|tiff)$/i, ".webp");
@@ -79,12 +119,19 @@ const markdownConfig = (md, themeConfig) => {
     if (!themeConfig.fancybox.enable) {
       return `<img src="${src}" alt="${alt}" loading="lazy" data-webp="${webpSrc}">`;
     }
+    // 作者已用 [![img](src)](href) 指明图片的点击目标时，不能再包一层 <a>：
+    // 嵌套 <a> 会让外层作者链接变成空壳，点击图片会进灯箱而不是作者写的 href。
+    // 改为把灯箱属性挂到 <img>（Fancybox.bind("[data-fancybox]") 直接命中 img），
+    // 并用 <span class="img-fancybox"> 保留 .img-fancybox / .post-img / .post-img-tip 的样式挂钩。
+    if (insideLink(tokens, idx)) {
+      return `<span class="img-fancybox"><img class="post-img" src="${src}" alt="${alt}" loading="lazy" data-fancybox="gallery" data-caption="${alt}" /><span class="post-img-tip">${alt}</span></span>`;
+    }
     return `<a class="img-fancybox" href="${src}" data-fancybox="gallery" data-caption="${alt}">
                 <img class="post-img" src="${src}" alt="${alt}" loading="lazy" data-webp="${webpSrc}" />
                 <span class="post-img-tip">${alt}</span>
               </a>`;
   };
-  
+
   // obsidian admonition
   const fence = md.renderer.rules.fence;
   md.renderer.rules.fence = (...args) => {
@@ -93,25 +140,28 @@ const markdownConfig = (md, themeConfig) => {
     const lang = token.info.trim();
 
     // 处理 Obsidian admonition
-    if (lang.startsWith('ad-')) {
+    if (lang.startsWith("ad-")) {
       const type = lang.substring(3); // 取ad-之后的内容，获取类型
       const content = token.content;
 
       const admonitionTypes = {
-        'note': 'info',
-        'question': 'info',
-        'warning': 'warning',
-        'tip': 'tip',
-        'summary': 'info',
-        'hint': 'tip',
-        'important': 'warning',
-        'caution': 'warning',
-        'error': 'danger',
-        'danger': 'danger'
+        note: "info",
+        question: "info",
+        warning: "warning",
+        tip: "tip",
+        summary: "info",
+        hint: "tip",
+        important: "warning",
+        caution: "warning",
+        error: "danger",
+        danger: "danger",
       };
 
-      const className = admonitionTypes[type] || 'info';
-      const title = type.toUpperCase();
+      const className = admonitionTypes[type] || "info";
+      // 兜底：```ad- 后为空时 type 为空串，type.toUpperCase() 会渲染出一个空标题。
+      // 此时回退到类型名 "NOTE"，与 note 的映射保持一致。
+      const safeType = type || "note";
+      const title = md.utils.escapeHtml(safeType.toUpperCase());
 
       return `<div class="${className} custom-block">
             <p class="custom-block-title">${title}</p>
@@ -121,7 +171,28 @@ const markdownConfig = (md, themeConfig) => {
     </div>`;
     }
     return fence(...args);
-  };  
+  };
+
+  // 构建期正文加密：posts 下带 password 的文章，渲染后的 HTML 转为密文写入 frontmatter.enc
+  const originalRender = md.renderer.render.bind(md.renderer);
+  md.renderer.render = (tokens, options, env) => {
+    const fm = env.frontmatter;
+    const isPost = (env.relativePath || "").startsWith("posts/");
+    if (!isPost || !fm?.password) return originalRender(tokens, options, env);
+    // 先完整渲染一次：title/headers/links 等副作用在渲染过程中收集，密文只替换最终输出
+    const html = originalRender(tokens, options, env);
+    env.frontmatter = { ...fm, enc: encryptPostHtml(html, String(fm.password)) };
+    delete env.frontmatter.password;
+    // 正文里的 <script>/<style>/自定义块不进构建产物，避免绕过加密
+    if (env.sfcBlocks) {
+      env.sfcBlocks.scripts = [];
+      env.sfcBlocks.script = null;
+      env.sfcBlocks.scriptSetup = null;
+      env.sfcBlocks.styles = [];
+      env.sfcBlocks.customBlocks = [];
+    }
+    return '<p class="post-encrypted">🔒 此文章已加密</p>';
+  };
 };
 
 export default markdownConfig;

@@ -4,6 +4,15 @@
       <div class="nav-all">
         <!-- 导航栏左侧 -->
         <div class="left-nav">
+          <!-- 移动端返回按钮 -->
+          <div
+            v-show="isMobileLayout && frontmatter.layout !== 'home'"
+            class="back-btn nav-btn"
+            title="返回"
+            @click="goBack"
+          >
+            <i class="iconfont icon-left"></i>
+          </div>
           <div class="more-menu nav-btn" title="更多内容">
             <i class="iconfont icon-menu" />
             <span class="site-name">{{ site.title }}</span>
@@ -48,7 +57,7 @@
         </div>
         <div class="right-nav">
           <!-- 开往 -->
-           <!--
+          <!--
           <a
             class="menu-btn nav-btn travellings"
             title="开往-友链接力"
@@ -58,12 +67,8 @@
             <i class="iconfont icon-subway"></i>
           </a>
         -->
-          <!-- 随机文章 -->
-          <div
-            class="menu-btn nav-btn"
-            title="随机前往一篇文章"
-            @click="router.go(shufflePost(theme.postData))"
-          >
+          <!-- 随机文章（桌面端） -->
+          <div class="menu-btn nav-btn pc" title="随机前往一篇文章" @click="shuffleGo">
             <i class="iconfont icon-shuffle"></i>
           </div>
           <!-- 搜索 -->
@@ -139,9 +144,13 @@
 import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 import { smoothScrolling, shufflePost } from "@/utils/helper";
+import { usePostData } from "@/utils/usePostData.mjs";
+import { useIsMobileLayout } from "@/utils/layout.js";
 
 const router = useRouter();
 const store = mainStore();
+const { loadPostData } = usePostData();
+const isMobileLayout = useIsMobileLayout();
 const app = getCurrentInstance()?.appContext.app;
 const SearchModal = defineAsyncComponent(async () => {
   const [{ default: InstantSearch }, searchComponent] = await Promise.all([
@@ -157,6 +166,23 @@ const { site, theme, frontmatter, page } = useData();
 
 // 标记 mobileOnly 的入口只在移动端侧栏出现
 const desktopNavItems = (items) => (items || []).filter((item) => !item.mobileOnly);
+
+// 移动端返回
+const goBack = () => {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    router.go("/");
+  }
+};
+
+// 随机文章
+const shuffleGo = async () => {
+  const data = await loadPostData();
+  if (data?.length) {
+    router.go(shufflePost(data));
+  }
+};
 
 // 站外链接交给浏览器新开标签，router.go 会丢弃 origin 把用户送回站内
 const goLink = (link) => {
@@ -206,7 +232,11 @@ const rightMenuSwitch = () => {
       width: 100%;
       left: 0;
       bottom: -80px;
-      background: linear-gradient(to bottom, color-mix(in srgb, var(--main-card-background) 30%, transparent), transparent);
+      background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--main-card-background) 30%, transparent),
+        transparent
+      );
       pointer-events: none;
       transition: opacity 0.3s;
     }
@@ -228,10 +258,87 @@ const rightMenuSwitch = () => {
           transform: translateY(50px);
           opacity: 0;
         }
+        @media (max-width: 768px) {
+          .left-nav,
+          .right-nav {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            transition:
+              opacity 0.3s,
+              visibility 0s;
+          }
+          .nav-center {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition:
+              opacity 0.3s,
+              visibility 0s 0.3s;
+          }
+        }
+        .force-mobile & {
+          .left-nav,
+          .right-nav {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            transition:
+              opacity 0.3s,
+              visibility 0s;
+          }
+          .nav-center {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition:
+              opacity 0.3s,
+              visibility 0s 0.3s;
+          }
+        }
       }
-      @media (max-width: 768px) {
+    }
+    @media (max-width: 768px) {
+      &:not(.top):not(.up) {
+        .nav-all {
+          .left-nav,
+          .right-nav {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition:
+              opacity 0.3s,
+              visibility 0s 0.3s;
+          }
+          .nav-center {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            transition:
+              opacity 0.3s,
+              visibility 0s;
+          }
+        }
+      }
+    }
+    .force-mobile &:not(.top):not(.up) {
+      .nav-all {
+        .left-nav,
+        .right-nav {
+          visibility: hidden;
+          opacity: 0;
+          pointer-events: none;
+          transition:
+            opacity 0.3s,
+            visibility 0s 0.3s;
+        }
         .nav-center {
-          top: -80px;
+          visibility: visible;
+          opacity: 1;
+          pointer-events: auto;
+          transition:
+            opacity 0.3s,
+            visibility 0s;
         }
       }
     }
@@ -286,7 +393,7 @@ const rightMenuSwitch = () => {
                 align-items: center;
                 height: 42px;
                 line-height: 50px;
-                padding: 0 1.8rem 0 2.0rem;
+                padding: 0 1.8rem 0 2rem;
                 border-radius: 100px;
                 white-space: nowrap;
                 margin: 0 4px;
@@ -602,9 +709,6 @@ const rightMenuSwitch = () => {
                 color: #fff;
               }
             }
-            &:active {
-              transform: scale(1);
-            }
           }
           .control-capsule {
             display: flex;
@@ -616,8 +720,7 @@ const rightMenuSwitch = () => {
             border: none;
             background-color: transparent;
             white-space: nowrap;
-            transition:
-              background-color 0.3s;
+            transition: background-color 0.3s;
             cursor: pointer;
             .iconfont {
               font-size: 18px;
@@ -637,9 +740,6 @@ const rightMenuSwitch = () => {
               .capsule-text {
                 color: #fff;
               }
-            }
-            &:active {
-              transform: scale(0.95);
             }
           }
         }
@@ -724,7 +824,7 @@ const rightMenuSwitch = () => {
         }
       }
     }
-    @media (max-width: 768px) {
+    @mixin mobile-nav-styles {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
@@ -732,20 +832,47 @@ const rightMenuSwitch = () => {
       .left-nav,
       .right-nav {
         min-width: auto;
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+        transition:
+          opacity 0.3s,
+          visibility 0s;
+        .back-btn {
+          display: flex;
+        }
       }
       .nav-center {
-        // display: none;
         position: absolute;
         top: 0;
         left: 0;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background-color: var(--main-card-background);
         border-bottom: 1px solid var(--main-card-border);
         z-index: 100;
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.3s,
+          visibility 0s 0.3s;
+        .site-menu {
+          display: none;
+        }
         .site-title {
           font-size: 15px;
           height: auto;
         }
       }
+    }
+    @media (max-width: 768px) {
+      @include mobile-nav-styles;
+    }
+    .force-mobile & {
+      @include mobile-nav-styles;
     }
   }
   .nav-btn {
@@ -755,7 +882,9 @@ const rightMenuSwitch = () => {
     width: 35px;
     height: 35px;
     padding: 0;
-    transition: background-color 0.3s;
+    transition:
+      background-color 0.3s,
+      transform var(--press-out) var(--press-ease);
     border-radius: 50%;
     cursor: pointer;
     .iconfont {
@@ -771,6 +900,17 @@ const rightMenuSwitch = () => {
       .site-name {
         color: var(--main-card-background);
       }
+    }
+    // 按下反馈只给移动端布局，桌面端顶栏靠 hover 就够了
+    @media (max-width: 768px) {
+      html:not(.force-pc) &:active {
+        transform: scale(0.9);
+        transition-duration: var(--press-in);
+      }
+    }
+    html.force-mobile &:active {
+      transform: scale(0.9);
+      transition-duration: var(--press-in);
     }
   }
 }

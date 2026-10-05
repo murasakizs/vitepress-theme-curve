@@ -3,6 +3,11 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./.vitepress/theme/*"]
+    },
+    "allowJs": true,
+    "noEmit": true,
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,

@@ -1,7 +1,11 @@
 <script setup>
 import dayjs from "dayjs";
+import { useClientNow } from "@/utils/useClientNow.mjs";
 
 const { theme } = useData();
+
+// 相对时间基于浏览器本地时钟实时计算
+const { now } = useClientNow();
 
 const normalizeItem = (item) => ({
   icon: item?.icon || "💌",
@@ -17,9 +21,7 @@ const timingItems = computed(() => {
   if (!timing?.enable) return [];
 
   if (Array.isArray(timing.items) && timing.items.length > 0) {
-    return timing.items
-      .map(normalizeItem)
-      .filter((item) => item.date && (item.name || item.event));
+    return timing.items.map(normalizeItem).filter((item) => item.date && (item.name || item.event));
   }
 
   if (timing.date && (timing.name || timing.event)) {
@@ -31,10 +33,10 @@ const timingItems = computed(() => {
 
 const getDisplayDate = (item) => {
   const target = dayjs(item.date);
-  if (!target.isValid()) return null;
+  if (!target.isValid() || !now.value) return null;
   if (!item.yearly) return target;
 
-  const today = dayjs().startOf("day");
+  const today = now.value.startOf("day");
   let nextDate = target.startOf("day");
   while (nextDate.isBefore(today)) {
     nextDate = nextDate.add(1, "year");
@@ -44,7 +46,7 @@ const getDisplayDate = (item) => {
 
 const isFuture = (item) => {
   const target = getDisplayDate(item);
-  return target ? target.isAfter(dayjs()) : false;
+  return target && now.value ? target.isAfter(now.value) : false;
 };
 
 const getMode = (item) => (item.yearly ? "days-until" : "days-gap");
@@ -52,14 +54,23 @@ const getMode = (item) => (item.yearly ? "days-until" : "days-gap");
 
 <template>
   <div v-if="timingItems.length" class="timing-card s-card">
-    <div v-for="(item, index) in timingItems" :key="`${item.name}-${item.event}-${index}`" class="timing-item">
+    <div
+      v-for="(item, index) in timingItems"
+      :key="`${item.name}-${item.event}-${index}`"
+      class="timing-item"
+    >
       <p class="custom-text">
         <span class="item-icon">{{ item.icon }}</span>
         <span v-if="item.name" class="title-name">{{ item.name }}</span>
         <span v-if="item.event" class="event-name">{{ item.event }}</span>
         <span class="state-text">{{ isFuture(item) ? "还有" : "已经" }}</span>
         <span class="day-number">
-          <LiveDate :mode="getMode(item)" :date="item.date" :yearly="item.yearly" :include-start="item.includeStart" />
+          <LiveDate
+            :mode="getMode(item)"
+            :date="item.date"
+            :yearly="item.yearly"
+            :include-start="item.includeStart"
+          />
         </span>
         <span class="state-text">天</span>
       </p>

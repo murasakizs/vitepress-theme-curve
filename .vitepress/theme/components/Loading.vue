@@ -13,8 +13,8 @@
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia';
-import { mainStore } from '@/store';
+import { storeToRefs } from "pinia";
+import { mainStore } from "@/store";
 
 const store = mainStore();
 const { theme } = useData();
@@ -90,10 +90,20 @@ onBeforeUnmount(() => {
 }
 
 @keyframes progress {
-  0% { width: 0%; }
-  20% { width: 30%; }
-  50% { width: 60%; }
-  80% { width: 85%; }
-  100% { width: 95%; }
+  0% {
+    width: 0%;
+  }
+  20% {
+    width: 30%;
+  }
+  50% {
+    width: 60%;
+  }
+  80% {
+    width: 85%;
+  }
+  100% {
+    width: 95%;
+  }
 }
 </style>

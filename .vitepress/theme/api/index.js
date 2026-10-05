@@ -18,7 +18,7 @@ export const getHitokoto = async () => {
     const hitokoto = await response.json();
     return hitokoto;
   } catch (error) {
-    console.error(`获取一言失败 (${useFallbackAPI ? '备用 API' : '主 API'})：`, error);
+    console.error(`获取一言失败 (${useFallbackAPI ? "备用 API" : "主 API"})：`, error);
     if (!useFallbackAPI) {
       // 主 API 失败，切换到备用 API
       useFallbackAPI = true;
@@ -77,9 +77,7 @@ export const getSiteInfo = async (url) => {
 export const getMusicList = async (url, id, server = "netease", type = "playlist") => {
   const ids = Array.isArray(id) ? id : [id];
   const results = await Promise.all(
-    ids.map((pid) =>
-      fetch(`${url}?server=${server}&type=${type}&id=${pid}`).then((r) => r.json())
-    )
+    ids.map((pid) => fetch(`${url}?server=${server}&type=${type}&id=${pid}`).then((r) => r.json())),
   );
   const merged = results.flat();
   // 按 id 去重
@@ -124,7 +122,6 @@ export const getStatistics = async (key) => {
   return statistics;
 };
 
-
 /**
  * 天气
  */
@@ -165,5 +162,3 @@ export const getCityByCoords = async (lat, lon) => {
   const data = await res.json();
   return data?.results?.[0]?.name || null;
 };
-
-

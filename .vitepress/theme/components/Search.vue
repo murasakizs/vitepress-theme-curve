@@ -164,6 +164,10 @@ onBeforeUnmount(() => {
     .search-list {
       .search-item {
         margin-bottom: 12px;
+        &:active {
+          transform: scale(0.98);
+          transition-duration: var(--press-in);
+        }
         .title {
           display: inline;
           font-size: 16px;
@@ -277,6 +281,10 @@ onBeforeUnmount(() => {
         .iconfont {
           color: var(--main-color);
         }
+      }
+      &:active {
+        opacity: 1;
+        transition-duration: var(--press-in);
       }
     }
     @media (max-width: 512px) {

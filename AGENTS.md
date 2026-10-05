@@ -1,64 +1,70 @@
 # VitePress Theme Curve - Agent Guide
 
-## Project Overview
-A VitePress blog theme with custom components, Pinia state management, and SCSS styling.
+VitePress blog theme (Vue 3 + Pinia + SCSS). Single package, no monorepo (`pnpm-workspace.yaml` lists only `.`).
 
-## Quick Commands
-- **Dev server**: `pnpm dev` (runs on port 9877)
-- **Build**: `pnpm build` (output: `.vitepress/dist`)
+## Commands
+
+- **Dev**: `pnpm dev` — port 9877 (hardcoded in `.vitepress/config.mjs`)
+- **Build**: `pnpm build` → `.vitepress/dist` (also emits `sitemap.xml`, `rss.xml`, PWA assets)
+- **Verify**: `pnpm format` (Prettier) → `pnpm lint` (ESLint, runs with `--fix`)
 - **Preview**: `pnpm preview`
-- **Format**: `pnpm format` (Prettier)
-- **Lint**: `pnpm lint` (ESLint)
+- **No tests and no typecheck script exist** — don't hunt for them; verify with lint + build.
+- Use **pnpm** (`.npmrc` pins npmmirror registry + `shamefully-hoist`). `package-lock.json` is stale upstream residue — `pnpm-lock.yaml` is the source of truth.
 
 ## Architecture
-- **Entry point**: `.vitepress/theme/index.mjs` - registers Vue app, Pinia, and plugins
-- **Main layout**: `.vitepress/theme/App.vue`
-- **Theme config**: `.vitepress/theme/assets/themeConfig.mjs` (default) → override with root `themeConfig.mjs`
-- **Content**: `posts/` for blog posts, `pages/` for static pages
-- **Components**: `.vitepress/theme/components/` (auto-imported)
+
+- **Config chain**: `.vitepress/config.mjs` → `getThemeConfig()` (`.vitepress/init.mjs`) deep-merges root `themeConfig.mjs` over defaults from `.vitepress/theme/assets/themeConfig.mjs`
+- **Theme entry**: `.vitepress/theme/index.mjs` (registers Pinia + persistedstate, root layout `App.vue`)
+- **Content**: `posts/` (file path = URL path), `pages/` (static pages), `page/` (home pagination + redirect stubs)
+- **Components**: auto-registered from `.vitepress/theme/components/` **and** `.vitepress/theme/views/` (`.vue` and `.md`); Vue/VitePress APIs auto-imported (`.vitepress/auto-imports.d.ts`)
+- **Alias**: `@` → `.vitepress/theme/`
 - **Styles**: `.vitepress/theme/style/` (SCSS)
+- **Serverless**: `api/status.ts` (Vercel) and `functions/api/status.ts` (Cloudflare Pages) are near-duplicate status endpoints — keep them in sync if you edit either.
 
-## Key Customizations
-1. **Override config**: Create `themeConfig.mjs` in project root (do NOT modify default config)
-2. **Site metadata**: title, description, author, social links
-3. **Navigation**: `nav` and `navMore` arrays in config
-4. **Features**: Toggle comment, music, search, PWA, weather in config
+## Config override rules
 
-## Development Notes
-- **Port**: Dev server hardcoded to 9877 in `.vitepress/config.mjs`
-- **Registry**: Uses npmmirror registry (configured in `.npmrc`)
-- **Auto-imports**: Vue and VitePress APIs auto-imported (see `.vitepress/auto-imports.d.ts`)
-- **Components**: Auto-registered from `.vitepress/theme/components/` and `views/`
-- **Path alias**: `@` maps to `.vitepress/theme/`
-- **TypeScript**: `tsconfig.json` 中移除了 `"vite/client"` 类型（VitePress 自带类型声明，不需要额外声明）。如有问题，将 `"types": ["node"]` 改回 `"types": ["vite/client", "node"]` 即可
+- Edit the root `themeConfig.mjs` only. Never modify or delete `.vitepress/theme/assets/themeConfig.mjs`.
+- Root `themeConfig.mjs` **is tracked by git** (despite what README says) — edits show up in `git status`.
+- Merge is `defu` deep merge, but **user-defined arrays replace defaults instead of concatenating**: `nav`, `navMore`, `inject.header`, `footer.social`, `footer.sitemap`, `aside.timing.items` (see `.vitepress/init.mjs`).
+- Toggles live here: comment (`artalk` / `twikoo`), music, search, PWA, fancybox, weather.
+- Weather uses `VITE_WEATHER_KEY` from `.env` (Amap). All `VITE_*` vars ship in the client bundle — only put publishable values there.
 
-## Build & Deploy
-- **CI**: GitHub Actions workflow in `.github/workflows/deploy.yml`
-- **Output**: Static files in `.vitepress/dist`
-- **Node**: Requires Node.js ≥20, pnpm ≥10
+## Content authoring
 
-## Common Pitfalls
-- Don't rename or delete default `themeConfig.mjs` - only override in root
-- Config uses `defu` for deep merge - partial overrides work correctly
-- Comments system supports Twikoo or Artalk (configure in `themeConfig.mjs`)
-- Weather API requires Amap key or falls back to public API
+- Post frontmatter: `title`, `date`, `categories`, `tags`, `description`, `top` (pin), `cover`, `articleGPT` (AI abstract widget).
+- `tags` / `categories` accept a bare string **or** an array — `normalizeList.mjs` normalizes both. Don't assume arrays.
+- **Password posts**: set `password` in frontmatter. Build-time encryption (AES-GCM, `mdEncrypt.mjs`) turns the rendered HTML into `frontmatter.enc` and **strips `password`**; client unlock is `decryptPost.mjs` / `PasswordProtect.vue`. Decrypted HTML is injected via `v-html` without VitePress's usual wrapper div.
+- Dynamic routes via `*.paths.mjs`: `pages/tags/[name]`, `pages/categories/[name]`, `page/[num]` (page size = `postSize` in themeConfig).
+
+## Generated / do-not-edit
+
+- `public/data/postData.json` — rewritten on every config load (gitignored). Contains `lastModified: mtimeMs`, so local builds produce non-reproducible diffs; don't `git add -A` blindly.
+- `.vitepress/auto-imports.d.ts`, `.vitepress/components.d.ts` — generated by unplugin (gitignored)
+- `srcExclude` in `config.mjs`: `**/README.md`, `**/TODO.md`, `_*.md`, `**/_*.md` — underscore-prefixed markdown is internal-only and never published.
+
+## Build gotchas
+
+- **Production build strips `console.log`** (terser `pure_funcs`) — debug logging won't appear in `pnpm build` output; use `console.warn`/`error` or `pnpm dev`.
+- **gray-matter caches by file content**: byte-identical `.md` files (`page.md`, `page/index.md`, `page/1.md`, `pages/index.md`) share one `frontmatter` object. `transformPageData` whitelists + rebuilds `head` per page for this reason — **never `push` into `pageData.frontmatter.head`** or canonical tags will accumulate across pages again.
+- Sitemap deliberately **excludes the redirect shells** `/page`, `/page/1`, `/pages` (see `transformItems` + `removeRedirectPagesFromSitemap` in `config.mjs`). Don't "fix" this.
+- VitePress 1.6.4 emits a broken empty `vp-icons.css` preload — `transformHtml` strips it; keep that workaround.
+- Dev server exposes `POST /api/theme-config` that regex-rewrites `.vitepress/theme/store/index.js` (version-bump tooling) — don't be surprised by dev-server file mutations.
+- `jumpRedirect` (outbound-link interstitial) is **disabled** and buggy — `$(el).text()` drops nested icons/images, and it has no same-origin check. Fix both before enabling.
+- `public/` is a source dir copied verbatim into `dist`; don't put hand-maintained build artifacts there.
+
+## Verify & style caveats
+
+- **ESLint 8 ignores dot-directories** — `.vitepress/` (the bulk of the code) is **not** linted, and `--ext` omits `.ts`. `pnpm lint` green ≠ full coverage.
+- **`linebreak-style` is off** on purpose: the repo checks out with `core.autocrlf=true` (CRLF). Don't enable it or mass-convert line endings.
+- `npx tsc --noEmit` typechecks only a handful of `.ts` files — no `vue-tsc`, and `tsconfig.json` deliberately has `"types": ["node"]` (VitePress ships its own types; restore `"vite/client"` only if type issues appear).
+- Style: double quotes, Prettier `printWidth: 100`, `trailingComma: all`; ESLint uses airbnb-base + vue3-essential.
+
+## Deploy
+
+- GitHub Actions (`.github/workflows/deploy.yml`) deploys `.vitepress/dist` to GitHub Pages on push to **master** (Node 22, pnpm 9; `engines` require Node ≥20). Current branch is **`selfuse`** — pushes there deploy nothing; check `git branch` first.
+- Also Vercel-ready: `vercel.json` + `pnpm deploy:vercel`.
+- `.env` is tracked in git; see the README's security notes before committing or publishing.
 
 ## TODO
-- [ ] 修复背景模糊功能：`filter: blur(20px)` 加在 `#app` 上会导致整个页面（含弹窗）被模糊，需改为只模糊背景层，弹窗和导航栏保持清晰
 
-## File Structure
-```
-├── .vitepress/
-│   ├── config.mjs          # VitePress config
-│   ├── theme/
-│   │   ├── index.mjs       # Theme entry
-│   │   ├── App.vue         # Root component
-│   │   ├── assets/         # Default config
-│   │   ├── components/     # Auto-imported components
-│   │   ├── style/          # SCSS styles
-│   │   └── utils/          # Utility functions
-├── posts/                  # Blog posts (markdown)
-├── pages/                  # Static pages
-├── public/                 # Static assets
-└── themeConfig.mjs         # User config override (create this)
-```
+- [ ] 修复背景模糊功能：`filter: blur(20px)` 加在 `#app` 上会导致整个页面（含弹窗）被模糊，需改为只模糊背景层，弹窗和导航栏保持清晰

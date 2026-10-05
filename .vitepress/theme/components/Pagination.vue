@@ -19,7 +19,10 @@
         v-for="(item, index) in pageNumber"
         :key="index"
         :class="[item === '...' ? 'point' : 'page-item', { choose: item === currentPage }]"
-        @click="item !== '...' && jumpPage(item === 1 ? `${routePath}` : `${routePath}/page/${item}`, item)"
+        @click="
+          item !== '...' &&
+          jumpPage(item === 1 ? `${routePath}` : `${routePath}/page/${item}`, item)
+        "
       >
         <span class="page-num">{{ item }}</span>
       </div>
@@ -95,7 +98,7 @@ const pageNumber = computed(() => {
   const total = totalPages.value;
   const wingSize = 2; // 当前页前后要显示的页码数
   let startPage = Math.max(current - wingSize, 2);
-  let endPage = Math.min(current + wingSize, total - 1);
+  const endPage = Math.min(current + wingSize, total - 1);
   // 总是显示第一页
   pages.push(1);
   // 当 startPage > 2 时，前面需要显示省略号
@@ -112,9 +115,6 @@ const pageNumber = computed(() => {
   // 当 endPage < totalPages-1 时，后面需要显示省略号
   if (endPage < total - 1) {
     pages.push("...");
-  } else {
-    // 如果 endPage 是 totalPages-1，不需要省略号，直接显示倒数第二页
-    if (endPage === total - 1) endPage = total - 1;
   }
   // 总是显示最后一页，除非只有一页
   if (total > 1) pages.push(total);
@@ -171,7 +171,25 @@ const checkCurrentPage = () => {
   }
   const params = new URLSearchParams(window.location.search);
   const page = Number(params.get("page"));
-  currentPage.value = Number.isInteger(page) && page > 0 ? page : 1;
+  // 先做下界校验：非整数 / <= 0 / 空值一律回落到第 1 页
+  if (!Number.isInteger(page) || page < 1) {
+    currentPage.value = 1;
+    return;
+  }
+  // 再做上界钳制：越界时钳到最后一页，而不是丢弃成第 1 页。
+  // 理由：?page=99 的用户意图是"翻到更靠后的内容"，钳到末页能给出
+  // 非空列表且当前页在页码列表内（高亮正常）；回落成第 1 页则与用户
+  // 意图相反，且会让"翻到最后一页"和"翻过头"看起来毫无区别。
+  //
+  // ⚠️ 上界只能依据**已加载**的 total：文章索引是挂载后才 fetch 的，
+  // 未就绪时 totalPages 为 0，钳制会把 ?page=2 误判成越界并与列表分叉。
+  // 未就绪时先只做下界校验，待数据到达后由 watch(totalPages) 重算。
+  if (props.total <= 0) {
+    currentPage.value = page;
+    return;
+  }
+  const maxPage = Math.max(totalPages.value, 1);
+  currentPage.value = Math.min(page, maxPage);
 };
 
 onMounted(() => {
@@ -187,6 +205,10 @@ watch(
   () => props.page,
   () => checkCurrentPage(),
 );
+
+// total 就绪后重算一次：只有此时才能正确判断页码是否越界，
+// 并保证「高亮页 == 列表页」不被冷启动的空索引破坏。
+watch(totalPages, () => checkCurrentPage());
 </script>
 
 <style lang="scss" scoped>
@@ -214,7 +236,8 @@ watch(
     box-shadow: 0 8px 16px -4px var(--main-border-shadow);
     transition:
       border-color 0.3s,
-      box-shadow 0.3s;
+      box-shadow 0.3s,
+      transform var(--press-out) var(--press-ease);
     cursor: pointer;
     &.prev,
     &.next {
@@ -267,6 +290,10 @@ watch(
           margin-left: 0;
         }
       }
+    }
+    &:active {
+      transform: scale(0.9);
+      transition-duration: var(--press-in);
     }
   }
   .page-number {
@@ -321,11 +348,16 @@ watch(
         transition:
           color 0.3s,
           opacity 0.3s,
-          background-color 0.3s;
+          background-color 0.3s,
+          transform var(--press-out) var(--press-ease);
         cursor: pointer;
         &:hover {
           color: var(--main-card-background);
           background-color: var(--main-color);
+        }
+        &:active {
+          transform: scale(0.9);
+          transition-duration: var(--press-in);
         }
       }
       &.focus,

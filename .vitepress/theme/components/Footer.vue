@@ -6,7 +6,12 @@
         <a :href="theme.siteMeta.author.link" class="author link" target="_blank">
           {{ theme.siteMeta.author.name }}
         </a>
-        <a v-if="theme.icp" class="icp link" href="https://icp.gov.moe/?keyword=20259222" target="_blank">
+        <a
+          v-if="theme.icp"
+          class="icp link"
+          href="https://icp.gov.moe/?keyword=20262118"
+          target="_blank"
+        >
           <i class="iconfont icon-safe" />
           {{ theme.icp }}
         </a>
@@ -37,12 +42,31 @@
           <i class="iconfont icon-nd-line" />
         </a>
         <a class="notbyai link" href="https://notbyai.fyi/" target="_blank">
-          <img class="light-badge" src="/notbyai/Written-By-Human-Not-By-AI-Badge-white.svg" alt="Written By Human" />
-          <img class="dark-badge" src="/notbyai/Written-By-Human-Not-By-AI-Badge-black.svg" alt="Written By Human" />
+          <img
+            class="light-badge"
+            src="/notbyai/Written-By-Human-Not-By-AI-Badge-white.svg"
+            alt="Written By Human"
+          />
+          <img
+            class="dark-badge"
+            src="/notbyai/Written-By-Human-Not-By-AI-Badge-black.svg"
+            alt="Written By Human"
+          />
         </a>
       </div>
       <div class="credit">
-        本站的诞生离不开上游作者的开源贡献。在此感谢他（她）们。本站遵循 <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"><strong>AGPL v3</strong></a> 协议 <a href="https://github.com/murasakizs/vitepress-theme-curve" target="_blank" style="color: var(--main-color)"><strong>开源</strong></a> 。
+        本站的诞生离不开上游作者的开源贡献。在此感谢他（她）们。本站遵循
+        <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank"
+          ><strong>AGPL v3</strong></a
+        >
+        协议
+        <a
+          href="https://github.com/murasakizs/vitepress-theme-curve"
+          target="_blank"
+          style="color: var(--main-color)"
+          ><strong>开源</strong></a
+        >
+        。
       </div>
     </div>
   </footer>
@@ -129,12 +153,12 @@ onBeforeUnmount(() => {
           opacity: 0.6;
         }
       }
-     // .upyun {
+      // .upyun {
       //  .iconfont {
       //    font-size: 20px;
       //    font-weight: normal;
       //  }
-    //  }
+      //  }
     }
     .meta {
       display: flex;
@@ -188,7 +212,8 @@ onBeforeUnmount(() => {
       border-radius: 12px;
       transition:
         color 0.3s,
-        background-color 0.3s;
+        background-color 0.3s,
+        transform var(--press-out) var(--press-ease);
       cursor: pointer;
       .iconfont {
         font-size: 22px;
@@ -201,6 +226,10 @@ onBeforeUnmount(() => {
         .iconfont {
           color: var(--main-color);
         }
+      }
+      &:active {
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
     @media (max-width: 768px) {

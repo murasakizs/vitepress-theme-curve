@@ -34,7 +34,12 @@
   --main-color-white: #ffffff40;
   --main-color-gray: #999;
   --main-color-red: #ff3842;
-  --main-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+  // 按下反馈：按下快速响应、松手柔和回弹（全站统一，调手感改这里）
+  --press-in: 80ms;
+  --press-out: 160ms;
+  --press-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --main-font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
     "Helvetica Neue", sans-serif;
 }
 
@@ -426,12 +431,34 @@ html.high-contrast-max {
   --cursor-bg-color: #000000 !important;
 
   // 全面移除阴影
-  .s-card, .message, .message.island, .message-card, .island-pill,
-  .main-nav, .main-footer, .more-card, .link-child, .set-expand-box,
-  button, .nav-btn, .menu-btn, .right-menu, .music-player,
-  .password-protect, .clock, .hello, .count-down, .widget-card,
-  .reward-btn, .link-card, .tag-item, .pagination .page-item,
-  .set-warn, .search-box, .modal, .modal-content {
+  .s-card,
+  .message,
+  .message.island,
+  .message-card,
+  .island-pill,
+  .main-nav,
+  .main-footer,
+  .more-card,
+  .link-child,
+  .set-expand-box,
+  button,
+  .nav-btn,
+  .menu-btn,
+  .right-menu,
+  .music-player,
+  .password-protect,
+  .clock,
+  .hello,
+  .count-down,
+  .widget-card,
+  .reward-btn,
+  .link-card,
+  .tag-item,
+  .pagination .page-item,
+  .set-warn,
+  .search-box,
+  .modal,
+  .modal-content {
     box-shadow: none !important;
     text-shadow: none !important;
   }
@@ -523,26 +550,40 @@ html.high-contrast-max {
     .control-item {
       background: #ffffff !important;
       border: 2px solid #000000 !important;
-      .iconfont { color: #000000 !important; }
+      .iconfont {
+        color: #000000 !important;
+      }
       &.open {
         background: #000000 !important;
-        .iconfont { color: #ffffff !important; }
+        .iconfont {
+          color: #ffffff !important;
+        }
       }
       &:hover {
         background: #000000 !important;
-        .iconfont { color: #ffffff !important; }
+        .iconfont {
+          color: #ffffff !important;
+        }
       }
     }
     .control-capsule {
       background: #ffffff !important;
       border: 2px solid #000000 !important;
-      .iconfont { color: #000000 !important; }
-      .capsule-text { color: #000000 !important; }
+      .iconfont {
+        color: #000000 !important;
+      }
+      .capsule-text {
+        color: #000000 !important;
+      }
       &:hover {
         background: #000000 !important;
         border-color: #000000 !important;
-        .iconfont { color: #ffffff !important; }
-        .capsule-text { color: #ffffff !important; }
+        .iconfont {
+          color: #ffffff !important;
+        }
+        .capsule-text {
+          color: #ffffff !important;
+        }
       }
     }
   }
@@ -575,7 +616,9 @@ html.high-contrast-max {
     background: #ffffff !important;
     border: 2px solid #000000 !important;
     box-shadow: none !important;
-    .text { color: #000000 !important; }
+    .text {
+      color: #000000 !important;
+    }
   }
 
   // 超级岛 - 确保有背景
@@ -584,8 +627,12 @@ html.high-contrast-max {
     background: #ffffff !important;
     border: 2px solid #000000 !important;
     box-shadow: none !important;
-    .text { color: #000000 !important; }
-    .message-content .text { color: #000000 !important; }
+    .text {
+      color: #000000 !important;
+    }
+    .message-content .text {
+      color: #000000 !important;
+    }
   }
 
   // 传统消息样式
@@ -593,7 +640,9 @@ html.high-contrast-max {
     .message-card {
       background: #ffffff !important;
       border: 2px solid #000000 !important;
-      .text { color: #000000 !important; }
+      .text {
+        color: #000000 !important;
+      }
     }
     .message-progress-bar {
       background: #000000 !important;
@@ -603,7 +652,9 @@ html.high-contrast-max {
   .island-pill {
     background: #ffffff !important;
     border: 2px solid #000000 !important;
-    .pill-text { color: #000000 !important; }
+    .pill-text {
+      color: #000000 !important;
+    }
   }
 
   // 输入框
@@ -754,12 +805,24 @@ html.high-contrast-max {
       box-shadow: none !important;
       .pointer {
         box-shadow: none !important;
-        &.hour { background-color: #000000 !important; }
-        &.minute { background-color: #333333 !important; }
-        &.second { background-color: #000000 !important; border: none !important; }
-        &.second::after { background-color: #000000 !important; }
+        &.hour {
+          background-color: #000000 !important;
+        }
+        &.minute {
+          background-color: #333333 !important;
+        }
+        &.second {
+          background-color: #000000 !important;
+          border: none !important;
+        }
+        &.second::after {
+          background-color: #000000 !important;
+        }
       }
-      &::after { background-color: #000000 !important; border: none !important; }
+      &::after {
+        background-color: #000000 !important;
+        border: none !important;
+      }
     }
   }
 
@@ -780,15 +843,26 @@ html.high-contrast-max {
     .social-link {
       background-color: transparent !important;
       border: 2px solid #000000 !important;
-      .iconfont { color: #000000 !important; }
+      .iconfont {
+        color: #000000 !important;
+      }
       &:hover {
         background-color: #000000 !important;
-        .iconfont { color: #ffffff !important; }
-        .social-icon-img { filter: brightness(0) invert(1) !important; }
+        .iconfont {
+          color: #ffffff !important;
+        }
+        .social-icon-img {
+          filter: brightness(0) invert(1) !important;
+        }
       }
     }
-    .author, .desc { color: #000000 !important; }
-    .site-desc { color: #000000 !important; }
+    .author,
+    .desc {
+      color: #000000 !important;
+    }
+    .site-desc {
+      color: #000000 !important;
+    }
   }
 
   // 系统状态组件
@@ -799,7 +873,9 @@ html.high-contrast-max {
     .status-dot-ping {
       background-color: #000000 !important;
     }
-    .status-label { color: #000000 !important; }
+    .status-label {
+      color: #000000 !important;
+    }
   }
 
   // 自定义光标
@@ -807,7 +883,10 @@ html.high-contrast-max {
     background: #000000 !important;
   }
   * {
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'%3E%3Ccircle cx='4' cy='4' r='4' fill='%23000000' /%3E%3C/svg%3E") 4 4, auto !important;
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'%3E%3Ccircle cx='4' cy='4' r='4' fill='%23000000' /%3E%3C/svg%3E")
+        4 4,
+      auto !important;
   }
 }
 html.dark.high-contrast-max {
@@ -842,12 +921,34 @@ html.dark.high-contrast-max {
   --cursor-bg-color: #ffffff !important;
 
   // 全面移除阴影
-  .s-card, .message, .message.island, .message-card, .island-pill,
-  .main-nav, .main-footer, .more-card, .link-child, .set-expand-box,
-  button, .nav-btn, .menu-btn, .right-menu, .music-player,
-  .password-protect, .clock, .hello, .count-down, .widget-card,
-  .reward-btn, .link-card, .tag-item, .pagination .page-item,
-  .set-warn, .search-box, .modal, .modal-content {
+  .s-card,
+  .message,
+  .message.island,
+  .message-card,
+  .island-pill,
+  .main-nav,
+  .main-footer,
+  .more-card,
+  .link-child,
+  .set-expand-box,
+  button,
+  .nav-btn,
+  .menu-btn,
+  .right-menu,
+  .music-player,
+  .password-protect,
+  .clock,
+  .hello,
+  .count-down,
+  .widget-card,
+  .reward-btn,
+  .link-card,
+  .tag-item,
+  .pagination .page-item,
+  .set-warn,
+  .search-box,
+  .modal,
+  .modal-content {
     box-shadow: none !important;
     text-shadow: none !important;
   }
@@ -939,26 +1040,40 @@ html.dark.high-contrast-max {
     .control-item {
       background: #000000 !important;
       border: 2px solid #ffffff !important;
-      .iconfont { color: #ffffff !important; }
+      .iconfont {
+        color: #ffffff !important;
+      }
       &.open {
         background: #ffffff !important;
-        .iconfont { color: #000000 !important; }
+        .iconfont {
+          color: #000000 !important;
+        }
       }
       &:hover {
         background: #ffffff !important;
-        .iconfont { color: #000000 !important; }
+        .iconfont {
+          color: #000000 !important;
+        }
       }
     }
     .control-capsule {
       background: #000000 !important;
       border: 2px solid #ffffff !important;
-      .iconfont { color: #ffffff !important; }
-      .capsule-text { color: #ffffff !important; }
+      .iconfont {
+        color: #ffffff !important;
+      }
+      .capsule-text {
+        color: #ffffff !important;
+      }
       &:hover {
         background: #ffffff !important;
         border-color: #ffffff !important;
-        .iconfont { color: #000000 !important; }
-        .capsule-text { color: #000000 !important; }
+        .iconfont {
+          color: #000000 !important;
+        }
+        .capsule-text {
+          color: #000000 !important;
+        }
       }
     }
   }
@@ -991,7 +1106,9 @@ html.dark.high-contrast-max {
     background: #000000 !important;
     border: 2px solid #ffffff !important;
     box-shadow: none !important;
-    .text { color: #ffffff !important; }
+    .text {
+      color: #ffffff !important;
+    }
   }
 
   // 超级岛 - 确保有背景
@@ -1000,8 +1117,12 @@ html.dark.high-contrast-max {
     background: #000000 !important;
     border: 2px solid #ffffff !important;
     box-shadow: none !important;
-    .text { color: #ffffff !important; }
-    .message-content .text { color: #ffffff !important; }
+    .text {
+      color: #ffffff !important;
+    }
+    .message-content .text {
+      color: #ffffff !important;
+    }
   }
 
   // 传统消息样式
@@ -1009,7 +1130,9 @@ html.dark.high-contrast-max {
     .message-card {
       background: #000000 !important;
       border: 2px solid #ffffff !important;
-      .text { color: #ffffff !important; }
+      .text {
+        color: #ffffff !important;
+      }
     }
     .message-progress-bar {
       background: #ffffff !important;
@@ -1019,7 +1142,9 @@ html.dark.high-contrast-max {
   .island-pill {
     background: #000000 !important;
     border: 2px solid #ffffff !important;
-    .pill-text { color: #ffffff !important; }
+    .pill-text {
+      color: #ffffff !important;
+    }
   }
 
   // 输入框
@@ -1170,12 +1295,24 @@ html.dark.high-contrast-max {
       box-shadow: none !important;
       .pointer {
         box-shadow: none !important;
-        &.hour { background-color: #ffffff !important; }
-        &.minute { background-color: #cccccc !important; }
-        &.second { background-color: #ffffff !important; border: none !important; }
-        &.second::after { background-color: #ffffff !important; }
+        &.hour {
+          background-color: #ffffff !important;
+        }
+        &.minute {
+          background-color: #cccccc !important;
+        }
+        &.second {
+          background-color: #ffffff !important;
+          border: none !important;
+        }
+        &.second::after {
+          background-color: #ffffff !important;
+        }
       }
-      &::after { background-color: #ffffff !important; border: none !important; }
+      &::after {
+        background-color: #ffffff !important;
+        border: none !important;
+      }
     }
   }
 
@@ -1196,16 +1333,29 @@ html.dark.high-contrast-max {
     .social-link {
       background-color: transparent !important;
       border: 2px solid #ffffff !important;
-      .iconfont { color: #ffffff !important; }
-      .social-icon-img { filter: brightness(0) invert(1) !important; }
+      .iconfont {
+        color: #ffffff !important;
+      }
+      .social-icon-img {
+        filter: brightness(0) invert(1) !important;
+      }
       &:hover {
         background-color: #ffffff !important;
-        .iconfont { color: #000000 !important; }
-        .social-icon-img { filter: none !important; }
+        .iconfont {
+          color: #000000 !important;
+        }
+        .social-icon-img {
+          filter: none !important;
+        }
       }
     }
-    .author, .desc { color: #ffffff !important; }
-    .site-desc { color: #ffffff !important; }
+    .author,
+    .desc {
+      color: #ffffff !important;
+    }
+    .site-desc {
+      color: #ffffff !important;
+    }
   }
 
   // 系统状态组件
@@ -1216,7 +1366,9 @@ html.dark.high-contrast-max {
     .status-dot-ping {
       background-color: #ffffff !important;
     }
-    .status-label { color: #ffffff !important; }
+    .status-label {
+      color: #ffffff !important;
+    }
   }
 
   // 自定义光标
@@ -1224,34 +1376,42 @@ html.dark.high-contrast-max {
     background: #ffffff !important;
   }
   * {
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'%3E%3Ccircle cx='4' cy='4' r='4' fill='%23ffffff' /%3E%3C/svg%3E") 4 4, auto !important;
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'%3E%3Ccircle cx='4' cy='4' r='4' fill='%23ffffff' /%3E%3C/svg%3E")
+        4 4,
+      auto !important;
   }
 }
 
 // 字体
 html {
   &.vsans {
-    --main-font-family: "Lexend", "vivosans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+    --main-font-family:
+      "Lexend", "vivosans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
       Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   }
 
   &.hmos {
-    --main-font-family: "Lexend", "HarmonyOS_Regular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    --main-font-family:
+      "Lexend", "HarmonyOS_Regular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   }
 
   &.xlfont {
-    --main-font-family: "Lexend", "xiaolai", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+    --main-font-family:
+      "Lexend", "xiaolai", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
       Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   }
 
   &.misans {
-    --main-font-family: "Lexend", "MiSans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+    --main-font-family:
+      "Lexend", "MiSans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
       Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   }
 
   &.browserfont {
-    --main-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+    --main-font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
       "Helvetica Neue", sans-serif;
   }
 
@@ -1311,6 +1471,8 @@ html {
 * {
   -webkit-user-drag: none;
   box-sizing: border-box;
+  // 禁用移动端点击时浏览器默认的触摸高亮层
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -1320,7 +1482,6 @@ html {
 
   // 特殊情况
   &.dark {
-
     // 代码高亮
     pre {
       code {
@@ -1418,7 +1579,6 @@ a {
   width: 100vw;
   width: 100dvw;
   // height: 100vh;
-  transition: filter 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   // 滚动条
   .simplebar-scrollbar {
@@ -1439,11 +1599,6 @@ a {
       }
     }
   }
-
-  // 全局模糊
-  &.blur {
-    filter: blur(20px);
-  }
 }
 
 // 通用卡片
@@ -1462,6 +1617,11 @@ a {
       box-shadow: 0 8px 16px -4px var(--main-color-bg);
     }
   }
+}
+
+// 按下反馈要跟手：:active 期间收紧过渡时长，松手后按原时长回弹
+.s-card:active {
+  transition-duration: var(--press-in);
 }
 
 // 滚动条
@@ -1501,7 +1661,7 @@ a {
 }
 
 // 图片懒加载骨架屏（仅限主内容区域）
-.mian-layout img:not(.no-lazy) {
+.main-layout img:not(.no-lazy) {
   opacity: 0;
   transition: opacity 0.4s ease;
   &.loaded {
@@ -1513,7 +1673,7 @@ a {
 }
 
 // fancybox 图片容器骨架屏（仅限主内容区域）
-.mian-layout .img-fancybox {
+.main-layout .img-fancybox {
   position: relative;
   min-height: 100px;
   background: linear-gradient(
@@ -1553,7 +1713,6 @@ a {
 //自定义块样式
 .custom-block {
   .custom-block-content {
-
     p,
     ul,
     ol,
@@ -1568,7 +1727,6 @@ a {
   &.tip,
   &.summary {
     .custom-block-content {
-
       p,
       ul,
       ol,
@@ -1640,6 +1798,20 @@ a:hover {
     border-color: var(--main-accent);
     background-color: var(--main-accent-bg);
   }
+  &:active {
+    transform: scale(0.95);
+    transition-duration: var(--press-in);
+  }
+}
+
+// 技能标签（关于页共用，均为 flex 项或 flex 容器，可安全缩放）
+.skills-item {
+  transition: transform var(--press-out) var(--press-ease);
+
+  &:active {
+    transform: scale(0.95);
+    transition-duration: var(--press-in);
+  }
 }
 
 .pagination .page-item {
@@ -1678,7 +1850,7 @@ html.force-pc {
         border: none !important;
       }
     }
-    .mian-layout {
+    .main-layout {
       padding: 1rem 2rem !important;
       &.is-post {
         padding: 1rem 2rem !important;
@@ -1718,7 +1890,7 @@ html.force-mobile {
       z-index: 100 !important;
     }
   }
-  .mian-layout {
+  .main-layout {
     padding: 1rem 1.5rem !important;
     &.is-post {
       padding: 0 !important;

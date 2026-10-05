@@ -23,13 +23,13 @@ const linkData = [
       {
         name: "lan2984",
         avatar: "/images/friend/lan2984.png",
-        desc: "是好闺闺的网站ww",
+        desc: "不向焦虑与抑郁投降，这个世界终会有我们存在的地方",
         url: "https://blog.lan2984.xyz",
       },
       {
         name: "爅峫",
         avatar: "/images/friend/moye.png",
-        desc: "嘿嘿>v<",
+        desc: "在视界边缘，记录一切",
         url: "https://luoxe.cn",
       },
     ],

@@ -10,19 +10,12 @@
     :title="`查看服务状态 - ${label}`"
   >
     <div class="status-dot-wrapper">
-      <span
-        v-if="!loading"
-        class="status-dot-ping"
-        :class="pingClass"
-      />
-      <span
-        class="status-dot"
-        :class="dotClass"
-      />
+      <span v-if="!loading" class="status-dot-ping" :class="pingClass" />
+      <span class="status-dot" :class="dotClass" />
     </div>
 
     <span class="status-label">
-      {{ loading ? 'Checking...' : label }}
+      {{ loading ? "Checking..." : label }}
     </span>
   </a>
 
@@ -35,25 +28,18 @@
     @click="handleRefresh"
   >
     <div class="status-dot-wrapper">
-      <span
-        v-if="!loading"
-        class="status-dot-ping"
-        :class="pingClass"
-      />
-      <span
-        class="status-dot"
-        :class="dotClass"
-      />
+      <span v-if="!loading" class="status-dot-ping" :class="pingClass" />
+      <span class="status-dot" :class="dotClass" />
     </div>
 
     <span class="status-label">
-      {{ loading ? 'Checking...' : label }}
+      {{ loading ? "Checking..." : label }}
     </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { mainStore } from "@/store/index.js";
+import { mainStore } from "@/store";
 
 const store = mainStore();
 
@@ -80,34 +66,34 @@ const pending = ref(true);
 const error = ref(false);
 
 const fetchData = async () => {
-    pending.value = true;
-    error.value = false;
-    try {
-        // 在开发环境模拟数据，避免 fetch 本地文件报错
-        if (import.meta.env.DEV) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            data.value = {
-                status: "operational",
-                label: "开发环境正常",
-                updatedAt: new Date().toISOString()
-            };
-            return;
-        }
-
-        const res = await fetch(`/api/status?t=${refreshKey.value}`);
-        if (!res.ok) throw new Error('Network response was not ok');
-        data.value = await res.json();
-    } catch (e) {
-        console.error(e);
-        error.value = true;
-    } finally {
-        pending.value = false;
+  pending.value = true;
+  error.value = false;
+  try {
+    // 在开发环境模拟数据，避免 fetch 本地文件报错
+    if (import.meta.env.DEV) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      data.value = {
+        status: "operational",
+        label: "开发环境正常",
+        updatedAt: new Date().toISOString(),
+      };
+      return;
     }
-}
+
+    const res = await fetch(`/api/status?t=${refreshKey.value}`);
+    if (!res.ok) throw new Error("Network response was not ok");
+    data.value = await res.json();
+  } catch (e) {
+    console.error(e);
+    error.value = true;
+  } finally {
+    pending.value = false;
+  }
+};
 
 // 初始加载
 onMounted(() => {
-    fetchData();
+  fetchData();
 });
 
 // 计算属性：处理加载状态和错误状态
@@ -119,27 +105,14 @@ const status = computed(() => {
   return data.value?.status || "unknown";
 });
 
-// 分支模式下的标签（1 = release分支，2 = beta分支，3 = dev分支）
+// 开发模式标签
 const channelLabel = computed(() => {
-  const mode = store.channelMode;
-  let base = '';
-  if (mode === 1) base = 'release';
-  else if (mode === 2) base = 'beta';
-  else if (mode === 3) base = 'dev';
-  if (!base) return '';
-  if (store.devMode === 2) return `${base}分支（开发模式）`;
-  return `${base}分支`;
+  if (store.devMode === 2) return "开发模式";
+  return "";
 });
 
-// 是否处于分支模式（1+devMode 或 2/3/4）
-const isChannelMode = computed(() => {
-  if (store.channelMode >= 2 && store.channelMode <= 3) return true;
-  if (store.channelMode === 1 && store.devMode === 2) return true;
-  return false;
-});
-
-// release分支（开发模式）用红色，其余用蓝色
-const isReleaseDevMode = computed(() => store.channelMode === 1 && store.devMode === 2);
+// 是否显示开发模式标签
+const isChannelMode = computed(() => store.devMode === 2);
 
 const label = computed(() => {
   if (isChannelMode.value) return channelLabel.value;
@@ -149,21 +122,18 @@ const label = computed(() => {
 // 动态样式类
 const statusClass = computed(() => {
   if (loading.value) return "status--loading";
-  if (isReleaseDevMode.value) return "status--channel-release";
-  if (isChannelMode.value) return "status--channel";
+  if (isChannelMode.value) return "status--channel-release";
   return `status--${status.value}`;
 });
 
 const dotClass = computed(() => {
   if (loading.value) return "dot--loading";
-  if (isReleaseDevMode.value) return "dot--channel-release";
-  if (isChannelMode.value) return "dot--channel";
+  if (isChannelMode.value) return "dot--channel-release";
   return `dot--${status.value}`;
 });
 
 const pingClass = computed(() => {
-  if (isReleaseDevMode.value) return "ping--channel-release";
-  if (isChannelMode.value) return "ping--channel";
+  if (isChannelMode.value) return "ping--channel-release";
   return `ping--${status.value}`;
 });
 
@@ -179,9 +149,7 @@ const handleRefresh = () => {
   const now = Date.now();
 
   // 清理超过5秒的记录
-  clickTimestamps.value = clickTimestamps.value.filter(
-    ts => now - ts < RATE_LIMIT_WINDOW,
-  );
+  clickTimestamps.value = clickTimestamps.value.filter((ts) => now - ts < RATE_LIMIT_WINDOW);
 
   // 检查是否超过限制
   if (clickTimestamps.value.length >= RATE_LIMIT_MAX) {
@@ -220,6 +188,7 @@ const handleRefresh = () => {
   &:active {
     background: var(--main-border-shadow);
     transform: translateY(0);
+    transition-duration: var(--press-in);
   }
 
   // 服务正常 - 绿色
@@ -252,13 +221,7 @@ const handleRefresh = () => {
     color: var(--main-info-color);
   }
 
-  // 分支模式 - 蓝色
-  &.status--channel {
-    background: var(--main-info-color-gray);
-    color: var(--main-info-color);
-  }
-
-  // release分支（开发模式）- 红色
+  // 开发模式 - 红色
   &.status--channel-release {
     background: var(--main-error-color-gray);
     color: var(--main-error-color);
@@ -293,14 +256,28 @@ const handleRefresh = () => {
   transform-origin: center;
   animation: status-ping 1.5s ease-out infinite;
 
-  &.ping--operational { background-color: var(--main-success-color); }
-  &.ping--degraded { background-color: var(--main-warning-color); }
-  &.ping--partial { background-color: var(--main-warning-color); }
-  &.ping--major { background-color: var(--main-error-color); }
-  &.ping--maintenance { background-color: var(--main-info-color); }
-  &.ping--channel { background-color: var(--main-info-color); }
-  &.ping--channel-release { background-color: var(--main-error-color); }
-  &.ping--error, &.ping--unknown { background-color: var(--main-font-second-color); }
+  &.ping--operational {
+    background-color: var(--main-success-color);
+  }
+  &.ping--degraded {
+    background-color: var(--main-warning-color);
+  }
+  &.ping--partial {
+    background-color: var(--main-warning-color);
+  }
+  &.ping--major {
+    background-color: var(--main-error-color);
+  }
+  &.ping--maintenance {
+    background-color: var(--main-info-color);
+  }
+  &.ping--channel-release {
+    background-color: var(--main-error-color);
+  }
+  &.ping--error,
+  &.ping--unknown {
+    background-color: var(--main-font-second-color);
+  }
 }
 
 .status-dot {
@@ -316,14 +293,28 @@ const handleRefresh = () => {
     animation: status-pulse 1.2s ease-in-out infinite;
   }
 
-  &.dot--operational { background-color: var(--main-success-color); }
-  &.dot--degraded { background-color: var(--main-warning-color); }
-  &.dot--partial { background-color: var(--main-warning-color); }
-  &.dot--major { background-color: var(--main-error-color); }
-  &.dot--maintenance { background-color: var(--main-info-color); }
-  &.dot--channel { background-color: var(--main-info-color); }
-  &.dot--channel-release { background-color: var(--main-error-color); }
-  &.dot--error, &.dot--unknown { background-color: var(--main-font-second-color); }
+  &.dot--operational {
+    background-color: var(--main-success-color);
+  }
+  &.dot--degraded {
+    background-color: var(--main-warning-color);
+  }
+  &.dot--partial {
+    background-color: var(--main-warning-color);
+  }
+  &.dot--major {
+    background-color: var(--main-error-color);
+  }
+  &.dot--maintenance {
+    background-color: var(--main-info-color);
+  }
+  &.dot--channel-release {
+    background-color: var(--main-error-color);
+  }
+  &.dot--error,
+  &.dot--unknown {
+    background-color: var(--main-font-second-color);
+  }
 }
 
 .status-label {

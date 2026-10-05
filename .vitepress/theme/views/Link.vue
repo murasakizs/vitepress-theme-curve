@@ -121,6 +121,10 @@ const randomJump = () => {
             color: #fff;
           }
         }
+        &:active {
+          transform: scale(0.95);
+          transition-duration: var(--press-in);
+        }
       }
     }
     .link-group {

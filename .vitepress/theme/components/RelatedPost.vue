@@ -17,6 +17,7 @@
 import { generateId } from "@/utils/commonTools";
 import { shufflePost } from "@/utils/helper";
 import { usePostData } from "@/utils/usePostData.mjs";
+import { normalizeList } from "@/utils/normalizeList.mjs";
 
 const router = useRouter();
 const { page, frontmatter } = useData();
@@ -28,7 +29,10 @@ const relatedData = ref(null);
 // 获取同一分类的文章
 const getRelatedData = () => {
   // 分类名
-  const catName = frontmatter.value.categories?.[0];
+  // 分类名：frontmatter 可能是数组，也可能是「裸写」字符串。字符串上取
+  // `?.[0]` 拿到的是**第一个字符**（"随便说说" → "随"），在 categoriesData
+  // 里查不到 → 这一类文章永远不会出现「相关推荐」。统一走 normalizeList。
+  const catName = normalizeList(frontmatter.value.categories)[0];
   // 指定分类数据
   const currentPostData = categoriesData.value?.[catName]?.articles || [];
   // 本篇索引
@@ -86,6 +90,11 @@ onMounted(() => {
       &:hover {
         opacity: 1;
         color: var(--main-color);
+      }
+      // 标题行已用 opacity 0.6 弱化，按下时再压暗一档
+      &:active {
+        opacity: 0.4;
+        transition-duration: var(--press-in);
       }
     }
   }

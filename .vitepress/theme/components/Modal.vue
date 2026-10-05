@@ -91,7 +91,7 @@ let isDragging = false;
 let startTime = 0;
 
 const onTouchStart = (e) => {
-  const modalContent = document.querySelector('.modal-content');
+  const modalContent = document.querySelector(".modal-content");
   if (modalContent && modalContent.scrollTop > 0) {
     isDragging = false;
     return;
@@ -105,15 +105,15 @@ const onTouchMove = (e) => {
   if (!isDragging) return;
   touchCurrentY = e.touches[0].clientY;
   const diff = Math.max(0, touchCurrentY - touchStartY);
-  const modalMain = document.querySelector('.modal-main');
+  const modalMain = document.querySelector(".modal-main");
   if (modalMain) {
     const progress = Math.min(diff / 300, 1);
     const scale = 1 - progress * 0.05;
     const opacity = 1 - progress * 0.3;
     modalMain.style.transform = `translateY(${diff}px) scale(${scale})`;
-    modalMain.style.transition = 'none';
+    modalMain.style.transition = "none";
     modalMain.style.opacity = opacity;
-    const mask = document.querySelector('.modal-mask');
+    const mask = document.querySelector(".modal-mask");
     if (mask) {
       mask.style.opacity = opacity;
     }
@@ -125,48 +125,48 @@ const onTouchEnd = () => {
   const diff = touchCurrentY - touchStartY;
   const elapsed = Date.now() - startTime;
   const velocity = diff / elapsed;
-  const modalMain = document.querySelector('.modal-main');
-  const mask = document.querySelector('.modal-mask');
+  const modalMain = document.querySelector(".modal-main");
+  const mask = document.querySelector(".modal-mask");
   const shouldClose = diff > 80 || velocity > 0.5;
 
   if (shouldClose) {
     if (modalMain) {
-      modalMain.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-      modalMain.style.transform = 'translateY(100vh) scale(0.95)';
-      modalMain.style.opacity = '0';
+      modalMain.style.transition = "transform 0.3s ease-out, opacity 0.3s ease-out";
+      modalMain.style.transform = "translateY(100vh) scale(0.95)";
+      modalMain.style.opacity = "0";
     }
     if (mask) {
-      mask.style.transition = 'opacity 0.3s ease-out';
-      mask.style.opacity = '0';
+      mask.style.transition = "opacity 0.3s ease-out";
+      mask.style.opacity = "0";
     }
     setTimeout(() => {
       if (modalMain) {
-        modalMain.style.transform = '';
-        modalMain.style.transition = '';
-        modalMain.style.opacity = '';
+        modalMain.style.transform = "";
+        modalMain.style.transition = "";
+        modalMain.style.opacity = "";
       }
       if (mask) {
-        mask.style.opacity = '';
-        mask.style.transition = '';
+        mask.style.opacity = "";
+        mask.style.transition = "";
       }
       modalClose();
     }, 300);
   } else {
     if (modalMain) {
-      modalMain.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
-      modalMain.style.transform = '';
-      modalMain.style.opacity = '';
+      modalMain.style.transition = "transform 0.25s ease-out, opacity 0.25s ease-out";
+      modalMain.style.transform = "";
+      modalMain.style.opacity = "";
     }
     if (mask) {
-      mask.style.transition = 'opacity 0.25s ease-out';
-      mask.style.opacity = '';
+      mask.style.transition = "opacity 0.25s ease-out";
+      mask.style.opacity = "";
     }
     setTimeout(() => {
       if (modalMain) {
-        modalMain.style.transition = '';
+        modalMain.style.transition = "";
       }
       if (mask) {
-        mask.style.transition = '';
+        mask.style.transition = "";
       }
     }, 250);
   }
@@ -240,10 +240,16 @@ watch(
         font-size: 1rem;
         border-radius: 8px;
         padding: 8px;
-        transition: background-color 0.3s;
+        transition:
+          background-color 0.3s,
+          transform var(--press-out) var(--press-ease);
         cursor: pointer;
         &:hover {
           background-color: var(--main-card-border);
+        }
+        &:active {
+          transform: scale(0.9);
+          transition-duration: var(--press-in);
         }
       }
     }
@@ -296,6 +302,7 @@ watch(
         transition: background-color 0.3s;
         &:active {
           background-color: var(--main-card-border);
+          transition-duration: var(--press-in);
         }
       }
       .close {
@@ -305,6 +312,24 @@ watch(
     .modal-content {
       max-height: calc(100vh - 48px - 64px - 40px);
       max-height: calc(100dvh - 48px - 64px - 40px);
+    }
+    // 移动端布局：设置面板按钮换行（穿透 slot 内容）
+    :deep(.set-list .set-item),
+    :deep(.set-list .set-expand-box .set-item) {
+      flex-direction: column;
+      align-items: flex-start;
+      .set-options {
+        margin-top: 8px;
+        margin-bottom: 8px;
+        height: auto;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        .options {
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+      }
     }
   }
 }

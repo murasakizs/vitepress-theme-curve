@@ -36,7 +36,8 @@ import Banner from "@/components/Banner.vue";
       backdrop-filter: blur(20px);
       transition:
         color 0.3s,
-        background-color 0.3s;
+        background-color 0.3s,
+        transform var(--press-out) var(--press-ease);
       .iconfont {
         margin-right: 8px;
         transition: color 0.3s;
@@ -47,6 +48,10 @@ import Banner from "@/components/Banner.vue";
         .iconfont {
           color: var(--main-card-background) !important;
         }
+      }
+      &:active {
+        transform: scale(0.95);
+        transition-duration: var(--press-in);
       }
     }
   }

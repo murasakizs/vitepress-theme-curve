@@ -5,7 +5,7 @@
     :key="router.route.path"
     ref="mainCommentRef"
     id="main-comment"
-    class="comment"
+    class="comment vp-raw"
   >
     <div v-if="!fill" class="title">
       <span class="name">
@@ -75,6 +75,10 @@ defineExpose({ scrollToComments });
       &:hover {
         opacity: 1;
         color: var(--main-color);
+      }
+      &:active {
+        opacity: 1;
+        transition-duration: var(--press-in);
       }
     }
   }

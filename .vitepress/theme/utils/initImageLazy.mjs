@@ -9,7 +9,6 @@ const IMAGE_SELECTOR = "img:not(.no-lazy), .img-fancybox img";
 
 // 默认配置
 const defaultConfig = {
-  lazyEnabled: true,
   webpEnabled: true,
 };
 
@@ -19,8 +18,7 @@ const checkWebpSupport = () => {
   if (webpSupported !== null) return webpSupported;
   try {
     const canvas = document.createElement("canvas");
-    webpSupported =
-      canvas.toDataURL("image/webp").indexOf("data:image/webp") === 0;
+    webpSupported = canvas.toDataURL("image/webp").indexOf("data:image/webp") === 0;
   } catch {
     webpSupported = false;
   }
@@ -73,12 +71,6 @@ const handleImage = (img, config = defaultConfig) => {
   // 已处理过则跳过
   if (img.dataset.lazyEnhanced) return;
   img.dataset.lazyEnhanced = "true";
-
-  // 懒加载增强关闭时，直接标记为已加载
-  if (!config.lazyEnabled) {
-    img.classList.add("loaded");
-    return;
-  }
 
   // 尝试加载 WebP 版本
   if (img.dataset.webp) {
@@ -143,7 +135,6 @@ let currentObserver = null;
 /**
  * 初始化图片懒加载增强
  * @param {Object} config - 配置对象
- * @param {boolean} config.lazyEnabled - 是否启用懒加载
  * @param {boolean} config.webpEnabled - 是否启用 WebP 自动转换
  */
 const initImageLazy = (config = defaultConfig) => {

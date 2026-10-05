@@ -6,9 +6,7 @@
       <span v-if="type === 'categories'" class="title-num">
         共有 {{ Object.keys(categoriesData)?.length || 0 }} 个分类
       </span>
-      <span v-else class="title-num">
-        共有 {{ Object.keys(tagsData)?.length || 0 }} 个标签
-      </span>
+      <span v-else class="title-num"> 共有 {{ Object.keys(tagsData)?.length || 0 }} 个标签 </span>
     </div>
     <div v-if="type === 'categories'" class="type-lists">
       <a
@@ -112,6 +110,11 @@ onMounted(() => {
         .iconfont {
           color: var(--main-card-background);
         }
+      }
+      // 按下时缩小，覆盖 :hover 的放大（同特异性、后置生效）
+      &:active {
+        transform: scale(0.98);
+        transition-duration: var(--press-in);
       }
     }
   }

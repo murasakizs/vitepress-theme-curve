@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" content="noindex, nofollow" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>安全中心 | 泠の小站</title>
@@ -195,6 +195,11 @@
       ];
       // 网址黑名单
       const blacklist = ["*.taobao.com", "*.jd.com"];
+      // 精确主机匹配：*.foo.com 仅匹配 foo.com 与 foo 的直接子域，避免正则子串绕过
+      const matches = (host, rule) =>
+        rule.startsWith("*.")
+          ? host === rule.slice(2) || host.endsWith("." + rule.slice(2))
+          : host === rule;
       // 提示文本
       const tipText = {
         safe: "✅ 该网址为信任网址，即将跳转",
@@ -230,16 +235,21 @@
           encodedUrl = encodedUrl.replace(/ /g, "+");
           // 解密 Base64
           jumpLink = atob(encodedUrl);
-          urlDom.innerHTML = jumpLink;
+          // 仅放行 http/https，阻断 javascript:/data: 等协议
+          const parsed = new URL(jumpLink);
+          if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+            throw new Error("不允许的协议");
+          }
+          jumpLink = parsed.href;
+          urlDom.textContent = jumpLink;
           // 获取网址的主机名
-          const urlHostname = new URL(jumpLink).hostname;
+          const urlHostname = parsed.hostname;
           // 判断网址是否在黑名单中
           for (let i = 0; i < blacklist.length; i++) {
-            const blackPattern = blacklist[i].replace(/\*/g, ".*");
-            if (urlHostname.match(blackPattern)) {
+            if (matches(urlHostname, blacklist[i])) {
               // 显示提示信息
-              urlTip.innerHTML = tipText.danger;
-              jumpButton.innerHTML = "禁止跳转";
+              urlTip.textContent = tipText.danger;
+              jumpButton.textContent = "禁止跳转";
               jumpButton.style.cursor = "not-allowed";
               jumpButton.style.pointerEvents = "none";
               jumpButton.style.opacity = "0.4";
@@ -249,10 +259,9 @@
           }
           // 判断网址是否在白名单中
           for (let i = 0; i < whitelist.length; i++) {
-            const whitePattern = whitelist[i].replace(/\*/g, ".*");
-            if (urlHostname.match(whitePattern)) {
+            if (matches(urlHostname, whitelist[i])) {
               // 显示提示信息
-              urlTip.innerHTML = tipText.safe;
+              urlTip.textContent = tipText.safe;
               jumpContent.className = "safe";
               autoJump();
               return true;
@@ -261,7 +270,7 @@
         } catch (error) {
           console.error(error);
           jumpContent.remove();
-          urlDom.innerHTML = "获取跳转链接失败，请检查链接格式";
+          urlDom.textContent = "获取跳转链接失败，请检查链接格式";
         }
       };
       document.addEventListener("contextmenu", function (event) {

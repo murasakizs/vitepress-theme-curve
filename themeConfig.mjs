@@ -1,9 +1,6 @@
 // 个人主题配置（覆盖默认配置）
 // 仅定义需要覆盖的字段，未定义的字段使用默认值
 export const themeConfig = {
-  // ===== 站点版本 =====
-  siteVersion: "V1.1",
-  siteVersionDate: "2026.8.24",
   // ===== 站点信息 =====
   siteMeta: {
     title: "泠の小站",
@@ -18,7 +15,7 @@ export const themeConfig = {
     },
   },
   // 备案信息（留空则不显示）
-  icp: "",
+  icp: "萌ICP备20262118号",
   // 建站日期
   since: "2026-08-19",
 
@@ -27,7 +24,15 @@ export const themeConfig = {
     header: [
       ["link", { rel: "icon", type: "image/png", href: "/images/logo/favicon-32.png" }],
       ["script", {}, "document.documentElement.classList.add('js-enabled');"],
-      ["link", { rel: "alternate", type: "application/rss+xml", title: "RSS", href: "/rss.xml" }],
+      [
+        "link",
+        {
+          rel: "alternate",
+          type: "application/rss+xml",
+          title: "RSS",
+          href: "/rss.xml",
+        },
+      ],
       ["link", { rel: "stylesheet", href: "/fonts/iconfont/iconfont.css" }],
     ],
   },
@@ -49,12 +54,22 @@ export const themeConfig = {
     {
       text: "我的",
       items: [
-          { text: "关于泠酱", link: "/pages/about-me", icon: "contacts" },
-          { text: "关于本站", link: "/pages/about-website", icon: "code" },
-          // mobileOnly：只在移动端侧栏显示，不进桌面导航下拉
-          { text: "回到主页", link: "/", icon: "home", mobileOnly: true },
-          { text: "服务状态", link: "https://status.sgexilq.com", icon: "chart", mobileOnly: true },
-        ],
+        { text: "关于泠酱", link: "/pages/about-me", icon: "contacts" },
+        { text: "关于本站", link: "/pages/about-website", icon: "code" },
+        // mobileOnly：只在移动端侧栏显示，不进桌面导航下拉
+        {
+          text: "回到主页",
+          link: "/",
+          icon: "home",
+          mobileOnly: true,
+        },
+        {
+          text: "服务状态",
+          link: "https://status.sgexilq.com",
+          icon: "chart",
+          mobileOnly: true,
+        },
+      ],
     },
   ],
   navMore: [
@@ -62,7 +77,11 @@ export const themeConfig = {
       name: "项目",
       list: [
         { icon: "/images/logo/favicon-256.png", name: "泠の小站", url: "/" },
-        { icon: "/images/logo/favicon-256.png", name: "精神状态", url: "https://whendie.sgexilq.com" },
+        {
+          icon: "/images/logo/favicon-256.png",
+          name: "精神状态",
+          url: "https://whendie.sgexilq.com",
+        },
       ],
     },
   ],
@@ -72,10 +91,10 @@ export const themeConfig = {
     social: [
       { icon: "email", link: "mailto:sgexilq@qq.com" },
       { icon: "qq", link: "https://myat-q.sgexilq.com" },
+      { icon: "telegram", link: "https://myat-t.sgexilq.com" },
+      { icon: "twitter-x", link: "https://myat-x.sgexilq.com" },
       { icon: "github", link: "https://myat-g.sgexilq.com" },
       { icon: "bilibili", link: "https://myat-b.sgexilq.com" },
-      { icon: "/images/icon/xiaohongshu.svg", iconType: "image", link: "https://myat-h.sgexilq.com" },
-      { icon: "/images/icon/steam.svg", iconType: "image", link: "https://myat-s.sgexilq.com" },
     ],
     sitemap: [
       {
@@ -90,7 +109,11 @@ export const themeConfig = {
       {
         text: "项目",
         items: [
-          { text: "本站源码", link: "https://github.com/murasakizs/vitepress-theme-curve", newTab: true },
+          {
+            text: "本站源码",
+            link: "https://github.com/murasakizs/vitepress-theme-curve",
+            newTab: true,
+          },
           { text: "精神状态", link: "https://whendie.sgexilq.com", newTab: true },
         ],
       },
@@ -139,7 +162,13 @@ export const themeConfig = {
     timing: {
       enable: true,
       items: [
-        { icon: "💌", name: "泠诗尘", event: "活着", date: "2009-10-10", includeStart: true },
+        {
+          icon: "💌",
+          name: "泠诗尘",
+          event: "活着",
+          date: "2009-10-10",
+          includeStart: true,
+        },
       ],
     },
   },
@@ -153,7 +182,9 @@ export const themeConfig = {
     server: "netease",
     type: "playlist",
   },
-  search: { enable: false }, // TODO: 获取 Algolia appId 和 apiKey 后启用
+  search: { enable: false, appId: "", apiKey: "" }, // TODO: 获取 Algolia appId 和 apiKey 后启用
+  // 显式空串覆盖上游 51la 统计凭据，防止进包（defu 空对象不删键，必须空串）
+  tongji: { "51la": "" },
   // 图片灯箱（点击放大查看）
   fancybox: {
     enable: true,
@@ -161,3 +192,7 @@ export const themeConfig = {
     css: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/fancyapps-ui/5.0.36/fancybox/fancybox.min.css",
   },
 };
+
+// 命名导出供 init.mjs 按 userConfig.themeConfig 读取；default 导出
+// 满足 import/prefer-default-export，也方便动态导入时按默认值兜底
+export default themeConfig;

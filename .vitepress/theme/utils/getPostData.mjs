@@ -57,7 +57,15 @@ const getPostMDFilePaths = async () => {
   try {
     // 获取所有 md 文件路径
     let paths = await globby(["**.md"], {
-      ignore: ["node_modules", "pages", ".vitepress", "README.md"],
+      ignore: [
+        "node_modules",
+        "pages",
+        ".vitepress",
+        "**/README.md",
+        "**/TODO.md",
+        "_*.md",
+        "**/_*.md",
+      ],
     });
     // 过滤路径，只包括 'posts' 目录下的文件
     return paths.filter((item) => item.includes("posts/"));
@@ -136,9 +144,9 @@ export const getAllPosts = async () => {
           // 未设置时保持 undefined（而不是空数组），以免模板里 `v-if="item?.tags"`
           // 由「隐藏」变成「渲染空容器」。
           const toListOrUndefined = (value) =>
-            value === undefined || value === null || value === ""
+            (value === undefined || value === null || value === ""
               ? undefined
-              : normalizeList(value);
+              : normalizeList(value));
           // 返回文章对象
           return {
             id: generateId(item),
@@ -149,7 +157,7 @@ export const getAllPosts = async () => {
             tags: toListOrUndefined(tags),
             categories: toListOrUndefined(categories),
             description,
-            regularPath: `/${item.replace(".md", ".html")}`,
+            regularPath: `/${item.replace(/\.md$/, "")}`,
             top,
             cover,
             wordCount,

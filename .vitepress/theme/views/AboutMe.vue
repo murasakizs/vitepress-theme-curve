@@ -12,7 +12,7 @@
       <div class="about-item skills" style="grid-column: 3; grid-row: 1">
         <span class="tip">成分</span>
         <div class="skills-list">
-          <span class="skills-item"
+          <span class="skills-item tag-pink"
             ><span class="tag-blue">Transgender</span
             ><span class="tag-pink-text tag-bold">·MtF</span></span
           >
@@ -63,26 +63,33 @@
       </div>
 
       <!-- Row 3 -->
-      <div class="about-item card-4" style="grid-column: 1 / 4; grid-row: 3">
-        <span class="tip"
-          >确定自己的性别认同<br />已经
-          <span class="tag-pink-text">{{ daysSinceCard }}</span> 天</span
+      <div class="about-item" style="grid-column: 1 / 4; grid-row: 3">
+        <p
+          class="text"
+          style="margin: 0; font-size: 1.5rem; line-height: 1.5; color: var(--about-accent); font-weight: bold"
         >
+          谢谢你，让我做了一场甜甜的梦。
+        </p>
       </div>
 
       <!-- Row 4 -->
-      <div class="about-item" style="grid-column: 1 / 4; grid-row: 4">
-        <span class="title2">𝕏 简介</span>
-        <div class="intro-content">
-          <p>MtF｜小证2026.6｜家长党｜持证含糖（还在等待生育力保存）</p>
-          <p>DIY HRT 26.5.10-6.22｜诞生日2009.10.10</p>
-          <p>高一休学｜175cm/62kg｜重庆&苏州</p>
-          <p>想要变可爱｜友所有人｜同类贴贴｜缺爱</p>
-          <p>INFP-T｜双｜二次元｜音游｜百合｜术力口</p>
+      <div class="about-item card-4" style="grid-column: 1 / 4; grid-row: 4">
+        <div class="hrt-nodes" style="font-size: 18px">
+          <p class="text">获取小证：<span style="color: var(--about-accent)">2026.6.19</span></p>
+          <p class="text">
+            获取HRT处方：<span style="color: var(--about-accent)">2026.7.29</span>
+          </p>
+          <p class="text">
+            DIY HRT：<span style="color: var(--about-accent)">2026.5.10 - 2026.6.22</span>
+          </p>
+          <p class="text" style="margin-bottom: 1em">
+            开始正规HRT：<span style="color: var(--about-accent)">2026.10.5</span>
+          </p>
         </div>
-        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">
-          最后更新于 2026.9.30
-        </p>
+        <span class="tip"
+          >开始正式跨性别激素替代<br />已经
+          <span class="tag-pink-text">{{ daysSinceCard }}</span> 天</span
+        >
       </div>
 
       <!-- Row 5 -->
@@ -119,27 +126,64 @@
           最后更新于 2026.10.1
         </p>
       </div>
+
+      <!-- Row 6 -->
+      <div class="about-item" style="grid-column: 1 / 4; grid-row: 6">
+        <span class="title2">𝕏 简介</span>
+        <div class="intro-content">
+          <p>MtF｜小证2026.6｜家长党｜持证含糖（还在等待生育力保存）</p>
+          <p>DIY HRT 26.5.10-6.22｜诞生日2009.10.10</p>
+          <p>高一休学｜175cm/62kg｜重庆&苏州</p>
+          <p>想要变可爱｜友所有人｜同类贴贴｜缺爱</p>
+          <p>INFP-T｜双｜二次元｜音游｜百合｜术力口</p>
+        </div>
+        <p style="font-size: 12px; opacity: 0.5; margin-top: 12px; margin-bottom: 0">
+          最后更新于 2026.9.30
+        </p>
+      </div>
     </div>
-    <!-- 记忆卡片 -->
-    <div class="about-content" style="display: flex">
+
+    <!-- Row 7 起：瀑布流 -->
+    <div class="about-content about-waterfall">
+      <div class="about-item">
+        <div class="intro-content">
+          <p>走上这条路是我自己的选择，有时候也会担心自己的选择到底是不是正确的。</p>
+          <p>
+            我决定去成为真正的自己，但我也会害怕，害怕我的努力得不到成果，害怕永远也见不到那个<span
+              style="color: var(--about-accent)"
+              >“她”</span
+            >。
+          </p>
+          <p>
+            但我还是会做出这个选择，因为<span
+              style="color: var(--about-accent); font-weight: bold"
+              >“她”可能是我活下去的唯一动力了呢。</span
+            >
+          </p>
+          <p>
+            无论如何，不管会让我付出什么代价，我也一定要见到<span
+              style="color: var(--about-accent)"
+              >“她”</span
+            >…
+          </p>
+          <p>每一步都是自己选的，我也就不再会后悔。</p>
+        </div>
+      </div>
+      <!-- 记忆卡片 -->
       <div class="about-item">
         <p class="text">在记忆之中，我逐渐开始忘记自己的存在。</p>
         <p class="text" style="font-weight: bold">"我到底是谁？"</p>
         <p class="text">不重要了。</p>
         <p class="text">在记忆之中，我逐渐接受忘记自己的存在…</p>
       </div>
-    </div>
-    <!-- 陷之死地 -->
-    <div class="about-content" style="display: flex">
+      <!-- 陷之死地 -->
       <div class="about-item">
         <p class="text">陷之死地而后生，置之亡地而后存。</p>
         <p class="text" style="color: var(--about-accent)">
           失败的人生同样是人生，她们有权品尝至最后
         </p>
       </div>
-    </div>
-    <!-- 关于这个站 -->
-    <div class="about-content" style="display: flex">
+      <!-- 关于这个站 -->
       <div class="about-item">
         <p class="text">愿每个人都被世界温柔以待~</p>
         <p class="text" style="color: var(--about-blue); opacity: 0.8">
@@ -149,9 +193,7 @@
           我爱你们
         </p>
       </div>
-    </div>
-    <!-- 下方卡片 -->
-    <div class="about-content" style="display: flex">
+      <!-- 下方卡片 -->
       <div class="about-item">
         <p class="text">往前走</p>
         <p class="text">路是很难走</p>
@@ -161,6 +203,13 @@
         <p class="text" style="color: var(--about-accent); font-weight: bold">可能连路都没有</p>
         <p class="text" style="text-align: right; opacity: 0.6">------潘柏林</p>
       </div>
+      <!-- 我的各种账号 -->
+      <div class="about-item">
+        <p class="text" style="margin: 0">我的各种账号</p>
+        <div class="card-action">
+          <a href="/pages/hide/nfc-aboutme-acgn#各种账号" class="view-btn">查看</a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -168,9 +217,9 @@
 <script setup>
 const birthDate = "2009-10-10";
 
-// 获得小证天数
+// 开始正规HRT天数
 const daysSinceCard = computed(() => {
-  const start = new Date("2025-08-19");
+  const start = new Date("2026-10-05");
   const now = new Date();
   return Math.floor((now - start) / (1000 * 60 * 60 * 24));
 });
@@ -250,10 +299,48 @@ html.dark .about {
         margin-right: 4rem;
         color: var(--about-text);
       }
+      &.card-3 {
+        .title2 {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 4px 8px;
+          margin-right: 0;
+        }
+      }
       .text {
         font-size: 18px;
         margin: 4px 0;
         color: var(--about-text);
+      }
+      .card-action {
+        margin-top: auto;
+        padding-top: 4px;
+        display: flex;
+        justify-content: flex-start;
+        .view-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.9375rem;
+          border-radius: 8px;
+          padding: 6px 8px;
+          min-width: 30px;
+          color: var(--about-card-bg);
+          background-color: var(--about-accent);
+          transition:
+            box-shadow var(--press-out) var(--press-ease),
+            transform var(--press-out) var(--press-ease);
+          text-decoration: none;
+          &:hover {
+            box-shadow: 0 8px 16px -4px var(--about-shadow);
+          }
+          &:active {
+            box-shadow: 0 8px 16px -4px var(--about-shadow);
+            transform: scale(0.95);
+            transition-duration: var(--press-in);
+          }
+        }
       }
       &.child {
         background-color: transparent;
@@ -506,6 +593,14 @@ html.dark .about {
         }
       }
     }
+    .intro-content {
+      margin-top: 12px;
+      p {
+        font-size: 1rem;
+        margin: 4px 0;
+        color: var(--about-text);
+      }
+    }
     &.about-grid {
       grid-template-columns: 0.8fr 1.2fr 1.2fr;
       grid-template-rows: auto auto auto;
@@ -514,21 +609,13 @@ html.dark .about {
         justify-content: center;
         align-items: flex-start;
         .tip {
-          font-size: 36px;
+          font-size: 24px;
           font-weight: bold;
           color: var(--about-text);
           opacity: 1;
           .tag-pink-text {
             color: var(--about-accent);
           }
-        }
-      }
-      .intro-content {
-        margin-top: 12px;
-        p {
-          font-size: 1rem;
-          margin: 4px 0;
-          color: var(--about-text);
         }
       }
       .card-mbti {
@@ -577,12 +664,27 @@ html.dark .about {
         }
       }
     }
+    &.about-waterfall {
+      display: block;
+      columns: 2;
+      column-gap: 20px;
+
+      > .about-item {
+        break-inside: avoid;
+        margin-bottom: 20px;
+      }
+    }
     &:last-child {
       margin-bottom: 0;
     }
     @media (max-width: 768px) {
       display: flex;
       flex-direction: column;
+
+      &.about-waterfall {
+        display: block;
+        columns: 1;
+      }
 
       .about-item {
         padding: 1.2rem 1.25rem;
@@ -606,10 +708,6 @@ html.dark .about {
         }
 
         &.card-3 .title2 {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 4px 8px;
           font-size: clamp(1.6rem, 8vw, 2rem);
         }
 
@@ -652,41 +750,25 @@ html.high-contrast-max .about {
   }
 
   .about-item.hello {
-    color: #000000 !important;
     background-image: none !important;
     background-color: #ffffff !important;
-
-    .title2,
-    .text1,
-    .text2,
-    .text3,
-    .text4 {
-      color: #000000 !important;
-    }
   }
 
-  .title2,
-  .tip,
-  .text,
-  .info-name,
-  .info-num,
-  .mbti-type,
-  .skills-item,
-  .intro-content p {
+  // 压过行内硬编码色（扩列卡等）；!important 可覆盖无 !important 的行内 style
+  .about-item,
+  .about-item * {
     color: #000000 !important;
-  }
-
-  .tag-pink,
-  .tag-pink-text,
-  .tag-blue,
-  .mbti-blue,
-  .mbti-pink {
-    color: #000000 !important;
+    opacity: 1 !important;
   }
 
   .skills-item {
     border-color: #000000 !important;
     background: #ffffff !important;
+  }
+
+  .view-btn {
+    background: #000000 !important;
+    color: #ffffff !important;
   }
 }
 
@@ -709,41 +791,24 @@ html.dark.high-contrast-max .about {
   }
 
   .about-item.hello {
-    color: #ffffff !important;
     background-image: none !important;
     background-color: #000000 !important;
-
-    .title2,
-    .text1,
-    .text2,
-    .text3,
-    .text4 {
-      color: #ffffff !important;
-    }
   }
 
-  .title2,
-  .tip,
-  .text,
-  .info-name,
-  .info-num,
-  .mbti-type,
-  .skills-item,
-  .intro-content p {
+  .about-item,
+  .about-item * {
     color: #ffffff !important;
-  }
-
-  .tag-pink,
-  .tag-pink-text,
-  .tag-blue,
-  .mbti-blue,
-  .mbti-pink {
-    color: #ffffff !important;
+    opacity: 1 !important;
   }
 
   .skills-item {
     border-color: #ffffff !important;
     background: #000000 !important;
+  }
+
+  .view-btn {
+    background: #ffffff !important;
+    color: #000000 !important;
   }
 }
 </style>

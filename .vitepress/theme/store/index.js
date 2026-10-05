@@ -5,7 +5,7 @@ let appCursorInstance;
 const isMobile =
   typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
-const PERSIST_VERSION = 23;
+const PERSIST_VERSION = 29;
 // 开发模式开关（1 = 未开启，2 = 开启）
 const DEFAULT_DEV_MODE = 1;
 
@@ -179,11 +179,11 @@ export const mainStore = defineStore("main", {
       scheduledDarkTime: "19:00",
       scheduledThemeTimer: null,
       // 站点版本信息（运行时覆盖，用于关于本站页面）
-      siteVersion: "V1.3",
-      siteVersionDate: "2026.9.12",
+      siteVersion: "V1.4",
+      siteVersionDate: "2026.10.5",
       // 分支版本（自动递增）
-      branchVersion: 141,
-      branchBuildTime: "2026.10.02 12:44:03",
+      branchVersion: 151,
+      branchBuildTime: "2026.10.05 13:10:34",
     };
   },
   actions: {
@@ -194,11 +194,13 @@ export const mainStore = defineStore("main", {
       this[value] = !this[value];
       // 阻止滚动
       document.body.style.overflowY = this[value] ? "hidden" : "";
-      // 全局模糊
-      const globalApp = document.getElementById("app");
-      this[value] && this.backgroundBlur && blur
-        ? globalApp.classList.add("blur")
-        : globalApp.classList.remove("blur");
+      // 背景层模糊（弹窗/导航保持清晰；close 模式下无背景层，开关无效）
+      const backgroundEl = document.querySelector(".background");
+      if (backgroundEl) {
+        this[value] && this.backgroundBlur && blur
+          ? backgroundEl.classList.add("blur")
+          : backgroundEl.classList.remove("blur");
+      }
     },
     // 更改字体大小
     changeFontSize(isAdd = false) {

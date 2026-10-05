@@ -78,12 +78,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const downCount = monitors.filter((m) => m.attributes.status === "down").length;
     const maintenanceCount = monitors.filter((m) => m.attributes.status === "maintenance").length;
     const validatingCount = monitors.filter((m) => m.attributes.status === "validating").length;
-    const upCount = monitors.filter(
-      (m) =>
-        m.attributes.status === "up" ||
-        m.attributes.status === "paused" ||
-        m.attributes.status === "pending",
-    ).length;
 
     let statusType: StatusType;
 
@@ -120,13 +114,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (error) {
     console.error("Fetch status failed:", error);
-    console.error("Token exists:", !!apiToken);
-    console.error("Token length:", apiToken?.length);
     return res.status(200).json({
       status: "error",
       label: "无法获取状态",
       updatedAt: null,
-      debug: error instanceof Error ? error.message : String(error),
     });
   }
 }

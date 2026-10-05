@@ -162,11 +162,12 @@ const { postData, loadPostData } = usePostData();
 const asArray = (val) => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
-  if (typeof val === "string")
+  if (typeof val === "string") {
     return val
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
+  }
   return [];
 };
 

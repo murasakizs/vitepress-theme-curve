@@ -1627,7 +1627,7 @@ const {
   cancelImportWarn,
   confirmImportConfirm,
   cancelImportConfirm,
-} = useConfigIO(theme.siteVersion || "V1.0");
+} = useConfigIO(store.siteVersion || theme.siteVersion || "V1.0");
 const {
   themeType,
   themeColor,
@@ -2034,7 +2034,10 @@ const saveStoreDefaults = async (data) => {
       body: JSON.stringify(data),
     });
     const json = await res.json();
-    if (!json.ok) console.error("Save failed:", json.error);
+    if (!json.ok) {
+      console.error("Save failed:", json.error);
+      $message.warning(`保存失败：${json.error || "格式不合法"}`);
+    }
   } catch (e) {
     console.error("Failed to save store defaults:", e);
   }

@@ -1579,7 +1579,6 @@ a {
   width: 100vw;
   width: 100dvw;
   // height: 100vh;
-  transition: filter 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   // 滚动条
   .simplebar-scrollbar {
@@ -1599,11 +1598,6 @@ a {
         background: var(--main-color);
       }
     }
-  }
-
-  // 全局模糊
-  &.blur {
-    filter: blur(20px);
   }
 }
 
@@ -1667,7 +1661,7 @@ a {
 }
 
 // 图片懒加载骨架屏（仅限主内容区域）
-.mian-layout img:not(.no-lazy) {
+.main-layout img:not(.no-lazy) {
   opacity: 0;
   transition: opacity 0.4s ease;
   &.loaded {
@@ -1679,7 +1673,7 @@ a {
 }
 
 // fancybox 图片容器骨架屏（仅限主内容区域）
-.mian-layout .img-fancybox {
+.main-layout .img-fancybox {
   position: relative;
   min-height: 100px;
   background: linear-gradient(
@@ -1856,7 +1850,7 @@ html.force-pc {
         border: none !important;
       }
     }
-    .mian-layout {
+    .main-layout {
       padding: 1rem 2rem !important;
       &.is-post {
         padding: 1rem 2rem !important;
@@ -1896,7 +1890,7 @@ html.force-mobile {
       z-index: 100 !important;
     }
   }
-  .mian-layout {
+  .main-layout {
     padding: 1rem 1.5rem !important;
     &.is-post {
       padding: 0 !important;

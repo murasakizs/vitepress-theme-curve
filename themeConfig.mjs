@@ -1,9 +1,6 @@
 // 个人主题配置（覆盖默认配置）
 // 仅定义需要覆盖的字段，未定义的字段使用默认值
 export const themeConfig = {
-  // ===== 站点版本 =====
-  siteVersion: "V1.1",
-  siteVersionDate: "2026.8.24",
   // ===== 站点信息 =====
   siteMeta: {
     title: "泠の小站",
@@ -185,7 +182,9 @@ export const themeConfig = {
     server: "netease",
     type: "playlist",
   },
-  search: { enable: false }, // TODO: 获取 Algolia appId 和 apiKey 后启用
+  search: { enable: false, appId: "", apiKey: "" }, // TODO: 获取 Algolia appId 和 apiKey 后启用
+  // 显式空串覆盖上游 51la 统计凭据，防止进包（defu 空对象不删键，必须空串）
+  tongji: { "51la": "" },
   // 图片灯箱（点击放大查看）
   fancybox: {
     enable: true,

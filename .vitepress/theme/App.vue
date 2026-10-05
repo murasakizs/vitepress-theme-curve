@@ -8,7 +8,7 @@
   <!-- 导航栏 -->
   <Nav />
   <!-- 主内容 -->
-  <main :class="['mian-layout', { loading: loadingStatus, 'is-post': isPostPage }]">
+  <main :class="['main-layout', { loading: loadingStatus, 'is-post': isPostPage }]">
     <!-- 404 -->
     <NotFound v-if="page.isNotFound" />
     <!-- 首页 -->
@@ -142,10 +142,11 @@ const startImportCheck = () => {
   }, 1000);
 };
 
-// 判断是否为文章页面
+// 判断是否为文章页面：路径在 posts/ 下，或 frontmatter 显式声明 layout: post
+// （pages/ 下的独立文章用后者走文章样式，又不进 RSS / 文章列表）
 const isPostPage = computed(() => {
   const routePath = decodeURIComponent(route.path);
-  return routePath.includes("/posts/");
+  return routePath.includes("/posts/") || frontmatter.value.layout === "post";
 });
 
 // 开启右键菜单
@@ -322,7 +323,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-.mian-layout {
+.main-layout {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;

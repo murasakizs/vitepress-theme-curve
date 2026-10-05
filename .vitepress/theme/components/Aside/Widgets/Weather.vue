@@ -162,8 +162,8 @@ const fetchWeather = async (showMsg = false) => {
 
     if (provider === "openmeteo") {
       // Open-Meteo：优先使用坐标，没有坐标时通过城市名查询
-      let queryLat = lat,
-        queryLon = lon;
+      let queryLat = lat;
+      let queryLon = lon;
       if (queryLat == null) {
         // 用 geocoding API 将城市名转坐标
         const geoRes = await fetch(

@@ -309,9 +309,10 @@ export default withPwa(
         cleanupOutdatedCaches: true,
         // 运行时缓存策略
         runtimeCaching: [
-          // API 请求 - 网络优先
+          // API 请求 - 网络优先（仅同源；跨域 Meting 等不得被拦截，
+          // 其 pathname 也是 /api/，且 type=url 为 302 跳转链，进 SW 会 no-response）
           {
-            urlPattern: ({ url }) => url.pathname.startsWith("/api/"),
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/api/"),
             handler: "NetworkFirst",
             options: {
               cacheName: "api-cache",
@@ -324,7 +325,7 @@ export default withPwa(
           },
           // 文章页面 - 网络优先，离线回退缓存
           {
-            urlPattern: /\.html$/i,
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\.html$/i.test(url.pathname),
             handler: "NetworkFirst",
             options: {
               cacheName: "html-cache",
@@ -337,7 +338,8 @@ export default withPwa(
           },
           // VitePress 生成的页面路由（cleanUrls 模式，排除根级带点文件）
           {
-            urlPattern: ({ url }) =>
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin &&
               /^\/[^/]+\/?$/.test(url.pathname) &&
               !/\.(?:js|mjs|css|map|json|txt|xml|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|webmanifest)$/i.test(
                 url.pathname,
@@ -354,7 +356,8 @@ export default withPwa(
           },
           // 文章详情页路由（排除静态资源后缀）
           {
-            urlPattern: ({ url }) =>
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin &&
               /^\/[^/]+\/.+/.test(url.pathname) &&
               !/\.(?:js|mjs|css|map|json|txt|xml|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|webmanifest)$/i.test(
                 url.pathname,

@@ -12,7 +12,7 @@
       <div class="about-item skills" style="grid-column: 3; grid-row: 1">
         <span class="tip">成分</span>
         <div class="skills-list">
-          <span class="skills-item"
+          <span class="skills-item tag-pink"
             ><span class="tag-blue">Transgender</span
             ><span class="tag-pink-text tag-bold">·MtF</span></span
           >
@@ -299,6 +299,15 @@ html.dark .about {
         margin-right: 4rem;
         color: var(--about-text);
       }
+      &.card-3 {
+        .title2 {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 4px 8px;
+          margin-right: 0;
+        }
+      }
       .text {
         font-size: 18px;
         margin: 4px 0;
@@ -306,7 +315,7 @@ html.dark .about {
       }
       .card-action {
         margin-top: auto;
-        padding-top: 12px;
+        padding-top: 4px;
         display: flex;
         justify-content: flex-start;
         .view-btn {
@@ -317,17 +326,17 @@ html.dark .about {
           border-radius: 8px;
           padding: 6px 8px;
           min-width: 30px;
-          color: var(--main-card-background);
-          background-color: var(--main-color);
+          color: var(--about-card-bg);
+          background-color: var(--about-accent);
           transition:
             box-shadow var(--press-out) var(--press-ease),
             transform var(--press-out) var(--press-ease);
           text-decoration: none;
           &:hover {
-            box-shadow: 0 8px 16px -4px var(--main-border-shadow);
+            box-shadow: 0 8px 16px -4px var(--about-shadow);
           }
           &:active {
-            box-shadow: 0 8px 16px -4px var(--main-border-shadow);
+            box-shadow: 0 8px 16px -4px var(--about-shadow);
             transform: scale(0.95);
             transition-duration: var(--press-in);
           }
@@ -699,10 +708,6 @@ html.dark .about {
         }
 
         &.card-3 .title2 {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 4px 8px;
           font-size: clamp(1.6rem, 8vw, 2rem);
         }
 
@@ -745,36 +750,15 @@ html.high-contrast-max .about {
   }
 
   .about-item.hello {
-    color: #000000 !important;
     background-image: none !important;
     background-color: #ffffff !important;
-
-    .title2,
-    .text1,
-    .text2,
-    .text3,
-    .text4 {
-      color: #000000 !important;
-    }
   }
 
-  .title2,
-  .tip,
-  .text,
-  .info-name,
-  .info-num,
-  .mbti-type,
-  .skills-item,
-  .intro-content p {
+  // 压过行内硬编码色（扩列卡等）；!important 可覆盖无 !important 的行内 style
+  .about-item,
+  .about-item * {
     color: #000000 !important;
-  }
-
-  .tag-pink,
-  .tag-pink-text,
-  .tag-blue,
-  .mbti-blue,
-  .mbti-pink {
-    color: #000000 !important;
+    opacity: 1 !important;
   }
 
   .skills-item {
@@ -807,36 +791,14 @@ html.dark.high-contrast-max .about {
   }
 
   .about-item.hello {
-    color: #ffffff !important;
     background-image: none !important;
     background-color: #000000 !important;
-
-    .title2,
-    .text1,
-    .text2,
-    .text3,
-    .text4 {
-      color: #ffffff !important;
-    }
   }
 
-  .title2,
-  .tip,
-  .text,
-  .info-name,
-  .info-num,
-  .mbti-type,
-  .skills-item,
-  .intro-content p {
+  .about-item,
+  .about-item * {
     color: #ffffff !important;
-  }
-
-  .tag-pink,
-  .tag-pink-text,
-  .tag-blue,
-  .mbti-blue,
-  .mbti-pink {
-    color: #ffffff !important;
+    opacity: 1 !important;
   }
 
   .skills-item {

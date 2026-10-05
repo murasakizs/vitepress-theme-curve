@@ -64,8 +64,11 @@
 
       <!-- Row 3 -->
       <div class="about-item" style="grid-column: 1 / 4; grid-row: 3">
-        <p class="text" style="margin: 0; font-size: 1.5rem; color: var(--about-accent); font-weight: bold">
-          谢谢你，让我做了一场甜甜的梦
+        <p
+          class="text"
+          style="margin: 0; font-size: 1.5rem; line-height: 1.5; color: var(--about-accent); font-weight: bold"
+        >
+          谢谢你，让我做了一场甜甜的梦。
         </p>
       </div>
 
@@ -84,7 +87,7 @@
           </p>
         </div>
         <span class="tip"
-          >开始正式跨性别激素替代（HRT）<br />已经
+          >开始正式跨性别激素替代<br />已经
           <span class="tag-pink-text">{{ daysSinceCard }}</span> 天</span
         >
       </div>

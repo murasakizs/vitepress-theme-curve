@@ -90,11 +90,11 @@ export const themeConfig = {
   footer: {
     social: [
       { icon: "email", link: "mailto:sgexilq@qq.com" },
-      { icon: "qq", link: "https://myat-q.sgexilq.com" },
-      { icon: "telegram", link: "https://myat-t.sgexilq.com" },
-      { icon: "twitter-x", link: "https://myat-x.sgexilq.com" },
-      { icon: "github", link: "https://myat-g.sgexilq.com" },
-      { icon: "bilibili", link: "https://myat-b.sgexilq.com" },
+      { icon: "qq", link: "https://qm.qq.com/q/q9GblP3JkY" },
+      { icon: "telegram", link: "https://t.me/murasakizs" },
+      { icon: "twitter-x", link: "https://x.com/mrsksyrx_xl" },
+      { icon: "github", link: "https://github.com/murasakizs" },
+      { icon: "bilibili", link: "https://space.bilibili.com/2118528077" },
     ],
     sitemap: [
       {

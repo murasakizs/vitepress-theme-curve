@@ -9,8 +9,7 @@
  */
 
 const ALLOWED_HOSTS = new Set([
-  "metingapi.sgexilq.com",
-  "metingapi.sgexilq.top",
+  "meting.20091010.xyz",
   "meting.20100907.xyz",
   "music.163.com",
 ]);

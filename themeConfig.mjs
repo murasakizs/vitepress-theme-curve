@@ -90,11 +90,11 @@ export const themeConfig = {
   footer: {
     social: [
       { icon: "email", link: "mailto:sgexilq@qq.com" },
-      { icon: "qq", link: "https://qm.qq.com/q/q9GblP3JkY" },
-      { icon: "telegram", link: "https://t.me/murasakizs" },
-      { icon: "twitter-x", link: "https://x.com/mrsksyrx_xl" },
-      { icon: "github", link: "https://github.com/murasakizs" },
-      { icon: "bilibili", link: "https://space.bilibili.com/2118528077" },
+      { icon: "qq", link: "https://myat-qq.20091010.xyz" },
+      { icon: "telegram", link: "https://myat-telegram.20091010.xyz" },
+      { icon: "twitter-x", link: "https://myat-twitter.20091010.xyz" },
+      { icon: "github", link: "https://myat-github.20091010.xyz" },
+      { icon: "bilibili", link: "https://myat-bilibili.20091010.xyz" },
     ],
     sitemap: [
       {
@@ -143,7 +143,7 @@ export const themeConfig = {
     type: "twikoo",
     twikoo: {
       js: "https://cdn.jsdelivr.net/npm/twikoo@1.6.42/dist/twikoo.all.min.js",
-      envId: "https://mytwikooapi.sgexilq.com",
+      envId: "https://twikoo.20091010.xyz",
       region: "",
       lang: "zh-CN",
     },
@@ -177,7 +177,7 @@ export const themeConfig = {
   rewardData: { enable: false },
   music: {
     enable: true,
-    url: "https://metingapi.sgexilq.com/api/meting",
+    url: "https://meting.20091010.xyz/api/meting",
     id: ["18348521365", "18351552429", "18351506618"],
     server: "netease",
     type: "playlist",

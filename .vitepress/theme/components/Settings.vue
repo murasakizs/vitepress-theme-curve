@@ -1515,8 +1515,8 @@
             <div class="set-item">
               <span class="set-label">反馈与建议</span>
               <div class="set-options">
-                <a href="mailto:sgexilq.com" target="_blank" class="options">EMail</a>
-                <a href="https://qm.qq.com/q/q9GblP3JkY" target="_blank" class="options">QQ</a>
+                <a href="mailto:sgexilq@qq.com" target="_blank" class="options">EMail</a>
+                <a href="https://myat-qq.20091010.xyz" target="_blank" class="options">QQ</a>
                 <a
                   href="https://github.com/murasakizs/vitepress-theme-curve/issues"
                   target="_blank"

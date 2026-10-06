@@ -191,6 +191,10 @@ export const themeConfig = {
     js: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js",
     css: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/fancyapps-ui/5.0.36/fancybox/fancybox.min.css",
   },
+  // 外链中转（跳转前显示安全提示页）
+  jumpRedirect: {
+    enable: true,
+  },
 };
 
 // 命名导出供 init.mjs 按 userConfig.themeConfig 读取；default 导出

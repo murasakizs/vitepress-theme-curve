@@ -87,6 +87,24 @@ export const loadCSS = (href, option = {}) => {
   });
 };
 
+// 始终排除的域名（含子域），这些域名的链接不走中转页
+const ALWAYS_EXCLUDE_DOMAINS = ["sgexilq.com", "sgexilq.top", "mrsksyrx.top", "20091010.xyz"];
+
+/**
+ * 判断链接是否应跳过中转（相对路径/同源，或命中始终排除的域名）
+ * @param {string} href
+ */
+const shouldSkipRedirect = (href) => {
+  try {
+    const url = new URL(href, "https://placeholder.local");
+    // 相对路径解析为 placeholder.local 即同源
+    if (url.origin === "https://placeholder.local") return true;
+    return ALWAYS_EXCLUDE_DOMAINS.some((d) => url.hostname === d || url.hostname.endsWith("." + d));
+  } catch {
+    return true;
+  }
+};
+
 /**
  * 跳转中转页
  * @param {string} html - 页面内容
@@ -116,6 +134,8 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
             return;
           }
           const linkHref = link.getAttribute("href");
+          // 同源 / 白名单域名不走中转
+          if (linkHref && shouldSkipRedirect(linkHref)) return;
           // 存在链接且非中转页
           if (linkHref && !linkHref.includes(redirectPage)) {
             // Base64
@@ -142,15 +162,8 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
         if (excludeClass.some((className) => classes.includes(className))) {
           return;
         }
-        // 同源链接不需要中转
-        if (href) {
-          try {
-            const linkUrl = new URL(href, "https://placeholder.local");
-            if (linkUrl.origin === "https://placeholder.local") return;
-          } catch {
-            return;
-          }
-        }
+        // 同源 / 白名单域名不走中转
+        if (href && shouldSkipRedirect(href)) return;
         // 存在链接且非中转页
         if (href && !href.includes(redirectPage)) {
           // Base64 编码 href

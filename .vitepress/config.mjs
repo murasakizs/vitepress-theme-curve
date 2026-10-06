@@ -270,6 +270,72 @@ export default withPwa(
             });
           },
         },
+        {
+          // 本地 dev 没有 Vercel/CF Functions，补一个与 api/music-url.ts 同口径的解析端点
+          name: "music-url-api",
+          configureServer(server) {
+            server.middlewares.use("/api/music-url", async (req, res) => {
+              if (req.method !== "GET") {
+                res.statusCode = 405;
+                res.end("Method Not Allowed");
+                return;
+              }
+              const reqUrl = new URL(req.url || "", "http://localhost");
+              const raw = reqUrl.searchParams.get("url") || "";
+              const ALLOWED_HOSTS = new Set([
+                "metingapi.sgexilq.com",
+                "metingapi.sgexilq.top",
+                "meting.20100907.xyz",
+                "music.163.com",
+              ]);
+              const ALLOWED_SUFFIXES = [".music.126.net", ".music.163.com"];
+              const isAllowedUrl = (value) => {
+                try {
+                  const u = new URL(value);
+                  if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+                  const host = u.hostname.toLowerCase();
+                  return ALLOWED_HOSTS.has(host) || ALLOWED_SUFFIXES.some((s) => host.endsWith(s))
+                    ? u
+                    : null;
+                } catch {
+                  return null;
+                }
+              };
+              res.setHeader("Content-Type", "application/json");
+              if (!raw) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: "missing url" }));
+                return;
+              }
+              try {
+                let current = isAllowedUrl(raw);
+                if (!current) throw new Error("URL not allowed");
+                for (let i = 0; i < 5; i++) {
+                  const hop = await fetch(current.toString(), {
+                    method: "GET",
+                    redirect: "manual",
+                    signal: AbortSignal.timeout(5000),
+                    headers: { "User-Agent": "Mozilla/5.0" },
+                  });
+                  if (hop.status >= 300 && hop.status < 400) {
+                    const loc = hop.headers.get("location");
+                    if (!loc) break;
+                    const next = isAllowedUrl(new URL(loc, current).toString());
+                    if (!next) throw new Error("redirect target not allowed");
+                    current = next;
+                    continue;
+                  }
+                  break;
+                }
+                const url = current.toString().replace(/^http:\/\//i, "https://");
+                res.end(JSON.stringify({ url }));
+              } catch (e) {
+                res.statusCode = 502;
+                res.end(JSON.stringify({ error: e.message || "resolve failed" }));
+              }
+            });
+          },
+        },
       ],
       resolve: {
         // 配置路径别名

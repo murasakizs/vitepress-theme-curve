@@ -189,9 +189,9 @@ const postMetaData = computed(() => {
   // 兜底路径：postData 尚未加载或查不到该文章时，直接由 frontmatter 构造。
   // date 必须与 getPostData.mjs 用同一口径（本地零点），否则同一篇文章
   // 在两条路径下会得到不同的 epoch，负时区访客会错一天。
-  const date = frontmatter.value.date
-    ? toLocalDayTimestamp(frontmatter.value.date)
-    : page.value.lastUpdated;
+  // 解析失败同样回退，不让 NaN 流进 expiredDays / 日期展示。
+  const parsedDate = frontmatter.value.date ? toLocalDayTimestamp(frontmatter.value.date) : NaN;
+  const date = Number.isNaN(parsedDate) ? page.value.lastUpdated : parsedDate;
   return {
     id: postId.value,
     title: frontmatter.value.title || page.value.title,

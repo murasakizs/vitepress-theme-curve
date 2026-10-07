@@ -49,7 +49,7 @@ VitePress blog theme (Vue 3 + Pinia + SCSS). Single package, no monorepo (`pnpm-
 - Sitemap deliberately **excludes the redirect shells** `/page`, `/page/1`, `/pages` (see `transformItems` + `removeRedirectPagesFromSitemap` in `config.mjs`). Don't "fix" this.
 - VitePress 1.6.4 emits a broken empty `vp-icons.css` preload — `transformHtml` strips it; keep that workaround.
 - Dev server exposes `POST /api/theme-config` that regex-rewrites `.vitepress/theme/store/index.js` (version-bump tooling) — don't be surprised by dev-server file mutations.
-- `jumpRedirect` (outbound-link interstitial) is **disabled** and buggy — `$(el).text()` drops nested icons/images, and it has no same-origin check. Fix both before enabling.
+- `jumpRedirect` (outbound-link interstitial) is **enabled** in root `themeConfig.mjs` (`jumpRedirect.enable: true`; the theme default stays `false`). Earlier defects (`$(el).text()` dropping nested icons, missing same-origin check) are fixed. Remaining invariants — don't regress them: `shouldSkipRedirect` must only pass `http:`/`https:` through (otherwise `mailto:`/`tel:` become dead links behind the interstitial), and `toBase64` in `commonTools.mjs` must stay UTF-8-symmetric with the `atob` + `TextDecoder` decode in `public/redirect.html` (bare `btoa`/`atob` mangles non-Latin1 URLs).
 - `public/` is a source dir copied verbatim into `dist`; don't put hand-maintained build artifacts there.
 
 ## Verify & style caveats

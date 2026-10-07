@@ -91,7 +91,7 @@ export const loadCSS = (href, option = {}) => {
 const ALWAYS_EXCLUDE_DOMAINS = ["sgexilq.com", "sgexilq.top", "mrsksyrx.top", "20091010.xyz"];
 
 /**
- * 判断链接是否应跳过中转（相对路径/同源，或命中始终排除的域名）
+ * 判断链接是否应跳过中转（相对路径/同源、非 http(s) 协议，或命中始终排除的域名）
  * @param {string} href
  */
 const shouldSkipRedirect = (href) => {
@@ -99,10 +99,26 @@ const shouldSkipRedirect = (href) => {
     const url = new URL(href, "https://placeholder.local");
     // 相对路径解析为 placeholder.local 即同源
     if (url.origin === "https://placeholder.local") return true;
+    // 仅 http/https 走中转：javascript:/data: 等伪协议、mailto:/tel: 等应用协议
+    // 一律原样保留——包进中转页只会被 redirect.html 的协议白名单拦成死链
+    if (url.protocol !== "http:" && url.protocol !== "https:") return true;
     return ALWAYS_EXCLUDE_DOMAINS.some((d) => url.hostname === d || url.hostname.endsWith("." + d));
   } catch {
     return true;
   }
+};
+
+/**
+ * UTF-8 安全的 Base64 编码。
+ * 必须与 redirect.html 里的解码保持对称：那边是 atob + TextDecoder，
+ * 任一侧改回裸 btoa/atob 都会让非 Latin1 URL 变成乱码跳转。
+ * @param {string} str
+ */
+const toBase64 = (str) => {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
 };
 
 /**
@@ -127,25 +143,30 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
       const allLinks = [...document.getElementsByTagName("a")];
       if (allLinks?.length === 0) return false;
       allLinks.forEach((link) => {
-        // 检查链接是否包含 target="_blank" 属性
-        if (link.getAttribute("target") === "_blank") {
-          // 检查链接是否包含排除的类
-          if (excludeClass.some((className) => link.classList.contains(className))) {
-            return;
+        // 单条失败不拖垮整轮改造
+        try {
+          // 检查链接是否包含 target="_blank" 属性
+          if (link.getAttribute("target") === "_blank") {
+            // 检查链接是否包含排除的类
+            if (excludeClass.some((className) => link.classList.contains(className))) {
+              return;
+            }
+            const linkHref = link.getAttribute("href");
+            // 同源 / 白名单域名 / 非 http(s) 协议不走中转
+            if (linkHref && shouldSkipRedirect(linkHref)) return;
+            // 存在链接且非中转页
+            if (linkHref && !linkHref.includes(redirectPage)) {
+              // Base64
+              const encodedHref = toBase64(linkHref);
+              const redirectLink = `${redirectPage}#url=${encodedHref}`;
+              // 保存原始链接
+              link.setAttribute("original-href", linkHref);
+              // 覆盖 href
+              link.setAttribute("href", redirectLink);
+            }
           }
-          const linkHref = link.getAttribute("href");
-          // 同源 / 白名单域名不走中转
-          if (linkHref && shouldSkipRedirect(linkHref)) return;
-          // 存在链接且非中转页
-          if (linkHref && !linkHref.includes(redirectPage)) {
-            // Base64
-            const encodedHref = btoa(linkHref);
-            const redirectLink = `${redirectPage}#url=${encodedHref}`;
-            // 保存原始链接
-            link.setAttribute("original-href", linkHref);
-            // 覆盖 href
-            link.setAttribute("href", redirectLink);
-          }
+        } catch (error) {
+          console.error("处理单条链接时出错：", error);
         }
       });
     } else {
@@ -162,12 +183,12 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
         if (excludeClass.some((className) => classes.includes(className))) {
           return;
         }
-        // 同源 / 白名单域名不走中转
+        // 同源 / 白名单域名 / 非 http(s) 协议不走中转
         if (href && shouldSkipRedirect(href)) return;
         // 存在链接且非中转页
         if (href && !href.includes(redirectPage)) {
           // Base64 编码 href
-          const encodedHref = Buffer.from(href, "utf-8").toString("base64");
+          const encodedHref = toBase64(href);
           // 获取所有属性（排除 href / original-href，稍后单独写入）
           const attributes = el.attribs;
           // 转义属性值中的 HTML 特殊字符

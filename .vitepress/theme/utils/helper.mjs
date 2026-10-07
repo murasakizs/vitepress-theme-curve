@@ -144,10 +144,14 @@ export const copyImage = async (imageURL) => {
         [blob.type]: blob,
       }),
     ]);
-    $message.success("图片已复制到剪贴板");
+    if (typeof $message !== "undefined") {
+      $message.success("图片已复制到剪贴板");
+    }
   } catch (error) {
     console.error("复制图片出错：", error);
-    $message.error("复制图片错误，请重试");
+    if (typeof $message !== "undefined") {
+      $message.error("复制图片错误，请重试");
+    }
   }
 };
 
@@ -160,7 +164,9 @@ export const downloadImage = (imageUrl) => {
     // 获取当前日期并转换为字符串形式，作为文件名
     const date = new Date();
     const timestamp = date.toISOString().replace(/[:.]/g, "-");
-    const imageName = `image-${timestamp}.jpg`;
+    const extMatch = /\.([a-zA-Z0-9]+)(?:[?#]|$)/.exec(imageUrl);
+    const ext = extMatch ? extMatch[1].toLowerCase() : "jpg";
+    const imageName = `image-${timestamp}.${ext}`;
     const anchor = document.createElement("a");
     anchor.download = imageName;
     anchor.href = imageUrl;
@@ -171,7 +177,9 @@ export const downloadImage = (imageUrl) => {
     document.body.removeChild(anchor);
   } catch (error) {
     console.error("下载图片出错：", error);
-    $message.error("下载图片错误，请重试");
+    if (typeof $message !== "undefined") {
+      $message.error("下载图片错误，请重试");
+    }
   }
 };
 

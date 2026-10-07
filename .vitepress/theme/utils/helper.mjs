@@ -11,7 +11,9 @@ export const calculateScroll = throttle(
       const store = mainStore();
       const scrollY = window.scrollY || window.pageYOffset;
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercentage = ((scrollY / totalHeight) * 100).toFixed(0);
+      // 无滚动空间时（内容不足一屏）视为 0%，避免除以 0 得到 NaN/Infinity
+      const raw = totalHeight > 0 ? (scrollY / totalHeight) * 100 : 0;
+      const scrollPercentage = Math.min(Math.max(raw, 0), 100).toFixed(0);
       // 判断滚动方向
       const scrollDirection = scrollY > store.scrollData.height ? "down" : "up";
       // 储存计算结果

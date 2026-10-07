@@ -1,4 +1,3 @@
-import { generateId } from "./commonTools.mjs";
 import { globby } from "globby";
 import matter from "gray-matter";
 import fs from "fs-extra";
@@ -159,7 +158,7 @@ export const getAllPosts = async () => {
               : normalizeList(value));
           // 返回文章对象
           return {
-            id: generateId(item),
+            id: item,
             title: title || "未命名文章",
             date: dateValue,
             lastModified: mtimeMs,

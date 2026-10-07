@@ -140,7 +140,6 @@
 </template>
 
 <script setup>
-import { generateId } from "@/utils/commonTools";
 import { daysPassedAt, formatTimestampAt, useClientNow } from "@/utils/useClientNow.mjs";
 import initFancybox from "@/utils/initFancybox";
 import { ensureCodeFontLoaded } from "@/utils/fontLoader.mjs";
@@ -179,7 +178,7 @@ const { now } = useClientNow();
 
 // 文章 ID
 
-const postId = computed(() => generateId(page.value.relativePath));
+const postId = computed(() => page.value.relativePath);
 
 // 获取对应文章数据
 const postMetaData = computed(() => {

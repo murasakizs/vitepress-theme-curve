@@ -59,43 +59,6 @@ export const smoothScrolling = (target = 0) => {
 };
 
 /**
- * 格式化时间戳为相应的日期格式
- * 如果时间戳表示的时间为7天内，则返回 'n天内'
- * 如果时间戳表示的时间为7天之后但在当年，则返回 '月/日'
- * 如果时间戳表示的时间在当年之前，则返回 '年/月/日'
- * @param {number} timestamp - 时间戳（以毫秒为单位）
- * @return {string} 返回日期格式的字符串
- */
-export const formatTimestamp = (timestamp) => {
-  let now = new Date();
-  // 获取今天0点
-  let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  // 获取昨天0点
-  let yesterday = new Date(today.getTime() - 1000 * 60 * 60 * 24);
-  let targetDate = new Date(timestamp);
-  // 是否为昨天
-  if (targetDate >= yesterday && targetDate < today) {
-    return "1天前";
-  } else {
-    let difference = Math.floor((today - targetDate) / (1000 * 60 * 60 * 24));
-    if (difference <= 0) {
-      return "今日内";
-    } else if (difference < 7) {
-      return `${difference}天前`;
-    } else {
-      let year = targetDate.getFullYear();
-      let month = targetDate.getMonth() + 1;
-      let day = targetDate.getDate();
-      if (year === now.getFullYear()) {
-        return `${month}/${day}`;
-      } else {
-        return `${year}/${month}/${day}`;
-      }
-    }
-  }
-};
-
-/**
  * 计算给定日期与当前日期相差的天数
  * @param {string} dateStr - 要计算差值的日期，为字符串形式
  * @returns {number} 天数差值

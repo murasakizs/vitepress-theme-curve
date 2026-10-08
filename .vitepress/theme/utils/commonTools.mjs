@@ -1,5 +1,10 @@
 import { load } from "cheerio";
 
+// src/href → 加载 Promise。共享加载状态：标签已插入但尚未 load 完成时，
+// 后续调用挂到同一 Promise 上，而不是同步回调（那时全局对象往往还没就绪）。
+const scriptLoads = new Map();
+const styleLoads = new Map();
+
 /**
  * 动态加载脚本
  * @param {string} src - 脚本 URL
@@ -9,35 +14,58 @@ export const loadScript = (src, option = {}) => {
   // 获取配置
   const { async = false, reload = false, callback } = option;
   if (typeof document === "undefined" || !src) {
-    // 早退也必须通知调用方：initComments 这类把 callback 当唯一 settle
-    // 通道的调用点，漏掉这次回调会让外层 Promise 永久 pending
-    callback && callback(new Error(`loadScript: 无效的 src（${src}）或非浏览器环境`));
-    return false;
+    // 早退也要 settle：callback 型调用方拿到具体原因，await 型调用方靠
+    // rejected Promise 拿到同一原因。空 catch 兼容忽略返回值的调用点。
+    const error = new Error(`loadScript: 无效的 src（${src}）或非浏览器环境`);
+    callback && callback(error);
+    const rejected = Promise.reject(error);
+    rejected.catch(() => {});
+    return rejected;
   }
-  // 检查是否已经加载过此脚本
-  const existingScript = document.querySelector(`script[src="${src}"]`);
-  if (existingScript) {
-    if (!reload) {
+  if (reload) {
+    document.querySelector(`script[src="${src}"]`)?.remove();
+    scriptLoads.delete(src);
+  } else if (scriptLoads.has(src)) {
+    // 已在加载或已完成：挂到同一 Promise，绝不走同步回调
+    const pending = scriptLoads.get(src);
+    pending.then(
+      (s) => callback && callback(null, s),
+      (e) => callback && callback(e),
+    );
+    return pending;
+  } else {
+    // 非本模块插入的既有标签，查不到加载状态，保持原同步语义
+    const existingScript = document.querySelector(`script[src="${src}"]`);
+    if (existingScript) {
       callback && callback(null, existingScript);
       return false;
     }
-    existingScript.remove();
   }
   // 创建一个新的script标签并加载
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = src;
     if (async) script.async = true;
-    script.onload = () => {
-      resolve(script);
-      callback && callback(null, script);
-    };
+    script.onload = () => resolve(script);
     script.onerror = (error) => {
+      // 清掉残留标签，否则下次调用会命中死标签、永远无法重试
+      script.remove();
+      // 只清掉自己这一条：若期间发生过 reload，缓存里已是更新的 Promise，
+      // 不能把人家的记录误删，否则新加载会失去共享状态
+      if (scriptLoads.get(src) === promise) scriptLoads.delete(src);
       reject(error);
-      callback && callback(error);
     };
     document.head.appendChild(script);
   });
+  scriptLoads.set(src, promise);
+  // callback-only 的调用方不 await 该 Promise，先挂空 catch 避免 unhandled rejection
+  promise.catch(() => {});
+  if (callback)
+    promise.then(
+      (s) => callback(null, s),
+      (e) => callback(e),
+    );
+  return promise;
 };
 
 /**
@@ -49,35 +77,52 @@ export const loadCSS = (href, option = {}) => {
   // 获取配置
   const { reload = false, callback } = option;
   if (typeof document === "undefined" || !href) {
-    // 与 loadScript 同理：早退也要走 callback，保持 settle 通道完整
-    callback && callback(new Error(`loadCSS: 无效的 href（${href}）或非浏览器环境`));
-    return false;
+    // 与 loadScript 同理：早退也要 settle，保持通道完整
+    const error = new Error(`loadCSS: 无效的 href（${href}）或非浏览器环境`);
+    callback && callback(error);
+    const rejected = Promise.reject(error);
+    rejected.catch(() => {});
+    return rejected;
   }
-  // 检查是否已经加载过此样式表
-  const existingLink = document.querySelector(`link[href="${href}"]`);
-  if (existingLink) {
-    if (!reload) {
+  if (reload) {
+    document.querySelector(`link[href="${href}"]`)?.remove();
+    styleLoads.delete(href);
+  } else if (styleLoads.has(href)) {
+    const pending = styleLoads.get(href);
+    pending.then(
+      (l) => callback && callback(null, l),
+      (e) => callback && callback(e),
+    );
+    return pending;
+  } else {
+    const existingLink = document.querySelector(`link[href="${href}"]`);
+    if (existingLink) {
       callback && callback(null, existingLink);
       return false;
     }
-    existingLink.remove();
   }
   // 创建新的link标签并设置属性
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     const link = document.createElement("link");
     link.href = href;
     link.rel = "stylesheet";
     link.type = "text/css";
-    link.onload = () => {
-      resolve(link);
-      callback && callback(null, link);
-    };
+    link.onload = () => resolve(link);
     link.onerror = (error) => {
+      link.remove();
+      if (styleLoads.get(href) === promise) styleLoads.delete(href);
       reject(error);
-      callback && callback(error);
     };
     document.head.appendChild(link);
   });
+  styleLoads.set(href, promise);
+  promise.catch(() => {});
+  if (callback)
+    promise.then(
+      (l) => callback(null, l),
+      (e) => callback(e),
+    );
+  return promise;
 };
 
 // 始终排除的域名（含子域），这些域名的链接不走中转页

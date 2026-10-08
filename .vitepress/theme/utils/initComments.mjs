@@ -1,5 +1,9 @@
 import { loadScript, loadCSS } from "./commonTools.mjs";
 
+// 库就绪判定：经 globalThis 取值（未定义时是 undefined，不会 ReferenceError），
+// 兼容 object / function 两种导出形态
+const isReady = (lib) => !!lib && typeof lib.init === "function";
+
 const initComments = async (themeConfig) => {
   try {
     // 必要数据
@@ -12,33 +16,16 @@ const initComments = async (themeConfig) => {
         const server = option.artalk.server;
         // 引入资源
         await loadCSS(`${server}/dist/Artalk.css`);
-        return await new Promise((resolve, reject) => {
-          loadScript(`${server}/dist/Artalk.js`, {
-            callback: (error) => {
-              if (error) return reject(error);
-              if (typeof Artalk === "object") {
-                resolve(Artalk);
-              } else {
-                reject(new Error("Artalk 初始化失败"));
-              }
-            },
-          });
-        });
+        await loadScript(`${server}/dist/Artalk.js`);
+        if (isReady(globalThis.Artalk)) return globalThis.Artalk;
+        throw new Error("Artalk 初始化失败");
       }
-      case "twikoo":
+      case "twikoo": {
         // 引入资源
-        return await new Promise((resolve, reject) => {
-          loadScript(option.twikoo.js, {
-            callback: (error) => {
-              if (error) return reject(error);
-              if (typeof twikoo === "object") {
-                resolve(twikoo);
-              } else {
-                reject(new Error("Twikoo 初始化失败"));
-              }
-            },
-          });
-        });
+        await loadScript(option.twikoo.js);
+        if (isReady(globalThis.twikoo)) return globalThis.twikoo;
+        throw new Error("Twikoo 初始化失败");
+      }
       default:
         return false;
     }

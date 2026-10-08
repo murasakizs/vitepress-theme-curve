@@ -41,6 +41,7 @@
 
 <script setup>
 import { useIsMobileLayout } from "@/utils/layout.js";
+import { lockBodyScroll, unlockBodyScroll } from "@/utils/commonTools.mjs";
 
 const isMobileLayout = useIsMobileLayout();
 
@@ -175,13 +176,19 @@ const onTouchEnd = () => {
   isDragging = false;
 };
 
-// 监听开启
+// 监听开启（引用计数，多弹窗并发时不会互相踩踏）
 watch(
   () => props.show,
-  (val) => {
-    document.body.style.overflowY = val ? "hidden" : "";
+  (val, oldVal) => {
+    if (val === oldVal) return;
+    if (val) lockBodyScroll();
+    else if (oldVal) unlockBodyScroll();
   },
+  { immediate: true },
 );
+onUnmounted(() => {
+  if (props.show) unlockBodyScroll();
+});
 </script>
 
 <style lang="scss" scoped>

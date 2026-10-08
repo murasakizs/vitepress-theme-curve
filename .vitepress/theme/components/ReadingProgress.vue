@@ -84,7 +84,12 @@ const saveReadingData = () => {
   const postId = route.path;
   if (!postId) return;
 
-  const readingData = JSON.parse(localStorage.getItem("readingData") || "{}");
+  let readingData = {};
+  try {
+    readingData = JSON.parse(localStorage.getItem("readingData") || "{}") || {};
+  } catch {
+    readingData = {};
+  }
   readingData[postId] = {
     scrollPercent: Math.round(scrollPercent.value),
     readingTime: Math.floor(totalReadingTime.value),
@@ -109,7 +114,12 @@ const loadReadingData = () => {
   const postId = route.path;
   if (!postId) return null;
 
-  const readingData = JSON.parse(localStorage.getItem("readingData") || "{}");
+  let readingData = {};
+  try {
+    readingData = JSON.parse(localStorage.getItem("readingData") || "{}") || {};
+  } catch {
+    readingData = {};
+  }
   return readingData[postId] || null;
 };
 

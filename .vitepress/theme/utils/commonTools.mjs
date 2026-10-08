@@ -254,3 +254,20 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
     console.error("处理链接时出错：", error);
   }
 };
+
+// body 滚动锁引用计数（多弹窗并发时互相踩踏）
+let bodyScrollLockCount = 0;
+
+export const lockBodyScroll = () => {
+  bodyScrollLockCount += 1;
+  if (bodyScrollLockCount === 1 && typeof document !== "undefined") {
+    document.body.style.overflowY = "hidden";
+  }
+};
+
+export const unlockBodyScroll = () => {
+  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+  if (bodyScrollLockCount === 0 && typeof document !== "undefined") {
+    document.body.style.overflowY = "";
+  }
+};

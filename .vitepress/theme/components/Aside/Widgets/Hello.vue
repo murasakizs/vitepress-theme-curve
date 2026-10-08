@@ -68,8 +68,13 @@ const isHasUser = () => {
   // 检查本地存储
   const userData = localStorage.getItem("ArtalkUser");
   if (!userData) return false;
-  // 获取用户数据
-  const { nick } = JSON.parse(userData);
+  let nick;
+  try {
+    ({ nick } = JSON.parse(userData) || {});
+  } catch {
+    return false;
+  }
+  if (!nick) return false;
   const hello = ["很高兴见到你", "好久不见", "欢迎回来"];
   // 随机问候语
   helloText.value = hello[Math.floor(Math.random() * hello.length)] + "，" + nick;

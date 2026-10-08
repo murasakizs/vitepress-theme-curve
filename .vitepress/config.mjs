@@ -117,7 +117,8 @@ export default withPwa(
     // transformPageData
     transformPageData: async (pageData) => {
       // canonical URL
-      const canonicalUrl = `${themeConfig.siteMeta.site}/${pageData.relativePath}`
+      const siteRoot = themeConfig.siteMeta.site.replace(/\/+$/, "");
+      const canonicalUrl = `${siteRoot}/${pageData.relativePath}`
         .replace(/index\.md$/, "")
         .replace(/\.md$/, "");
       // ⚠️ 这里不能 `head.push(...)`：

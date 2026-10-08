@@ -370,7 +370,8 @@ const rightMenuFunc = async (type) => {
         window.open(clickedTypeData.value?.href);
         break;
       case "copy-link":
-        const pageLink = theme.value?.siteMeta?.site + router.route.path;
+        const pageLink =
+          (theme.value?.siteMeta?.site || "").replace(/\/+$/, "") + router.route.path;
         if (!pageLink) {
           $message.error("复制失败：无法获取页面地址");
           return;

@@ -82,7 +82,7 @@
             </div>
             <!-- 输入框 -->
             <div
-              v-if="clickedType === 'input' && typeof clickedTypeData.value === 'string'"
+              v-if="clickedType === 'input' && typeof clickedTypeData?.value === 'string'"
               class="btn"
               @click="rightMenuFunc('input-paste')"
             >

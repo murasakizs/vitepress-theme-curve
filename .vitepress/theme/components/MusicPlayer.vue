@@ -540,30 +540,42 @@ const seekTo = (clientX) => {
   currentTime.value = audioRef.value.currentTime;
 };
 
+let cleanupDrag = null;
+
+const endDrag = () => {
+  isDragging.value = false;
+  if (cleanupDrag) {
+    cleanupDrag();
+    cleanupDrag = null;
+  }
+};
+
 const onProgressMouseDown = (e) => {
+  endDrag();
   isDragging.value = true;
   seekTo(e.clientX);
-  const onMouseMove = (e) => seekTo(e.clientX);
-  const onMouseUp = () => {
-    isDragging.value = false;
+  const onMouseMove = (ev) => seekTo(ev.clientX);
+  const onMouseUp = () => endDrag();
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
+  cleanupDrag = () => {
     document.removeEventListener("mousemove", onMouseMove);
     document.removeEventListener("mouseup", onMouseUp);
   };
-  document.addEventListener("mousemove", onMouseMove);
-  document.addEventListener("mouseup", onMouseUp);
 };
 
 const onProgressTouchStart = (e) => {
+  endDrag();
   isDragging.value = true;
   seekTo(e.touches[0].clientX);
-  const onTouchMove = (e) => seekTo(e.touches[0].clientX);
-  const onTouchEnd = () => {
-    isDragging.value = false;
+  const onTouchMove = (ev) => seekTo(ev.touches[0].clientX);
+  const onTouchEnd = () => endDrag();
+  document.addEventListener("touchmove", onTouchMove);
+  document.addEventListener("touchend", onTouchEnd);
+  cleanupDrag = () => {
     document.removeEventListener("touchmove", onTouchMove);
     document.removeEventListener("touchend", onTouchEnd);
   };
-  document.addEventListener("touchmove", onTouchMove);
-  document.addEventListener("touchend", onTouchEnd);
 };
 
 // Audio 事件
@@ -648,6 +660,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  endDrag();
   if (observer) observer.disconnect();
   if (audioRef.value) {
     audioRef.value.pause();

@@ -93,6 +93,8 @@ let fontSwitchTaskId = 0;
 const importCheckVisible = ref(false);
 const importCheckCountdown = ref(10);
 let importCheckTimer = null;
+// 保留同一 MediaQueryList 实例，卸载时才能移除 change 监听
+let colorSchemeMql = null;
 
 //2025.06.12更新：在 Next.js 的服务端渲染过程中，应用会在服务器端先进行渲染
 //而在服务器端的 JavaScript 环境中，并没有浏览器提供的 window 对象。
@@ -308,7 +310,8 @@ onMounted(() => {
   // 复制监听
   window.addEventListener("copy", copyTip);
   // 监听系统颜色
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", changeSiteThemeType);
+  colorSchemeMql = window.matchMedia("(prefers-color-scheme: dark)");
+  colorSchemeMql.addEventListener("change", changeSiteThemeType);
   // 检查是否需要显示导入后检查弹窗
   if (localStorage.getItem("importJustCompleted") === "true") {
     startImportCheck();
@@ -318,6 +321,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("scroll", calculateScroll);
   window.removeEventListener("contextmenu", openRightMenu);
+  window.removeEventListener("copy", copyTip);
+  colorSchemeMql?.removeEventListener("change", changeSiteThemeType);
+  colorSchemeMql = null;
   clearInterval(importCheckTimer);
 });
 </script>

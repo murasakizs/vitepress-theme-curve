@@ -37,6 +37,22 @@ class Cursor {
     };
     this.pt = [];
     this.currentThemeType = "auto";
+    this.rafId = null;
+
+    // 稳定的 handler 引用：refresh()/destroy() 需用同一引用精确解绑
+    this.handleMouseMove = (e) => {
+      this.pos.curr == null && this.move(e.clientX - 8, e.clientY - 8);
+      this.pos.curr = {
+        x: e.clientX - 8,
+        y: e.clientY - 8,
+      };
+      this.cursor.classList.remove("hidden");
+      this.render();
+    };
+    this.handleMouseEnter = () => this.cursor.classList.remove("hidden");
+    this.handleMouseLeave = () => this.cursor.classList.add("hidden");
+    this.handleMouseDown = () => this.cursor.classList.add("active");
+    this.handleMouseUp = () => this.cursor.classList.remove("active");
 
     // 所有 DOM 操作和事件绑定都在 create/init 中处理，这些方法会包含环境检查
     this.create();
@@ -76,7 +92,8 @@ class Cursor {
     }
 
     var el = document.getElementsByTagName("*");
-    for (let i = 0; i < el.length; i++) if (getStyle(el[i], "cursor") == "pointer") this.pt.push(el[i].outerHTML);
+    for (let i = 0; i < el.length; i++)
+      if (getStyle(el[i], "cursor") == "pointer") this.pt.push(el[i].outerHTML);
 
     if (!this.scr) {
       document.body.appendChild((this.scr = document.createElement("style")));
@@ -150,8 +167,38 @@ class Cursor {
     }
   }
 
+  cancelRender() {
+    if (this.rafId != null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+  }
+
+  unbindEvents() {
+    if (typeof document === "undefined") return;
+    document.removeEventListener("mousemove", this.handleMouseMove);
+    document.removeEventListener("mouseenter", this.handleMouseEnter);
+    document.removeEventListener("mouseleave", this.handleMouseLeave);
+    document.removeEventListener("mousedown", this.handleMouseDown);
+    document.removeEventListener("mouseup", this.handleMouseUp);
+  }
+
+  destroy() {
+    this.cancelRender();
+    if (typeof document === "undefined") return;
+
+    this.unbindEvents();
+    this.cursor?.remove();
+    this.scr?.remove();
+    this.cursor = null;
+    this.scr = null;
+  }
+
   refresh() {
     if (typeof document === "undefined") return; // 确保在客户端
+
+    // 重跑 create/init/render 前必须掐掉旧 RAF，否则多条渲染循环叠加
+    this.cancelRender();
 
     // 移动端在 init() 里会提前 return，this.scr 可能尚未创建；
     // 桌面端则必须先置空，否则 create() 里的 `if (!this.scr)` 为假，
@@ -178,19 +225,13 @@ class Cursor {
       return;
     }
 
-    document.onmousemove = (e) => {
-      this.pos.curr == null && this.move(e.clientX - 8, e.clientY - 8);
-      this.pos.curr = {
-        x: e.clientX - 8,
-        y: e.clientY - 8,
-      };
-      this.cursor.classList.remove("hidden");
-      this.render();
-    };
-    document.onmouseenter = () => this.cursor.classList.remove("hidden");
-    document.onmouseleave = () => this.cursor.classList.add("hidden");
-    document.onmousedown = () => this.cursor.classList.add("active");
-    document.onmouseup = () => this.cursor.classList.remove("active");
+    // 先摘掉旧监听，保证 refresh() 重复 init 时不会叠加
+    this.unbindEvents();
+    document.addEventListener("mousemove", this.handleMouseMove);
+    document.addEventListener("mouseenter", this.handleMouseEnter);
+    document.addEventListener("mouseleave", this.handleMouseLeave);
+    document.addEventListener("mousedown", this.handleMouseDown);
+    document.addEventListener("mouseup", this.handleMouseUp);
   }
 
   render() {
@@ -208,8 +249,12 @@ class Cursor {
     } else {
       this.pos.prev = this.pos.curr;
     }
-    if (!isEqual(this.pos.curr, this.pos.prev)) {
-      requestAnimationFrame(() => this.render());
+    // 仅在收敛未完成且没有待执行帧时续期，保证同一时刻只有一条 RAF 链
+    if (!isEqual(this.pos.curr, this.pos.prev) && this.rafId == null) {
+      this.rafId = requestAnimationFrame(() => {
+        this.rafId = null;
+        this.render();
+      });
     }
   }
 }

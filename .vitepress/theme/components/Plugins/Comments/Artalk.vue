@@ -21,12 +21,15 @@ const { comment } = theme.value;
 // 评论数据
 const artalk = ref(null);
 const commentRef = ref(null);
+// initArtalk 的 await 期间组件可能已卸载，置位以中止 init，避免实例无法销毁
+let unmounted = false;
 
 // 初始化 Artalk
 const initArtalk = async () => {
   try {
     await nextTick();
     const Artalk = await initComments(theme.value);
+    if (unmounted) return;
     artalk.value = Artalk.init({
       el: commentRef.value || "#comment-dom",
       locale: "auto",
@@ -82,6 +85,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  unmounted = true;
   artalk.value?.destroy();
 });
 </script>

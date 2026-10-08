@@ -120,6 +120,7 @@ const currentLyrics = ref([]);
 const activeLyricIndex = ref(-1);
 const userScrolling = ref(false);
 let followResumeTimer = null;
+let disposed = false;
 
 // 随机轮播
 const rotatePhase = ref("");
@@ -249,13 +250,16 @@ const resolveAudioUrl = async (rawUrl) => {
 };
 
 // 用户交互后备：浏览器阻止自动播放时，等待用户首次交互后播放
+let autoPlayInteractionHandler = null;
 const tryAutoPlayOnInteraction = () => {
   if (!playerAutoPlay.value || hasPlayed.value) return;
   const handler = () => {
     safePlay();
     document.removeEventListener("click", handler);
     document.removeEventListener("keydown", handler);
+    autoPlayInteractionHandler = null;
   };
+  autoPlayInteractionHandler = handler;
   document.addEventListener("click", handler, { once: true });
   document.addEventListener("keydown", handler, { once: true });
 };
@@ -269,6 +273,8 @@ const initAPlayer = async (list) => {
     const APlayer = module.default;
     // 先解析首曲，避免 APlayer 挂载后 audio.src 仍为空
     if (playlistData[0]?.url) await resolveAudioUrl(playlistData[0].url);
+    // 卸载后 import/解析可能才完成，避免往空容器挂播放器
+    if (disposed || !playerDom.value) return false;
     player.value = new APlayer({
       container: playerDom.value,
       volume: playerVolume.value,
@@ -601,8 +607,15 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  disposed = true;
   stopRotate();
   clearTimeout(followResumeTimer);
+  clearTimeout(musicSourceTimer);
+  if (autoPlayInteractionHandler) {
+    document.removeEventListener("click", autoPlayInteractionHandler);
+    document.removeEventListener("keydown", autoPlayInteractionHandler);
+    autoPlayInteractionHandler = null;
+  }
   player.value?.destroy();
 });
 </script>

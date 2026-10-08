@@ -35,6 +35,7 @@ const router = useRouter();
 // 摘要数据
 const loading = ref(true);
 const waitTimeOut = ref(null);
+let typeTimer = null;
 const abstractData = ref("");
 const showIndex = ref(0);
 const showType = ref(false);
@@ -48,7 +49,7 @@ const typeWriter = (text = null) => {
       abstractData.value += data.charAt(showIndex.value++);
       // 生成字符延迟
       const delay = Math.random() * (150 - 30) + 30;
-      setTimeout(() => {
+      typeTimer = setTimeout(() => {
         typeWriter(text);
       }, delay);
     } else {
@@ -95,6 +96,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   clearTimeout(waitTimeOut.value);
+  clearTimeout(typeTimer);
 });
 </script>
 

@@ -85,6 +85,10 @@ onMounted(() => {
   fetchData();
   window.addEventListener("resize", calcHeight);
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", calcHeight);
+});
 </script>
 
 <style lang="scss" scoped>

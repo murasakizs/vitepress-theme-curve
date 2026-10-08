@@ -6,14 +6,16 @@ const initComments = async (themeConfig) => {
     const option = themeConfig.comment;
     const commentType = option.type;
     if (!option.enable) return false;
-    const server = option[commentType].server;
     switch (commentType) {
-      case "artalk":
+      case "artalk": {
+        // 只有 artalk 用 server；提到 case 内避免 type 拼错时在 switch 之前就抛
+        const server = option.artalk.server;
         // 引入资源
         await loadCSS(`${server}/dist/Artalk.css`);
         return await new Promise((resolve, reject) => {
           loadScript(`${server}/dist/Artalk.js`, {
-            callback: () => {
+            callback: (error) => {
+              if (error) return reject(error);
               if (typeof Artalk === "object") {
                 resolve(Artalk);
               } else {
@@ -22,11 +24,13 @@ const initComments = async (themeConfig) => {
             },
           });
         });
+      }
       case "twikoo":
         // 引入资源
         return await new Promise((resolve, reject) => {
-          loadScript(option[commentType].js, {
-            callback: () => {
+          loadScript(option.twikoo.js, {
+            callback: (error) => {
+              if (error) return reject(error);
               if (typeof twikoo === "object") {
                 resolve(twikoo);
               } else {

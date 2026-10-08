@@ -6,9 +6,14 @@ import { load } from "cheerio";
  * * @param {object} option - 配置
  */
 export const loadScript = (src, option = {}) => {
-  if (typeof document === "undefined" || !src) return false;
   // 获取配置
   const { async = false, reload = false, callback } = option;
+  if (typeof document === "undefined" || !src) {
+    // 早退也必须通知调用方：initComments 这类把 callback 当唯一 settle
+    // 通道的调用点，漏掉这次回调会让外层 Promise 永久 pending
+    callback && callback(new Error(`loadScript: 无效的 src（${src}）或非浏览器环境`));
+    return false;
+  }
   // 检查是否已经加载过此脚本
   const existingScript = document.querySelector(`script[src="${src}"]`);
   if (existingScript) {
@@ -41,9 +46,13 @@ export const loadScript = (src, option = {}) => {
  * @param {object} option - 配置
  */
 export const loadCSS = (href, option = {}) => {
-  if (typeof document === "undefined" || !href) return false;
   // 获取配置
   const { reload = false, callback } = option;
+  if (typeof document === "undefined" || !href) {
+    // 与 loadScript 同理：早退也要走 callback，保持 settle 通道完整
+    callback && callback(new Error(`loadCSS: 无效的 href（${href}）或非浏览器环境`));
+    return false;
+  }
   // 检查是否已经加载过此样式表
   const existingLink = document.querySelector(`link[href="${href}"]`);
   if (existingLink) {

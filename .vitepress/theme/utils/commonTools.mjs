@@ -60,11 +60,10 @@ export const loadScript = (src, option = {}) => {
   scriptLoads.set(src, promise);
   // callback-only 的调用方不 await 该 Promise，先挂空 catch 避免 unhandled rejection
   promise.catch(() => {});
-  if (callback)
-    promise.then(
+  if (callback) { promise.then(
       (s) => callback(null, s),
       (e) => callback(e),
-    );
+    ); }
   return promise;
 };
 
@@ -117,11 +116,10 @@ export const loadCSS = (href, option = {}) => {
   });
   styleLoads.set(href, promise);
   promise.catch(() => {});
-  if (callback)
-    promise.then(
+  if (callback) { promise.then(
       (l) => callback(null, l),
       (e) => callback(e),
-    );
+    ); }
   return promise;
 };
 

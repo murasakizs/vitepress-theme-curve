@@ -45,7 +45,7 @@ VitePress blog theme (Vue 3 + Pinia + SCSS). Single package, no monorepo (`pnpm-
 ## Build gotchas
 
 - **Production build strips `console.log`** (terser `pure_funcs`) — debug logging won't appear in `pnpm build` output; use `console.warn`/`error` or `pnpm dev`.
-- **gray-matter caches by file content**: byte-identical `.md` files (`page.md`, `page/index.md`, `page/1.md`, `pages/index.md`) share one `frontmatter` object. `transformPageData` whitelists + rebuilds `head` per page for this reason — **never `push` into `pageData.frontmatter.head`** or canonical tags will accumulate across pages again.
+- **gray-matter caches by file content**: byte-identical `.md` files (`page.md`, `page/index.md`, `page/1.md`, `pages/index.md`) share one `head` array. `transformPageData` rebuilds `head` per page (replace the reference, never mutate) and keeps user-defined frontmatter head items — **never `push` into `pageData.frontmatter.head`** or canonical tags will accumulate across pages again. Do not reintroduce a meta-refresh-only whitelist; that silently drops custom `frontmatter.head` entries.
 - Sitemap deliberately **excludes the redirect shells** `/page`, `/page/1`, `/pages` (see `transformItems` + `removeRedirectPagesFromSitemap` in `config.mjs`). Don't "fix" this.
 - VitePress 1.6.4 emits a broken empty `vp-icons.css` preload — `transformHtml` strips it; keep that workaround.
 - Dev server exposes `POST /api/theme-config` that regex-rewrites `.vitepress/theme/store/index.js` (version-bump tooling) — don't be surprised by dev-server file mutations.

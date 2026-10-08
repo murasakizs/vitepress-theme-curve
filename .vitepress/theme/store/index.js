@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import cursorInit from "@/utils/cursor.js";
+import { PERSIST_PATHS } from "@/utils/configKeys.mjs";
 
 let appCursorInstance;
 const isMobile =
@@ -423,68 +424,11 @@ export const mainStore = defineStore("main", {
       }
     },
   },
-  // 数据持久化
+  // 数据持久化（键列表见 utils/configKeys.mjs，与配置导入/导出共用）
   persist: [
     {
       key: "siteData",
-      paths: [
-        "themeType",
-        "themeColor",
-        "bannerType",
-        "useRightMenu",
-        "useCustomCursor",
-        "playerShow",
-        "playerAutoPlay",
-        "playerPlayMode",
-        "playerMusicSource",
-        "playerCustomIds",
-        "playerVolume",
-        "islandPlayerSupport",
-        "islandStyle",
-        "backgroundBlur",
-        "backgroundType",
-        "fontFamily",
-        "fontSize",
-        "fontSizePending",
-        "infoPosition",
-        "backgroundUrl",
-        "showMoreSettings",
-        "showMoreSettingsConfirmed",
-        "highContrast",
-        "siteLayout",
-        "siteLayoutPending",
-        "lastSiteLayout",
-        "messageStyle",
-        "messagePosition",
-        "progressDirection",
-        "messageDuration",
-        "islandMode",
-        "islandUseThemeColor",
-        "islandShowSeconds",
-        "islandShowDate",
-        "customThemeEnabled",
-        "customPrimaryColor",
-        "customSecondaryColor",
-        "lastCustomPrimaryColor",
-        "lastCustomSecondaryColor",
-        "customThemeBeforeHighContrast",
-        "removeAnimations",
-        "pwaCacheEnabled",
-        "pwaCacheLimit",
-        "readingProgressEnabled",
-        "imageWebpEnabled",
-        "weatherProvider",
-        "weatherLocationMode",
-        "weatherManualCity",
-        "weatherWidgetEnabled",
-        "scheduledThemeEnabled",
-        "scheduledLightTime",
-        "scheduledDarkTime",
-        "siteVersion",
-        "siteVersionDate",
-        "branchVersion",
-        "branchBuildTime",
-      ],
+      paths: PERSIST_PATHS,
     },
   ],
 });

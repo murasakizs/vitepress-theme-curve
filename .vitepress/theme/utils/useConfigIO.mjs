@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import { PORTABLE_CONFIG_KEYS } from "./configKeys.mjs";
 
 // 混淆编码
 const obfuscate = (str) => {
@@ -24,47 +25,36 @@ const deobfuscate = (str) => {
     .join("");
 };
 
-// 有效配置键（与 store persist paths 对齐）
-const VALID_CONFIG_KEYS = [
-  "themeType",
-  "themeColor",
-  "bannerType",
-  "useRightMenu",
-  "useCustomCursor",
-  "playerShow",
-  "playerVolume",
-  "backgroundBlur",
-  "backgroundType",
-  "fontFamily",
-  "fontSize",
-  "infoPosition",
-  "backgroundUrl",
-  "highContrast",
-  "siteLayout",
-  "messageStyle",
-  "messagePosition",
-  "progressDirection",
-  "messageDuration",
-  "islandMode",
-  "islandUseThemeColor",
-  "islandShowSeconds",
-  "islandShowDate",
-  "islandPlayerSupport",
-  "islandStyle",
-  "customThemeEnabled",
-  "customPrimaryColor",
-  "customSecondaryColor",
-  "removeAnimations",
-  "showMoreSettings",
-  "scheduledThemeEnabled",
-  "scheduledLightTime",
-  "scheduledDarkTime",
-  "devFeaturesExpanded",
-  "pwaCacheEnabled",
-  "pwaCacheLimit",
-  "readingProgressEnabled",
-  "imageWebpEnabled",
-];
+// "V1.10" / "1.10.2" → [1, 10, 2]
+const parseVersionParts = (input) => {
+  const parts = String(input ?? "")
+    .replace(/^[Vv]/, "")
+    .split(".")
+    .map((n) => parseInt(n, 10) || 0);
+  return [parts[0] || 0, parts[1] || 0, parts[2] || 0];
+};
+
+const compareVersions = (a, b) => {
+  const pa = parseVersionParts(a);
+  const pb = parseVersionParts(b);
+  for (let i = 0; i < 3; i++) {
+    if (pa[i] !== pb[i]) return pa[i] - pb[i];
+  }
+  return 0;
+};
+
+// 旧导出格式把 V/. 剥掉后 parseInt（"V1.10" → 110），仅用于旧文件的就近比较
+const legacyVersionNumber = (input) => parseInt(String(input).replace(/[Vv.]/g, ""), 10) || 10;
+
+const pickPortable = (config) => {
+  const filtered = {};
+  for (const key of PORTABLE_CONFIG_KEYS) {
+    if (config[key] !== undefined) {
+      filtered[key] = config[key];
+    }
+  }
+  return filtered;
+};
 
 /**
  * 配置导入/导出 composable
@@ -77,8 +67,6 @@ export const useConfigIO = (siteVersion = "V1.0") => {
   const importWarnType = ref(""); // "high" | "low"
   const pendingImportConfig = ref(null);
 
-  const getCurrentVersion = () => parseInt(siteVersion.replace(/[Vv.]/g, ""), 10) || 10;
-
   const handleExportConfig = () => {
     try {
       const siteData = localStorage.getItem("siteData");
@@ -88,11 +76,10 @@ export const useConfigIO = (siteVersion = "V1.0") => {
         }
         return;
       }
-      const parsed = JSON.parse(siteData);
       const exportData = {
-        version: getCurrentVersion(),
+        version: siteVersion,
         timestamp: new Date().toISOString(),
-        config: parsed,
+        config: pickPortable(JSON.parse(siteData)),
       };
       const encoded = obfuscate(JSON.stringify(exportData));
       const blob = new Blob([encoded], { type: "text/plain" });
@@ -134,15 +121,21 @@ export const useConfigIO = (siteVersion = "V1.0") => {
           data = JSON.parse(content);
         }
         const importVersion = data.version;
-        const currentVersion = getCurrentVersion();
+        // 新格式存版本字符串；旧格式存坏编码的数字，走 legacy 通道
+        const diff =
+          typeof importVersion === "string"
+            ? compareVersions(importVersion, siteVersion)
+            : typeof importVersion === "number"
+              ? importVersion - legacyVersionNumber(siteVersion)
+              : 0;
         // 检查版本号
-        if (typeof importVersion === "number" && importVersion > currentVersion) {
+        if (diff > 0) {
           pendingImportConfig.value = data;
           importWarnType.value = "high";
           importWarnVisible.value = true;
           return;
         }
-        if (typeof importVersion === "number" && importVersion < currentVersion) {
+        if (diff < 0) {
           pendingImportConfig.value = data;
           importWarnType.value = "low";
           importWarnVisible.value = true;
@@ -164,12 +157,7 @@ export const useConfigIO = (siteVersion = "V1.0") => {
   const applyImportConfig = (data) => {
     try {
       const config = data.config || data;
-      const filtered = {};
-      for (const key of VALID_CONFIG_KEYS) {
-        if (config[key] !== undefined) {
-          filtered[key] = config[key];
-        }
-      }
+      const filtered = pickPortable(config);
       localStorage.setItem("siteData", JSON.stringify(filtered));
       if (typeof $message !== "undefined") {
         $message.success("配置已导入，页面将刷新以应用设置", { duration: 3000 });

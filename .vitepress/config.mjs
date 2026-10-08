@@ -270,6 +270,71 @@ export default withPwa(
             });
           },
         },
+        {
+          // 本地 dev 没有 Vercel/CF Functions，补一个与 api/music-url.ts 同口径的解析端点
+          name: "music-url-api",
+          configureServer(server) {
+            server.middlewares.use("/api/music-url", async (req, res) => {
+              if (req.method !== "GET") {
+                res.statusCode = 405;
+                res.end("Method Not Allowed");
+                return;
+              }
+              const reqUrl = new URL(req.url || "", "http://localhost");
+              const raw = reqUrl.searchParams.get("url") || "";
+              const ALLOWED_HOSTS = new Set([
+                "meting.20091010.xyz",
+                "meting.20100907.xyz",
+                "music.163.com",
+              ]);
+              const ALLOWED_SUFFIXES = [".music.126.net", ".music.163.com"];
+              const isAllowedUrl = (value) => {
+                try {
+                  const u = new URL(value);
+                  if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+                  const host = u.hostname.toLowerCase();
+                  return ALLOWED_HOSTS.has(host) || ALLOWED_SUFFIXES.some((s) => host.endsWith(s))
+                    ? u
+                    : null;
+                } catch {
+                  return null;
+                }
+              };
+              res.setHeader("Content-Type", "application/json");
+              if (!raw) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: "missing url" }));
+                return;
+              }
+              try {
+                let current = isAllowedUrl(raw);
+                if (!current) throw new Error("URL not allowed");
+                for (let i = 0; i < 5; i++) {
+                  const hop = await fetch(current.toString(), {
+                    method: "GET",
+                    redirect: "manual",
+                    signal: AbortSignal.timeout(5000),
+                    headers: { "User-Agent": "Mozilla/5.0" },
+                  });
+                  if (hop.status >= 300 && hop.status < 400) {
+                    const loc = hop.headers.get("location");
+                    if (!loc) break;
+                    const next = isAllowedUrl(new URL(loc, current).toString());
+                    if (!next) throw new Error("redirect target not allowed");
+                    current = next;
+                    continue;
+                  }
+                  break;
+                }
+                const url = current.toString().replace(/^http:\/\//i, "https://");
+                res.end(JSON.stringify({ url }));
+              } catch (e) {
+                res.statusCode = 502;
+                res.end(JSON.stringify({ error: e.message || "resolve failed" }));
+              }
+            });
+          },
+        },
       ],
       resolve: {
         // 配置路径别名
@@ -309,9 +374,10 @@ export default withPwa(
         cleanupOutdatedCaches: true,
         // 运行时缓存策略
         runtimeCaching: [
-          // API 请求 - 网络优先
+          // API 请求 - 网络优先（仅同源；跨域 Meting 等不得被拦截，
+          // 其 pathname 也是 /api/，且 type=url 为 302 跳转链，进 SW 会 no-response）
           {
-            urlPattern: ({ url }) => url.pathname.startsWith("/api/"),
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/api/"),
             handler: "NetworkFirst",
             options: {
               cacheName: "api-cache",
@@ -324,7 +390,7 @@ export default withPwa(
           },
           // 文章页面 - 网络优先，离线回退缓存
           {
-            urlPattern: /\.html$/i,
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\.html$/i.test(url.pathname),
             handler: "NetworkFirst",
             options: {
               cacheName: "html-cache",
@@ -337,7 +403,8 @@ export default withPwa(
           },
           // VitePress 生成的页面路由（cleanUrls 模式，排除根级带点文件）
           {
-            urlPattern: ({ url }) =>
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin &&
               /^\/[^/]+\/?$/.test(url.pathname) &&
               !/\.(?:js|mjs|css|map|json|txt|xml|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|webmanifest)$/i.test(
                 url.pathname,
@@ -354,7 +421,8 @@ export default withPwa(
           },
           // 文章详情页路由（排除静态资源后缀）
           {
-            urlPattern: ({ url }) =>
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin &&
               /^\/[^/]+\/.+/.test(url.pathname) &&
               !/\.(?:js|mjs|css|map|json|txt|xml|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|webmanifest)$/i.test(
                 url.pathname,

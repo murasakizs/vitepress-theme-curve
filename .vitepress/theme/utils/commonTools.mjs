@@ -1,20 +1,9 @@
 import { load } from "cheerio";
 
-/**
- * 从文件名生成数字 ID
- * @param {string} fileName - 文件名
- * @returns {number} - 生成的数字ID
- */
-export const generateId = (fileName) => {
-  // 将文件名转换为哈希值
-  let hash = 0;
-  for (let i = 0; i < fileName.length; i++) {
-    hash = (hash << 5) - hash + fileName.charCodeAt(i);
-  }
-  // 将哈希值转换为正整数
-  const numericId = Math.abs(hash % 10000000000);
-  return numericId;
-};
+// src/href → 加载 Promise。共享加载状态：标签已插入但尚未 load 完成时，
+// 后续调用挂到同一 Promise 上，而不是同步回调（那时全局对象往往还没就绪）。
+const scriptLoads = new Map();
+const styleLoads = new Map();
 
 /**
  * 动态加载脚本
@@ -22,33 +11,61 @@ export const generateId = (fileName) => {
  * * @param {object} option - 配置
  */
 export const loadScript = (src, option = {}) => {
-  if (typeof document === "undefined" || !src) return false;
   // 获取配置
   const { async = false, reload = false, callback } = option;
-  // 检查是否已经加载过此脚本
-  const existingScript = document.querySelector(`script[src="${src}"]`);
-  if (existingScript) {
-    if (!reload) {
+  if (typeof document === "undefined" || !src) {
+    // 早退也要 settle：callback 型调用方拿到具体原因，await 型调用方靠
+    // rejected Promise 拿到同一原因。空 catch 兼容忽略返回值的调用点。
+    const error = new Error(`loadScript: 无效的 src（${src}）或非浏览器环境`);
+    callback && callback(error);
+    const rejected = Promise.reject(error);
+    rejected.catch(() => {});
+    return rejected;
+  }
+  if (reload) {
+    document.querySelector(`script[src="${src}"]`)?.remove();
+    scriptLoads.delete(src);
+  } else if (scriptLoads.has(src)) {
+    // 已在加载或已完成：挂到同一 Promise，绝不走同步回调
+    const pending = scriptLoads.get(src);
+    pending.then(
+      (s) => callback && callback(null, s),
+      (e) => callback && callback(e),
+    );
+    return pending;
+  } else {
+    // 非本模块插入的既有标签，查不到加载状态，保持原同步语义
+    const existingScript = document.querySelector(`script[src="${src}"]`);
+    if (existingScript) {
       callback && callback(null, existingScript);
       return false;
     }
-    existingScript.remove();
   }
   // 创建一个新的script标签并加载
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = src;
     if (async) script.async = true;
-    script.onload = () => {
-      resolve(script);
-      callback && callback(null, script);
-    };
+    script.onload = () => resolve(script);
     script.onerror = (error) => {
+      // 清掉残留标签，否则下次调用会命中死标签、永远无法重试
+      script.remove();
+      // 只清掉自己这一条：若期间发生过 reload，缓存里已是更新的 Promise，
+      // 不能把人家的记录误删，否则新加载会失去共享状态
+      if (scriptLoads.get(src) === promise) scriptLoads.delete(src);
       reject(error);
-      callback && callback(error);
     };
     document.head.appendChild(script);
   });
+  scriptLoads.set(src, promise);
+  // callback-only 的调用方不 await 该 Promise，先挂空 catch 避免 unhandled rejection
+  promise.catch(() => {});
+  if (callback)
+    promise.then(
+      (s) => callback(null, s),
+      (e) => callback(e),
+    );
+  return promise;
 };
 
 /**
@@ -57,34 +74,89 @@ export const loadScript = (src, option = {}) => {
  * @param {object} option - 配置
  */
 export const loadCSS = (href, option = {}) => {
-  if (typeof document === "undefined" || !href) return false;
   // 获取配置
   const { reload = false, callback } = option;
-  // 检查是否已经加载过此样式表
-  const existingLink = document.querySelector(`link[href="${href}"]`);
-  if (existingLink) {
-    if (!reload) {
+  if (typeof document === "undefined" || !href) {
+    // 与 loadScript 同理：早退也要 settle，保持通道完整
+    const error = new Error(`loadCSS: 无效的 href（${href}）或非浏览器环境`);
+    callback && callback(error);
+    const rejected = Promise.reject(error);
+    rejected.catch(() => {});
+    return rejected;
+  }
+  if (reload) {
+    document.querySelector(`link[href="${href}"]`)?.remove();
+    styleLoads.delete(href);
+  } else if (styleLoads.has(href)) {
+    const pending = styleLoads.get(href);
+    pending.then(
+      (l) => callback && callback(null, l),
+      (e) => callback && callback(e),
+    );
+    return pending;
+  } else {
+    const existingLink = document.querySelector(`link[href="${href}"]`);
+    if (existingLink) {
       callback && callback(null, existingLink);
       return false;
     }
-    existingLink.remove();
   }
   // 创建新的link标签并设置属性
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     const link = document.createElement("link");
     link.href = href;
     link.rel = "stylesheet";
     link.type = "text/css";
-    link.onload = () => {
-      resolve(link);
-      callback && callback(null, link);
-    };
+    link.onload = () => resolve(link);
     link.onerror = (error) => {
+      link.remove();
+      if (styleLoads.get(href) === promise) styleLoads.delete(href);
       reject(error);
-      callback && callback(error);
     };
     document.head.appendChild(link);
   });
+  styleLoads.set(href, promise);
+  promise.catch(() => {});
+  if (callback)
+    promise.then(
+      (l) => callback(null, l),
+      (e) => callback(e),
+    );
+  return promise;
+};
+
+// 始终排除的域名（含子域），这些域名的链接不走中转页
+const ALWAYS_EXCLUDE_DOMAINS = ["sgexilq.com", "sgexilq.top", "mrsksyrx.top", "20091010.xyz"];
+
+/**
+ * 判断链接是否应跳过中转（相对路径/同源、非 http(s) 协议，或命中始终排除的域名）
+ * @param {string} href
+ */
+const shouldSkipRedirect = (href) => {
+  try {
+    const url = new URL(href, "https://placeholder.local");
+    // 相对路径解析为 placeholder.local 即同源
+    if (url.origin === "https://placeholder.local") return true;
+    // 仅 http/https 走中转：javascript:/data: 等伪协议、mailto:/tel: 等应用协议
+    // 一律原样保留——包进中转页只会被 redirect.html 的协议白名单拦成死链
+    if (url.protocol !== "http:" && url.protocol !== "https:") return true;
+    return ALWAYS_EXCLUDE_DOMAINS.some((d) => url.hostname === d || url.hostname.endsWith("." + d));
+  } catch {
+    return true;
+  }
+};
+
+/**
+ * UTF-8 安全的 Base64 编码。
+ * 必须与 redirect.html 里的解码保持对称：那边是 atob + TextDecoder，
+ * 任一侧改回裸 btoa/atob 都会让非 Latin1 URL 变成乱码跳转。
+ * @param {string} str
+ */
+const toBase64 = (str) => {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
 };
 
 /**
@@ -109,23 +181,30 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
       const allLinks = [...document.getElementsByTagName("a")];
       if (allLinks?.length === 0) return false;
       allLinks.forEach((link) => {
-        // 检查链接是否包含 target="_blank" 属性
-        if (link.getAttribute("target") === "_blank") {
-          // 检查链接是否包含排除的类
-          if (excludeClass.some((className) => link.classList.contains(className))) {
-            return;
+        // 单条失败不拖垮整轮改造
+        try {
+          // 检查链接是否包含 target="_blank" 属性
+          if (link.getAttribute("target") === "_blank") {
+            // 检查链接是否包含排除的类
+            if (excludeClass.some((className) => link.classList.contains(className))) {
+              return;
+            }
+            const linkHref = link.getAttribute("href");
+            // 同源 / 白名单域名 / 非 http(s) 协议不走中转
+            if (linkHref && shouldSkipRedirect(linkHref)) return;
+            // 存在链接且非中转页
+            if (linkHref && !linkHref.includes(redirectPage)) {
+              // Base64
+              const encodedHref = toBase64(linkHref);
+              const redirectLink = `${redirectPage}#url=${encodedHref}`;
+              // 保存原始链接
+              link.setAttribute("original-href", linkHref);
+              // 覆盖 href
+              link.setAttribute("href", redirectLink);
+            }
           }
-          const linkHref = link.getAttribute("href");
-          // 存在链接且非中转页
-          if (linkHref && !linkHref.includes(redirectPage)) {
-            // Base64
-            const encodedHref = btoa(linkHref);
-            const redirectLink = `${redirectPage}#url=${encodedHref}`;
-            // 保存原始链接
-            link.setAttribute("original-href", linkHref);
-            // 覆盖 href
-            link.setAttribute("href", redirectLink);
-          }
+        } catch (error) {
+          console.error("处理单条链接时出错：", error);
         }
       });
     } else {
@@ -142,19 +221,12 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
         if (excludeClass.some((className) => classes.includes(className))) {
           return;
         }
-        // 同源链接不需要中转
-        if (href) {
-          try {
-            const linkUrl = new URL(href, "https://placeholder.local");
-            if (linkUrl.origin === "https://placeholder.local") return;
-          } catch {
-            return;
-          }
-        }
+        // 同源 / 白名单域名 / 非 http(s) 协议不走中转
+        if (href && shouldSkipRedirect(href)) return;
         // 存在链接且非中转页
         if (href && !href.includes(redirectPage)) {
           // Base64 编码 href
-          const encodedHref = Buffer.from(href, "utf-8").toString("base64");
+          const encodedHref = toBase64(href);
           // 获取所有属性（排除 href / original-href，稍后单独写入）
           const attributes = el.attribs;
           // 转义属性值中的 HTML 特殊字符

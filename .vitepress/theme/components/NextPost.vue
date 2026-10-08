@@ -24,7 +24,6 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
-import { generateId } from "@/utils/commonTools";
 import { usePostData } from "@/utils/usePostData.mjs";
 
 const router = useRouter();
@@ -41,10 +40,10 @@ const nextPostData = ref(null);
 
 // 获取文章
 const getNextPostData = () => {
-  const { filePath } = page.value;
-  if (!postData.value.length || !filePath) return false;
+  const { relativePath } = page.value;
+  if (!postData.value.length || !relativePath) return false;
   // 本篇索引
-  const postId = generateId(filePath);
+  const postId = relativePath;
   const postIndex = postData.value.findIndex((post) => post.id === postId);
   // 是否有下一篇
   if (postIndex >= 0 && postIndex < postData.value.length - 1) {

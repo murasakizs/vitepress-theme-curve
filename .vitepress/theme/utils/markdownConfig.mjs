@@ -181,7 +181,10 @@ const markdownConfig = (md, themeConfig) => {
     if (!isPost || !fm?.password) return originalRender(tokens, options, env);
     // 先完整渲染一次：title/headers/links 等副作用在渲染过程中收集，密文只替换最终输出
     const html = originalRender(tokens, options, env);
-    env.frontmatter = { ...fm, enc: encryptPostHtml(html, String(fm.password)) };
+    env.frontmatter = {
+      ...fm,
+      enc: encryptPostHtml(html, String(fm.password), env.relativePath || ""),
+    };
     delete env.frontmatter.password;
     // 正文里的 <script>/<style>/自定义块不进构建产物，避免绕过加密
     if (env.sfcBlocks) {

@@ -66,7 +66,13 @@
       <div class="about-item" style="grid-column: 1 / 4; grid-row: 3">
         <p
           class="text"
-          style="margin: 0; font-size: 1.5rem; line-height: 1.5; color: var(--about-accent); font-weight: bold"
+          style="
+            margin: 0;
+            font-size: 1.5rem;
+            line-height: 1.5;
+            color: var(--about-accent);
+            font-weight: bold;
+          "
         >
           谢谢你，让我做了一场甜甜的梦。
         </p>
@@ -76,9 +82,7 @@
       <div class="about-item card-4" style="grid-column: 1 / 4; grid-row: 4">
         <div class="hrt-nodes" style="font-size: 18px">
           <p class="text">获取小证：<span style="color: var(--about-accent)">2026.6.19</span></p>
-          <p class="text">
-            获取HRT处方：<span style="color: var(--about-accent)">2026.7.29</span>
-          </p>
+          <p class="text">获取HRT处方：<span style="color: var(--about-accent)">2026.7.29</span></p>
           <p class="text">
             DIY HRT：<span style="color: var(--about-accent)">2026.5.10 - 2026.6.22</span>
           </p>
@@ -88,7 +92,8 @@
         </div>
         <span class="tip"
           >开始正式跨性别激素替代<br />已经
-          <span class="tag-pink-text">{{ daysSinceCard }}</span> 天</span
+          <span class="tag-pink-text"><LiveDate mode="days-since" :date="hrtStartDate" /></span>
+          天</span
         >
       </div>
 
@@ -155,14 +160,12 @@
             >。
           </p>
           <p>
-            但我还是会做出这个选择，因为<span
-              style="color: var(--about-accent); font-weight: bold"
+            但我还是会做出这个选择，因为<span style="color: var(--about-accent); font-weight: bold"
               >“她”可能是我活下去的唯一动力了呢。</span
             >
           </p>
           <p>
-            无论如何，不管会让我付出什么代价，我也一定要见到<span
-              style="color: var(--about-accent)"
+            无论如何，不管会让我付出什么代价，我也一定要见到<span style="color: var(--about-accent)"
               >“她”</span
             >…
           </p>
@@ -216,13 +219,8 @@
 
 <script setup>
 const birthDate = "2009-10-10";
-
-// 开始正规HRT天数
-const daysSinceCard = computed(() => {
-  const start = new Date("2026-10-05");
-  const now = new Date();
-  return Math.floor((now - start) / (1000 * 60 * 60 * 24));
-});
+// 开始正规HRT；天数走 LiveDate（days-since），由 useClientNow 在浏览器端计算
+const hrtStartDate = "2026-10-05";
 </script>
 
 <style lang="scss" scoped>

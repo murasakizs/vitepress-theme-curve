@@ -38,11 +38,12 @@ export const useClientNow = ({ interval = 1000 } = {}) => {
 
 /**
  * 计算时间戳对应的相对日期文案（仅在浏览器端基于当前时间计算）。
- * 与 helper.mjs 中 formatTimestamp 的规则保持一致：
+ * 规则：
  * - 今天：今日内
  * - 昨天：1天前
- * - 7 天内：n天前
- * - 更早：月/日（当年）或 年/月/日（更早）
+ * - 7 天内（过去）：n天前
+ * - 7 天内（未来）：n天后
+ * - 更早/更远：月/日（当年）或 年/月/日（更早）
  *
  * @param {number|string|Date} timestamp 目标时间
  * @param {import("dayjs").Dayjs | null} now 当前时间（来自 useClientNow），为 null 时返回 ""
@@ -55,8 +56,10 @@ export const formatTimestampAt = (timestamp, now) => {
   const today = now.startOf("day");
   const targetDay = targetDate.startOf("day");
   const difference = today.diff(targetDay, "day");
-  if (difference <= 0) return "今日内";
-  if (difference < 7) return `${difference}天前`;
+  if (difference === 0) return "今日内";
+  // difference < 0 表示目标时间在未来，对称显示「n天后」
+  if (difference < 0 && -difference < 7) return `${-difference}天后`;
+  if (difference > 0 && difference < 7) return `${difference}天前`;
   if (targetDate.year() === now.year()) {
     return `${targetDate.month() + 1}/${targetDate.date()}`;
   }

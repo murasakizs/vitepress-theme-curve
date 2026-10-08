@@ -55,23 +55,23 @@ INFP-T｜双｜二次元｜音游｜百合｜术力口
 
 ## <span style="color: var(--main-color)">各种账号</span>
 
-QQ：<a href="https://qm.qq.com/q/q9GblP3JkY" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
+QQ：<a href="https://myat-qq.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
 
 邮箱：<a href="mailto:sgexilq@qq.com" target="_blank" style="color: var(--main-color)"><strong>sgexilq@qq.com</strong></a>
 
-Telegram：<a href="https://t.me/murasakizs" target="_blank" style="color: var(--main-color)"><strong>@murasakizs</strong></a>
+Telegram：<a href="https://myat-telegram.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>@murasakizs</strong></a>
 
-Twitter：<a href="https://x.com/mrsksyrx_xl" target="_blank" style="color: var(--main-color)"><strong>@mrsksyrx_xl</strong></a>
+Twitter：<a href="https://myat-twitter.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>@mrsksyrx_xl</strong></a>
 
-Github：<a href="https://github.com/murasakizs" target="_blank" style="color: var(--main-color)"><strong>@murasakizs</strong></a>
+Github：<a href="https://myat-github.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>@murasakizs</strong></a>
 
-Bilibili：<a href="https://space.bilibili.com/2118528077" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
+Bilibili：<a href="https://myat-bilibili.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
 
-网易云音乐：<a href="https://music.163.com/#/user?id=1931375930" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
+网易云音乐：<a href="https://myat-neteasecloudmusic.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
 
-Rednote：<a href="https://myat-h.sgexilq.com" target="_blank" style="color: var(--main-color)"><strong>mzsecy</strong></a>
+Rednote：<a href="https://myat-rednote.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>mzsecy</strong></a>
 
-STEAM：<a href="https://steamcommunity.com/id/SGeXiLQ/" target="_blank" style="color: var(--main-color)"><strong>泠酱</strong></a>
+STEAM：<a href="https://myat-steam.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>泠酱</strong></a>
 
 <hr style="border: none; border-bottom: 1px dashed var(--main-color-bg); height: 0; background: none; margin: 1.5rem 0" />
 

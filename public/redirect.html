@@ -187,6 +187,9 @@
       // 网址白名单
       const whitelist = [
         "*.sgexilq.com",
+        "*.sgexilq.top",
+        "*.20091010.xyz",
+        "*.mrsksyrx.top",
         "gitee.com",
         "github.com",
         "*.baidu.com",
@@ -233,8 +236,12 @@
           }
           // 修复 Base64 在 URL 传递时 + 被当成空格的问题
           encodedUrl = encodedUrl.replace(/ /g, "+");
-          // 解密 Base64
-          jumpLink = atob(encodedUrl);
+          // 解密 Base64（UTF-8 安全，与 commonTools.mjs 的 toBase64 对称；
+          // 裸 atob 会把 UTF-8 字节当 Latin1 解出来，中文/emoji 链接变乱码）
+          const binary = atob(encodedUrl);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+          jumpLink = new TextDecoder().decode(bytes);
           // 仅放行 http/https，阻断 javascript:/data: 等协议
           const parsed = new URL(jumpLink);
           if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {

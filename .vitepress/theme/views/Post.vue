@@ -199,9 +199,7 @@ const postMetaData = computed(() => {
     tags: normalizeList(frontmatter.value.tags),
     categories: normalizeList(frontmatter.value.categories),
     description: frontmatter.value.description,
-    regularPath: page.value.relativePath
-      ? `/${page.value.relativePath.replace(".md", ".html")}`
-      : "",
+    regularPath: page.value.relativePath ? `/${page.value.relativePath.replace(/\.md$/, "")}` : "",
     top: frontmatter.value.top,
     cover: frontmatter.value.cover,
   };

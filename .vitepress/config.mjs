@@ -192,7 +192,8 @@ export default withPwa(
               req.on("end", () => {
                 try {
                   const data = JSON.parse(body);
-                  // 输入格式白名单：只校验请求里出现过的键，不合规直接 400
+                  // 输入格式白名单：只允许已注册 validator 的键，不合规直接 400。
+                  // 新增写入字段必须在此注册白名单 validator，禁止跳过校验直接拼接进文件。
                   const validators = {
                     siteVersion: (v) => /^V?\d+(\.\d+)*$/.test(v),
                     siteVersionDate: (v) =>
@@ -206,7 +207,13 @@ export default withPwa(
                   };
                   for (const key of Object.keys(data)) {
                     const validate = validators[key];
-                    if (validate && !validate(data[key])) {
+                    if (!validate) {
+                      res.statusCode = 400;
+                      res.setHeader("Content-Type", "application/json");
+                      res.end(JSON.stringify({ ok: false, error: `未知字段 ${key}` }));
+                      return;
+                    }
+                    if (!validate(data[key])) {
                       res.statusCode = 400;
                       res.setHeader("Content-Type", "application/json");
                       res.end(JSON.stringify({ ok: false, error: `字段 ${key} 格式不合法` }));

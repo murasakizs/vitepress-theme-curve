@@ -32,6 +32,14 @@ module.exports = {
 
   overrides: [
     {
+      // TypeScript 文件需要 TS parser（api/、functions/ 下的 .ts）
+      files: ["**/*.ts"],
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        sourceType: "module",
+      },
+    },
+    {
       // 配置文件本身为 CommonJS
       files: [".eslintrc.{js,cjs}", "*.cjs"],
       env: {
@@ -52,6 +60,13 @@ module.exports = {
       ],
       env: {
         node: true,
+      },
+      rules: {
+        // 与现有代码风格冲突的 airbnb 规则（同 .vitepress 主体放宽项）
+        "no-plusplus": "off",
+        "no-await-in-loop": "off",
+        "no-continue": "off",
+        "import/prefer-default-export": "off",
       },
     },
     {

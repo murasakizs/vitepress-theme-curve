@@ -188,7 +188,7 @@ const shuffleGo = async () => {
 const goLink = (link) => {
   if (!link) return;
   if (/^https?:\/\//i.test(link)) {
-    window.open(link, "_blank", "noopener");
+    window.open(link, "_blank", "noopener,noreferrer");
     return;
   }
   router.go(link);

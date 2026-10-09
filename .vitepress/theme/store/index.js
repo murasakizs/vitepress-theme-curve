@@ -4,6 +4,8 @@ import { PERSIST_PATHS } from "@/utils/configKeys.mjs";
 import { lockBodyScroll, unlockBodyScroll } from "@/utils/commonTools.mjs";
 
 let appCursorInstance;
+// 定时切换明暗外观的 interval 句柄（不可序列化，不能放进 state，见下方注释）
+let scheduledThemeTimer = null;
 const isMobile =
   typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // 开发用版本号，每次改默认值时 +1，自动清除旧缓存
@@ -121,6 +123,7 @@ export const mainStore = defineStore("main", {
       lastScrollY: 0,
       // 站点背景
       backgroundType: "patterns",
+      // 第三方图片接口（非本站源），无 SRI 校验，内容与可用性由第三方控制，风险自担
       backgroundUrl: "https://api.miaomc.cn/image/get",
       // 显示更多设置
       showMoreSettings: false,
@@ -184,7 +187,7 @@ export const mainStore = defineStore("main", {
       scheduledThemeEnabled: false,
       scheduledLightTime: "07:00",
       scheduledDarkTime: "19:00",
-      scheduledThemeTimer: null,
+      // scheduledThemeTimer: null, // 句柄不可序列化，已移至模块级变量
       // 站点版本信息（运行时覆盖，用于关于本站页面）
       siteVersion: "V1.4",
       siteVersionDate: "2026.10.5",
@@ -421,13 +424,13 @@ export const mainStore = defineStore("main", {
       checkAndSwitch();
 
       // 每分钟检查一次
-      this.scheduledThemeTimer = setInterval(checkAndSwitch, 60000);
+      scheduledThemeTimer = setInterval(checkAndSwitch, 60000);
     },
 
     stopScheduledTheme() {
-      if (this.scheduledThemeTimer) {
-        clearInterval(this.scheduledThemeTimer);
-        this.scheduledThemeTimer = null;
+      if (scheduledThemeTimer) {
+        clearInterval(scheduledThemeTimer);
+        scheduledThemeTimer = null;
       }
     },
   },

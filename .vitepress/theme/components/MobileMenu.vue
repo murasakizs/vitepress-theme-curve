@@ -65,7 +65,7 @@
                   v-for="(item, tag, index) in tagsData"
                   :key="index"
                   class="link-child-btn"
-                  @click="pageJump(`/pages/tags/${tag}`)"
+                  @click="pageJump(`/pages/tags/${encodeURIComponent(tag)}`)"
                 >
                   <span class="name">{{ tag }}</span>
                   <sup class="num">{{ item.count }}</sup>
@@ -107,7 +107,7 @@ const pageJump = (url) => {
   store.changeShowStatus("mobileMenuShow");
   // 站外链接交给浏览器新开标签，router.go 会丢弃 origin 把用户送回站内
   if (/^https?:\/\//i.test(url)) {
-    window.open(url, "_blank", "noopener");
+    window.open(url, "_blank", "noopener,noreferrer");
     return;
   }
   router.go(url);

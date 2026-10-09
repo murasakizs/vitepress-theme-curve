@@ -7,7 +7,7 @@
           <a
             v-for="(item, index) in asArray(postMetaData.categories)"
             :key="index"
-            :href="`/pages/categories/${item}`"
+            :href="`/pages/categories/${encodeURIComponent(item)}`"
             class="cat-item"
           >
             <i class="iconfont icon-folder" />
@@ -18,7 +18,7 @@
           <a
             v-for="(item, index) in asArray(postMetaData.tags)"
             :key="index"
-            :href="`/pages/tags/${item}`"
+            :href="`/pages/tags/${encodeURIComponent(item)}`"
             class="tag-item"
           >
             <i class="iconfont icon-hashtag" />
@@ -109,7 +109,7 @@
             <a
               v-for="(item, index) in asArray(postMetaData.tags)"
               :key="index"
-              :href="`/pages/tags/${item}`"
+              :href="`/pages/tags/${encodeURIComponent(item)}`"
               class="tag-item"
             >
               <i class="iconfont icon-hashtag" />

@@ -70,7 +70,7 @@ import { ensureGlobalFontsLoaded } from "@/utils/fontLoader.mjs";
 // const screenWidth = ref(0);
 const route = useRoute();
 const store = mainStore();
-const { frontmatter, page, theme } = useData();
+const { frontmatter, page } = useData();
 const {
   loadingStatus,
   footerIsShow,
@@ -247,7 +247,6 @@ watch(
 
 onMounted(() => {
   initializeCursor();
-  console.log(frontmatter.value, page.value, theme.value);
   // 全站置灰
   specialDayGray();
   // 更改主题类别

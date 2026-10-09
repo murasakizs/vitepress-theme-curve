@@ -11,7 +11,7 @@
       <div class="data-item" v-for="(item, index) in list" :key="item.id">
         <span class="name">{{ index + 1 }}.</span>
         <span class="num">
-          <a :href="item.url" target="_blank" rel="noopener">
+          <a :href="item.url" target="_blank" rel="noopener noreferrer">
             {{ item.title }}
           </a>
         </span>

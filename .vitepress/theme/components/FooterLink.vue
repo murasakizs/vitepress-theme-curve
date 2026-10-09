@@ -12,6 +12,7 @@
         :key="index"
         :href="item.link"
         target="_blank"
+        rel="noopener noreferrer"
         class="social-link"
       >
         <img
@@ -30,6 +31,7 @@
         :key="index"
         :href="item.link"
         target="_blank"
+        rel="noopener noreferrer"
         class="social-link"
       >
         <img

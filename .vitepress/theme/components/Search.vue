@@ -46,7 +46,12 @@
           <div class="information">
             <span v-if="hasSearchValue" class="text"> 本次用时 {{ processingTimeMS }} 毫秒 </span>
           </div>
-          <a class="power" href="https://www.algolia.com/" target="_blank">
+          <a
+            class="power"
+            href="https://www.algolia.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <i class="iconfont icon-algolia" />
             <span class="name">Algolia</span>
           </a>

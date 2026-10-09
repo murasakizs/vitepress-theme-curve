@@ -95,6 +95,7 @@
               :href="`${isLink(clickedTypeData)}`"
               class="btn right-menu-link"
               target="_blank"
+              rel="noopener noreferrer"
             >
               <i class="iconfont icon-link"></i>
               <span class="name">在新标签页打开</span>
@@ -115,6 +116,7 @@
               :href="`https://cn.bing.com/search?q=${encodeURIComponent(clickedTypeData)}`"
               class="btn right-menu-link"
               target="_blank"
+              rel="noopener noreferrer"
             >
               <i class="iconfont icon-bing"></i>
               <span class="name">使用必应搜索</span>

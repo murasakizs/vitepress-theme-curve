@@ -47,7 +47,7 @@
               v-for="tag in asArray(item?.tags)"
               :key="tag"
               class="tags-name"
-              :href="`/pages/tags/${tag}`"
+              :href="`/pages/tags/${encodeURIComponent(tag)}`"
             >
               <i class="iconfont icon-hashtag" />
               {{ tag }}

@@ -190,6 +190,8 @@ const playSong = (idx) => {
 // 获取播放列表
 const getMusicListData = async () => {
   if (!enable) return false;
+  // url 缺失时 new URL(url) 会抛 TypeError，直接跳过
+  if (!url) return false;
 
   try {
     // 根据歌单来源决定使用哪个 ID
@@ -205,7 +207,7 @@ const getMusicListData = async () => {
     const fullList = musicList.map((song) => ({
       ...song,
       pic: song.cover,
-      url: new URL(song.url, apiOrigin).href,
+      url: song.url ? new URL(song.url, apiOrigin).href : undefined,
       lrc: song.lrc ? new URL(song.lrc, apiOrigin).href : undefined,
     }));
     allSongs.value = fullList;

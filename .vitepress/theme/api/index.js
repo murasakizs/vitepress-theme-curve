@@ -166,11 +166,42 @@ export const getWeatherOpenMeteo = async (lat, lon) => {
   return await res.json();
 };
 
-// 根据经纬度获取城市名（Open-Meteo 逆地理编码）
+// 根据经纬度获取城市名（Nominatim 逆地理编码）
+// 注意：Nominatim 要求标识调用方的 User-Agent，并限流 1 req/s（请勿高频轮询）；
+// 浏览器端 fetch 禁止覆盖 User-Agent（forbidden header），此处仅为非浏览器环境/文档意图保留。
+// Open-Meteo 的 /v1/search 不支持按经纬度逆地理（name= 为空时恒返回空 results），
+// 故改用 Nominatim。失败时返回 null，由调用方兜底（如 cityName || "北京"）。
 export const getCityByCoords = async (lat, lon) => {
-  const res = await fetch(
-    `https://geocoding-api.open-meteo.com/v1/search?name=&latitude=${lat}&longitude=${lon}&count=1&language=zh`,
-  );
-  const data = await res.json();
-  return data?.results?.[0]?.name || null;
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=zh`,
+      {
+        headers: {
+          "User-Agent": "vitepress-theme-curve/1.0 (blog weather widget; 1req/s)",
+        },
+      },
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data || data.error) return null;
+    // 优先取 address 中的城市级字段
+    const address = data.address || {};
+    const city =
+      address.city ||
+      address.town ||
+      address.village ||
+      address.municipality ||
+      address.county ||
+      address.state;
+    if (city) return city;
+    // 回退解析 display_name（形如「区, 市, 省, 国家」），取第一个区段
+    if (data.display_name) {
+      const first = String(data.display_name).split(",")[0]?.trim();
+      return first || null;
+    }
+    return null;
+  } catch (error) {
+    console.warn("逆地理编码失败：", error);
+    return null;
+  }
 };

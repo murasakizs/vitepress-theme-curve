@@ -2,7 +2,7 @@
   <div class="copyright s-card">
     <div class="title">
       <span class="post-name">{{ postData?.title || "未命名文章" }}</span>
-      <a :href="siteRoot + route.path" class="post-link" target="_blank">
+      <a :href="siteRoot + route.path" class="post-link" target="_blank" rel="noopener noreferrer">
         {{ siteRoot + route.path }}
       </a>
     </div>
@@ -25,6 +25,7 @@
           class="name"
           href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans"
           target="_blank"
+          rel="noopener noreferrer"
         >
           CC BY-NC-SA 4.0
         </a>

@@ -115,6 +115,8 @@ const text = computed(() => {
   }
 
   if (props.mode === "days-since") {
+    // days-since 语义固定为包含起点日（diff + 1），不随 includeStart 变化；
+    // includeStart 仅作用于 days-gap。调用方（如 AboutMe.vue）依赖此 +1 语义。
     const diff = current.startOf("day").diff(target.startOf("day"), "day");
     return diff >= 0 ? String(diff + 1) : "0";
   }

@@ -90,8 +90,8 @@ const changeLoading = (option = {}) => {
       }
       // 替换链接
       // jumpRedirect(null, true);
-      // 清除定时器
-      clearTimeout(loadingTimer);
+      // 定时器已触发，clearTimeout 无效；入口处已有正确清理
+      // clearTimeout(loadingTimer);
     },
     Math.floor(Math.random() * (800 - 260 + 1)) + 260,
   );

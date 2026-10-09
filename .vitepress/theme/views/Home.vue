@@ -16,9 +16,9 @@
           :useParams="showCategories || showTags ? true : false"
           :routePath="
             showCategories
-              ? `/pages/categories/${showCategories}`
+              ? `/pages/categories/${encodeURIComponent(showCategories)}`
               : showTags
-                ? `/pages/tags/${showTags}`
+                ? `/pages/tags/${encodeURIComponent(showTags)}`
                 : ''
           "
         />
@@ -69,8 +69,8 @@ const props = defineProps({
   },
 });
 
-// 每页文章数
-const postSize = theme.value.postSize;
+// 每页文章数（钳制下界与 page/[num].paths.mjs 一致：0 会让 totalPages 变 Infinity，NaN 会让分页失效）
+const postSize = Math.max(1, Number(theme.value.postSize) || 1);
 
 // 当前页数（分类 / 标签页使用 query 参数控制，需要手动保持响应式）
 const currentPage = ref(props.page || 1);

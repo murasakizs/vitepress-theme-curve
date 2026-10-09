@@ -146,7 +146,11 @@ class Cursor {
 
   setCursorColor(hexColor) {
     if (typeof window === "undefined" || !this.scr) return;
-    const encoded = hexColor.replace("#", "%23");
+    // 白名单校验：只接受 3-8 位十六进制色值，防止拼进 innerHTML 的 CSS 注入
+    if (typeof hexColor !== "string" || !/^#?[0-9a-fA-F]{3,8}$/.test(hexColor)) {
+      hexColor = "#e8558e";
+    }
+    const encoded = hexColor.replaceAll("#", "%23");
     this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='10px' height='10px'><circle cx='4' cy='4' r='4' fill='${encoded}' /></svg>") 4 4, auto !important}`;
   }
 

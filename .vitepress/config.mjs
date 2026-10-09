@@ -79,7 +79,7 @@ export default withPwa(
         "noscript",
         {},
         `<style>
-          .loading {
+          body > .loading {
             display: none !important;
           }
           .main-layout {
@@ -394,6 +394,8 @@ export default withPwa(
             },
           },
           // 文章页面 - 网络优先，离线回退缓存
+          // cleanUrls 模式下永不命中（URL 不带 .html 后缀），保留供 cleanUrls 关闭时使用
+          /*
           {
             urlPattern: ({ url, sameOrigin }) => sameOrigin && /\.html$/i.test(url.pathname),
             handler: "NetworkFirst",
@@ -406,6 +408,7 @@ export default withPwa(
               },
             },
           },
+          */
           // VitePress 生成的页面路由（cleanUrls 模式，排除根级带点文件）
           {
             urlPattern: ({ url, sameOrigin }) =>
@@ -466,10 +469,10 @@ export default withPwa(
               },
             },
           },
-          // JS 资源 - 缓存优先
+          // JS 资源 - 第三方无 hash JS 需要后台更新
           {
             urlPattern: /\.js$/i,
-            handler: "CacheFirst",
+            handler: "StaleWhileRevalidate",
             options: {
               cacheName: "js-cache",
               expiration: {

@@ -64,6 +64,7 @@ const fillComments = (data) => {
   if (!commentDom) return false;
   // 获取输入框
   const commentInput = commentDom.querySelector("textarea");
+  if (!commentInput) return false;
   // 写入内容
   commentInput.value = data + "\n\n";
   commentInput.focus();

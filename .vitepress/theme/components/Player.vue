@@ -370,9 +370,14 @@ const getMusicData = () => {
   try {
     if (!playerDom.value) return false;
     const songInfo = playerDom.value.querySelector(".aplayer-info");
-    const songName = songInfo.querySelector(".aplayer-title").innerText;
-    const songArtist = songInfo.querySelector(".aplayer-author").innerText.replace(" - ", "");
     const audio = player.value?.list?.audios?.[player.value.list.index];
+    // songInfo 可能为 null（播放器 DOM 未就绪/已销毁），回退到 list.audios 元数据
+    const songName = songInfo?.querySelector(".aplayer-title")?.innerText || audio?.name || "";
+    const songArtist = (
+      songInfo?.querySelector(".aplayer-author")?.innerText ||
+      audio?.artist ||
+      ""
+    ).replace(" - ", "");
     const songCover = allSongs.value[currentIdx.value]?.cover || "";
     const songLrc = allSongs.value[currentIdx.value]?.lrc || "";
     playerData.value = {
@@ -511,6 +516,9 @@ watch(
     currentLyrics.value = [];
     activeLyricIndex.value = -1;
     player.value?.destroy();
+    // 清理：destroy 后置空 player 并停止轮播定时器，避免悬空引用与残留 interval
+    player.value = null;
+    stopRotate();
     getMusicListData();
   },
 );
@@ -562,6 +570,9 @@ watch(
     musicSourceTimer = setTimeout(() => {
       if (playerMusicSource.value === "custom" && !playerCustomIds.value) return;
       player.value?.destroy();
+      // 清理：destroy 后置空 player 并停止轮播定时器，避免悬空引用与残留 interval
+      player.value = null;
+      stopRotate();
       allSongs.value = [];
       hasPlayed.value = false;
       playState.value = false;
@@ -578,6 +589,9 @@ watch(
     clearTimeout(musicSourceTimer);
     musicSourceTimer = setTimeout(() => {
       player.value?.destroy();
+      // 清理：destroy 后置空 player 并停止轮播定时器，避免悬空引用与残留 interval
+      player.value = null;
+      stopRotate();
       allSongs.value = [];
       hasPlayed.value = false;
       playState.value = false;
@@ -617,6 +631,8 @@ onBeforeUnmount(() => {
     autoPlayInteractionHandler = null;
   }
   player.value?.destroy();
+  // 清理：destroy 后置空 player（stopRotate 已在上方调用）
+  player.value = null;
 });
 </script>
 

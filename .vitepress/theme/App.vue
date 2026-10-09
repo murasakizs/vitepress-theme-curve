@@ -222,7 +222,7 @@ const changeSiteFont = async () => {
 
 // 监听设置变化
 watch(
-  () => [themeType.value, backgroundType.value],
+  () => [themeType.value, backgroundType.value, themeColor.value],
   () => changeSiteThemeType(),
 );
 watch(

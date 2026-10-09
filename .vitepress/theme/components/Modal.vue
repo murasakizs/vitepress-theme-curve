@@ -3,8 +3,9 @@
   <Teleport to="body">
     <Transition name="fade" mode="out-in">
       <div v-if="show" :class="['modal', { 'modal-wrapper-mobile': isMobileLayout }]">
-        <div class="modal-mask" @click.stop="maskClick" />
+        <div ref="modalMaskEl" class="modal-mask" @click.stop="maskClick" />
         <div
+          ref="modalMainEl"
           :style="{
             maxWidth: typeof maxWidth === 'string' ? maxWidth : `${maxWidth}px`,
           }"
@@ -30,7 +31,7 @@
             <i class="iconfont icon-left back" @click="modalClose" />
           </div>
           <!-- 弹窗内容 -->
-          <div class="modal-content" :style="{ '--height': maxHeight + 'vh' }">
+          <div ref="modalContentEl" class="modal-content" :style="{ '--height': maxHeight + 'vh' }">
             <slot />
           </div>
         </div>
@@ -81,6 +82,11 @@ const props = defineProps({
 // 发射事件
 const emit = defineEmits(["mask-click", "modal-close"]);
 
+// 模板 ref（多 Modal 并存时手势只作用于本实例）
+const modalContentEl = ref(null);
+const modalMainEl = ref(null);
+const modalMaskEl = ref(null);
+
 // 遮罩层事件
 const maskClick = () => emit("mask-click");
 const modalClose = () => emit("modal-close");
@@ -92,7 +98,7 @@ let isDragging = false;
 let startTime = 0;
 
 const onTouchStart = (e) => {
-  const modalContent = document.querySelector(".modal-content");
+  const modalContent = modalContentEl.value;
   if (modalContent && modalContent.scrollTop > 0) {
     isDragging = false;
     return;
@@ -106,7 +112,7 @@ const onTouchMove = (e) => {
   if (!isDragging) return;
   touchCurrentY = e.touches[0].clientY;
   const diff = Math.max(0, touchCurrentY - touchStartY);
-  const modalMain = document.querySelector(".modal-main");
+  const modalMain = modalMainEl.value;
   if (modalMain) {
     const progress = Math.min(diff / 300, 1);
     const scale = 1 - progress * 0.05;
@@ -114,7 +120,7 @@ const onTouchMove = (e) => {
     modalMain.style.transform = `translateY(${diff}px) scale(${scale})`;
     modalMain.style.transition = "none";
     modalMain.style.opacity = opacity;
-    const mask = document.querySelector(".modal-mask");
+    const mask = modalMaskEl.value;
     if (mask) {
       mask.style.opacity = opacity;
     }
@@ -126,8 +132,8 @@ const onTouchEnd = () => {
   const diff = touchCurrentY - touchStartY;
   const elapsed = Date.now() - startTime;
   const velocity = diff / elapsed;
-  const modalMain = document.querySelector(".modal-main");
-  const mask = document.querySelector(".modal-mask");
+  const modalMain = modalMainEl.value;
+  const mask = modalMaskEl.value;
   const shouldClose = diff > 80 || velocity > 0.5;
 
   if (shouldClose) {

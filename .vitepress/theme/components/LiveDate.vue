@@ -52,11 +52,16 @@ const parseLiveDate = (value) => {
     // 基准年只影响"今年之前"的部分，yearly 循环会把它加回到不早于今天，
     // 所以取当前年份可读性最好，也不影响最终结果。
     const base = now.value || dayjs();
+    // 先把日固定到 1 再设月份，避免基准日处于月末（如 31 号）时
+    // .month(month - 1) 在原生 Date 层进位到次月，导致合法日期落错月份。
     const parsed = base
       .startOf("day")
+      .date(1)
       .month(month - 1)
       .date(day)
       .startOf("day");
+    // 非法日期（如 02-30）会被 Date 层进位到下个月，这里按无效处理
+    if (parsed.month() !== month - 1 || parsed.date() !== day) return null;
     return parsed.isValid() ? parsed : null;
   }
   const parsed = dayjs(str);

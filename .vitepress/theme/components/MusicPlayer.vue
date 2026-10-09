@@ -371,7 +371,9 @@ const loadEmbeddedCover = async (src) => {
     const jsmediatags = jsmediatagsMod.default || jsmediatagsMod || window.jsmediatags;
     if (!jsmediatags || !jsmediatags.read) return;
 
-    jsmediatags.read(src, {
+    // jsmediatags 的 FileReader 匹配不到相对路径，统一转绝对路径再解析
+    const abs = new URL(src, location.href).href;
+    jsmediatags.read(abs, {
       onSuccess: (tag) => {
         const picture = tag.tags.picture;
         if (picture) {
@@ -383,7 +385,7 @@ const loadEmbeddedCover = async (src) => {
         }
       },
       onError: (error) => {
-        // ignore errors
+        console.warn("Failed to read embedded cover tags", error);
       },
     });
   } catch (err) {
@@ -631,9 +633,10 @@ const onEnded = () => {
 };
 
 const onProgress = () => {
-  if (audioRef.value && audioRef.value.buffered.length > 0) {
+  if (!audioRef.value || !duration.value) return;
+  if (audioRef.value.buffered.length > 0) {
     const buffered = audioRef.value.buffered.end(audioRef.value.buffered.length - 1);
-    bufferedPercent.value = (buffered / duration.value) * 100;
+    bufferedPercent.value = Math.min(100, Math.max(0, (buffered / duration.value) * 100));
   }
 };
 

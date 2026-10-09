@@ -72,6 +72,9 @@ const isHasUser = () => {
   try {
     ({ nick } = JSON.parse(userData) || {});
   } catch {
+    // [B30] 解析失败说明 ArtalkUser 已损坏，清理掉避免后续每次挂载都重复踩坑
+    localStorage.removeItem("ArtalkUser");
+    console.warn("[Hello] ArtalkUser 解析失败，已清除损坏数据");
     return false;
   }
   if (!nick) return false;

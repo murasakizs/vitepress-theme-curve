@@ -135,9 +135,10 @@ const openSettings = () => {
   }, 300);
 };
 
-onMounted(() => {
-  loadPostData();
-});
+// [B48-冗余] 与上方 onMounted 重复，loadPostData 幂等，注释掉
+// onMounted(() => {
+//   loadPostData();
+// });
 </script>
 
 <style lang="scss" scoped>

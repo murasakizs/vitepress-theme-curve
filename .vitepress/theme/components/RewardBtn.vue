@@ -1,7 +1,7 @@
 <!-- 打赏按钮 -->
 
 <template>
-  <div v-if="rewardData.enable" class="reward">
+  <div v-if="rewardData?.enable" class="reward">
     <div class="reward-btn" @click="rewardShow = true">
       <i class="iconfont icon-reward" />
       <span class="text">赞赏博主</span>

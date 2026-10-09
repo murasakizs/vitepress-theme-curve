@@ -431,10 +431,17 @@ const playerControl = (type) => {
 // 选中内容是否为链接
 const isLink = (data) => {
   if (!data) return false;
-  const hasProtocol = /^(http|https):\/\//i.test(data);
-  const urlData = hasProtocol ? data : `http://${data}`;
+  const text = data.trim();
+  if (!text) return false;
+  // 不再无条件补协议：原文本本身须形如 URL（已有协议 / www. 前缀，或裸域名含点分 TLD）
+  const hasProtocolOrWww = /^(https?:\/\/|www\.)\S+$/i.test(text);
+  const isBareDomain = /^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?([/?#]\S*)?$/i.test(text);
+  if (!hasProtocolOrWww && !isBareDomain) return false;
+  const urlData = /^https?:\/\//i.test(text) ? text : `http://${text}`;
   try {
-    new URL(urlData);
+    const url = new URL(urlData);
+    // 拒绝纯数字主机名（如 123.456、192.168.1.1）
+    if (/^\d+(\.\d+)+$/.test(url.hostname)) return false;
     return urlData;
   } catch (error) {
     return false;

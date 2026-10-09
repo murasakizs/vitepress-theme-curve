@@ -94,6 +94,8 @@ module.exports = {
         onUnmounted: "readonly",
         defineAsyncComponent: "readonly",
         getCurrentInstance: "readonly",
+        // Vite define 注入（config.mjs vite.define）
+        __GIT_COMMIT__: "readonly",
         // window.$xxx 运行时全局（Message.vue / Player.vue / Artalk.vue 挂载）
         $message: "readonly",
         $player: "readonly",

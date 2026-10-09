@@ -55,23 +55,23 @@ INFP-T｜双｜二次元｜音游｜百合｜术力口
 
 ## <span style="color: var(--main-color)">各种账号</span>
 
-QQ：<a href="https://myat-qq.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
+QQ：<a href="https://myat-qq.20091010.xyz" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
 
-邮箱：<a href="mailto:sgexilq@qq.com" target="_blank" style="color: var(--main-color)"><strong>sgexilq@qq.com</strong></a>
+邮箱：<a href="mailto:sgexilq@qq.com" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>sgexilq@qq.com</strong></a>
 
-Telegram：<a href="https://myat-telegram.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>@murasakizs</strong></a>
+Telegram：<a href="https://myat-telegram.20091010.xyz" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>@murasakizs</strong></a>
 
-Twitter：<a href="https://myat-twitter.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>@mrsksyrx_xl</strong></a>
+Twitter：<a href="https://myat-twitter.20091010.xyz" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>@mrsksyrx_xl</strong></a>
 
-Github：<a href="https://myat-github.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>@murasakizs</strong></a>
+Github：<a href="https://myat-github.20091010.xyz" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>@murasakizs</strong></a>
 
-Bilibili：<a href="https://myat-bilibili.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
+Bilibili：<a href="https://myat-bilibili.20091010.xyz" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
 
-网易云音乐：<a href="https://myat-neteasecloudmusic.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
+网易云音乐：<a href="https://myat-neteasecloudmusic.20091010.xyz" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>泠诗尘</strong></a>
 
-Rednote：<a href="https://myat-rednote.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>mzsecy</strong></a>
+Rednote：<a href="https://myat-rednote.20091010.xyz" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>mzsecy</strong></a>
 
-STEAM：<a href="https://myat-steam.20091010.xyz" target="_blank" style="color: var(--main-color)"><strong>泠酱</strong></a>
+STEAM：<a href="https://myat-steam.20091010.xyz" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>泠酱</strong></a>
 
 <hr style="border: none; border-bottom: 1px dashed var(--main-color-bg); height: 0; background: none; margin: 1.5rem 0" />
 
@@ -85,8 +85,8 @@ STEAM：<a href="https://myat-steam.20091010.xyz" target="_blank" style="color: 
 
 继续探索小站：<a href="/" style="color: var(--main-color)"><strong>sgexilq.com</strong></a>
 
-向我匿名提问！：<a href="https://ngl.sgexilq.com" target="_blank" style="color: var(--main-color)"><strong>NGL.Link</strong></a>（会在Twitter回复）
+向我匿名提问！：<a href="https://ngl.sgexilq.com" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>NGL.Link</strong></a>（会在Twitter回复）
 
 ::: tip Tips
-如果泥是通过卡片进入，可以使用 <a href="https://nfc.software/zh" target="_blank" style="color: var(--main-color)"><strong>NFC Tools</strong></a> 工具将其修改为泥想要的功能哦
+如果泥是通过卡片进入，可以使用 <a href="https://nfc.software/zh" target="_blank" rel="noopener noreferrer" style="color: var(--main-color)"><strong>NFC Tools</strong></a> 工具将其修改为泥想要的功能哦
 :::

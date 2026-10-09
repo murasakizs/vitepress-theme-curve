@@ -10,8 +10,15 @@ import Components from "unplugin-vue-components/vite";
 import path from "path";
 import fs from "fs-extra";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// 构建时注入的 Git 短哈希，页脚点击标题可查看
+let gitCommit = "unknown";
+try {
+  gitCommit = execSync("git rev-parse --short HEAD").toString().trim();
+} catch {}
 
 // 获取全局数据
 const postData = await getAllPosts();
@@ -165,6 +172,9 @@ export default withPwa(
     },
     // vite
     vite: {
+      define: {
+        __GIT_COMMIT__: JSON.stringify(gitCommit),
+      },
       plugins: [
         AutoImport({
           imports: ["vue", "vitepress"],
